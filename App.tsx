@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   StatusBar,
+  ScrollView,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,9 +21,10 @@ import { Task, FilterType } from './types';
 export default function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskText, setNewTaskText] = useState('');
-  const [filter, setFilter] = useState<FilterType>('priority');
+  const [filter, setFilter] = useState<FilterType>('completed');
   const [showTaskTypeModal, setShowTaskTypeModal] = useState(false);
   const [pendingTaskText, setPendingTaskText] = useState('');
+  const [showAllCategories, setShowAllCategories] = useState(true);
 
   useEffect(() => {
     loadTasks();
@@ -144,6 +146,10 @@ export default function App() {
   };
 
   const filteredTasks = tasks.filter(task => {
+    if (showAllCategories) {
+      // When showing all categories, only filter out completed tasks
+      return !task.completed;
+    }
     if (filter === 'completed') return task.completed;
     return !task.completed && task.category === filter;
   });
@@ -162,6 +168,45 @@ export default function App() {
       onDelete={deleteTask}
     />
   );
+
+  const renderAllCategoriesView = () => {
+    const categories: FilterType[] = ['priority', 'on', 'off'];
+    const tasksByCategory = categories.map(category => 
+      tasks.filter(task => !task.completed && task.category === category)
+    );
+
+    return (
+      <ScrollView style={styles.allCategoriesContainer} contentContainerStyle={styles.allCategoriesContent}>
+        <View style={styles.categoriesRow}>
+          {categories.map((category, index) => (
+            <View key={category} style={styles.categoryColumn}>
+              <View style={styles.categoryHeader}>
+                <Ionicons 
+                  name={category === 'priority' ? 'flag' : category === 'on' ? 'play' : 'pause'} 
+                  size={16} 
+                  color={category === 'priority' ? '#e74c3c' : category === 'on' ? '#3498db' : '#95a5a6'} 
+                />
+                <Text style={styles.categoryTitle}>
+                  {category === 'priority' ? 'Priority' : category === 'on' ? 'On' : 'Off'}
+                </Text>
+                <Text style={styles.categoryCount}>({tasksByCategory[index].length})</Text>
+              </View>
+              <View style={styles.categoryTasksContainer}>
+                {tasksByCategory[index].map(task => (
+                  <TaskItem
+                    key={task.id}
+                    task={task}
+                    onToggle={toggleTask}
+                    onDelete={deleteTask}
+                  />
+                ))}
+              </View>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+    );
+  };
 
   return (
     <KeyboardAvoidingView
@@ -192,72 +237,93 @@ export default function App() {
 
       {/* Filter Tabs */}
       <View style={styles.filterContainer}>
+        <View style={styles.filterTabsRow}>
+          <TouchableOpacity
+            style={[styles.filterTab, filter === 'priority' && styles.activeFilterTab]}
+            onPress={() => setFilter('priority')}
+          >
+            <Ionicons 
+              name="flag" 
+              size={16} 
+              color={filter === 'priority' ? 'white' : '#e74c3c'} 
+              style={styles.filterIcon}
+            />
+            <Text style={[styles.filterText, filter === 'priority' && styles.activeFilterText]}>
+              Priority ({getFilterCount('priority')})
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filterTab, filter === 'on' && styles.activeFilterTab]}
+            onPress={() => setFilter('on')}
+          >
+            <Ionicons 
+              name="play" 
+              size={16} 
+              color={filter === 'on' ? 'white' : '#3498db'} 
+              style={styles.filterIcon}
+            />
+            <Text style={[styles.filterText, filter === 'on' && styles.activeFilterText]}>
+              On ({getFilterCount('on')})
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filterTab, filter === 'off' && styles.activeFilterTab]}
+            onPress={() => setFilter('off')}
+          >
+            <Ionicons 
+              name="pause" 
+              size={16} 
+              color={filter === 'off' ? 'white' : '#95a5a6'} 
+              style={styles.filterIcon}
+            />
+            <Text style={[styles.filterText, filter === 'off' && styles.activeFilterText]}>
+              Off ({getFilterCount('off')})
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filterTab, filter === 'completed' && styles.activeFilterTab]}
+            onPress={() => setFilter('completed')}
+          >
+            <Ionicons 
+              name="checkmark-circle" 
+              size={16} 
+              color={filter === 'completed' ? 'white' : '#4CAF50'} 
+              style={styles.filterIcon}
+            />
+            <Text style={[styles.filterText, filter === 'completed' && styles.activeFilterText]}>
+              Done ({getFilterCount('completed')})
+            </Text>
+          </TouchableOpacity>
+        </View>
+        
+        {/* Show All Button */}
         <TouchableOpacity
-          style={[styles.filterTab, filter === 'priority' && styles.activeFilterTab]}
-          onPress={() => setFilter('priority')}
+          style={[styles.showAllButton, showAllCategories && styles.showAllButtonActive]}
+          onPress={() => setShowAllCategories(!showAllCategories)}
         >
           <Ionicons 
-            name="flag" 
+            name="grid" 
             size={16} 
-            color={filter === 'priority' ? 'white' : '#e74c3c'} 
-            style={styles.filterIcon}
+            color={showAllCategories ? 'white' : '#FF8C42'} 
           />
-          <Text style={[styles.filterText, filter === 'priority' && styles.activeFilterText]}>
-            Priority ({getFilterCount('priority')})
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filterTab, filter === 'on' && styles.activeFilterTab]}
-          onPress={() => setFilter('on')}
-        >
-          <Ionicons 
-            name="play" 
-            size={16} 
-            color={filter === 'on' ? 'white' : '#3498db'} 
-            style={styles.filterIcon}
-          />
-          <Text style={[styles.filterText, filter === 'on' && styles.activeFilterText]}>
-            On ({getFilterCount('on')})
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filterTab, filter === 'off' && styles.activeFilterTab]}
-          onPress={() => setFilter('off')}
-        >
-          <Ionicons 
-            name="pause" 
-            size={16} 
-            color={filter === 'off' ? 'white' : '#95a5a6'} 
-            style={styles.filterIcon}
-          />
-          <Text style={[styles.filterText, filter === 'off' && styles.activeFilterText]}>
-            Off ({getFilterCount('off')})
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filterTab, filter === 'completed' && styles.activeFilterTab]}
-          onPress={() => setFilter('completed')}
-        >
-          <Ionicons 
-            name="checkmark-circle" 
-            size={16} 
-            color={filter === 'completed' ? 'white' : '#4CAF50'} 
-            style={styles.filterIcon}
-          />
-          <Text style={[styles.filterText, filter === 'completed' && styles.activeFilterText]}>
-            Done ({getFilterCount('completed')})
+          <Text style={[styles.showAllText, showAllCategories && styles.showAllTextActive]}>
+            {showAllCategories ? 'Show Filtered' : 'Show All Categories'}
           </Text>
         </TouchableOpacity>
       </View>
 
-      {/* Tasks List */}
-      <FlatList
-        data={filteredTasks}
-        renderItem={renderTask}
-        keyExtractor={item => item.id}
-        style={styles.taskList}
-        showsVerticalScrollIndicator={false}
-      />
+      {/* Tasks List or All Categories View */}
+      {showAllCategories ? (
+        renderAllCategoriesView()
+      ) : (
+        <FlatList
+          data={filteredTasks}
+          renderItem={renderTask}
+          keyExtractor={item => item.id}
+          style={styles.taskList}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
 
       {/* Clear Completed Button */}
       {getFilterCount('completed') > 0 && (
@@ -331,14 +397,17 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   filterContainer: {
-    flexDirection: 'row',
     paddingHorizontal: 20,
     paddingVertical: 15,
     backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#e9ecef',
+  },
+  filterTabsRow: {
+    flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
+    marginBottom: 10,
   },
   filterTab: {
     flexDirection: 'row',
@@ -364,9 +433,69 @@ const styles = StyleSheet.create({
   filterIcon: {
     marginRight: 4,
   },
+  showAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 25,
+    backgroundColor: '#FF8C42',
+    alignSelf: 'center',
+    minWidth: 140,
+  },
+  showAllButtonActive: {
+    backgroundColor: '#e74c3c',
+  },
+  showAllText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '500',
+    marginLeft: 4,
+  },
+  showAllTextActive: {
+    color: 'white',
+  },
   taskList: {
     flex: 1,
     paddingHorizontal: 20,
+  },
+  allCategoriesContainer: {
+    flex: 1,
+  },
+  allCategoriesContent: {
+    paddingBottom: 20,
+  },
+  categoriesRow: {
+    flexDirection: Platform.OS === 'web' ? 'row' : 'column',
+    justifyContent: 'space-around',
+    marginBottom: 10,
+  },
+  categoryColumn: {
+    flex: Platform.OS === 'web' ? 1 : undefined,
+    marginHorizontal: Platform.OS === 'web' ? 5 : 0,
+    marginBottom: Platform.OS === 'web' ? 0 : 20,
+    minHeight: Platform.OS === 'web' ? undefined : 'auto',
+  },
+  categoryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    paddingHorizontal: Platform.OS === 'web' ? 10 : 20,
+  },
+  categoryTasksContainer: {
+    paddingHorizontal: Platform.OS === 'web' ? 10 : 20,
+  },
+  categoryTitle: {
+    fontSize: Platform.OS === 'web' ? 14 : 16,
+    fontWeight: 'bold',
+    color: '#34495e',
+    marginLeft: 5,
+  },
+  categoryCount: {
+    fontSize: Platform.OS === 'web' ? 12 : 14,
+    color: '#7f8c8d',
+    marginLeft: 5,
   },
   clearButton: {
     margin: 20,
