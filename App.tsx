@@ -14,12 +14,15 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { TaskItem } from './components/TaskItem';
+import { TaskTypeModal } from './components/TaskTypeModal';
 import { Task, FilterType } from './types';
 
 export default function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskText, setNewTaskText] = useState('');
-  const [filter, setFilter] = useState<FilterType>('all');
+  const [filter, setFilter] = useState<FilterType>('priority');
+  const [showTaskTypeModal, setShowTaskTypeModal] = useState(false);
+  const [pendingTaskText, setPendingTaskText] = useState('');
 
   useEffect(() => {
     loadTasks();
@@ -29,7 +32,13 @@ export default function App() {
     try {
       const storedTasks = await AsyncStorage.getItem('tasks');
       if (storedTasks) {
-        setTasks(JSON.parse(storedTasks));
+        const parsedTasks = JSON.parse(storedTasks);
+        // Add default color for existing tasks that don't have a color property
+        const tasksWithColor = parsedTasks.map((task: Task) => ({
+          ...task,
+          color: task.color || 'blue', // Default to blue for existing tasks
+        }));
+        setTasks(tasksWithColor);
       }
     } catch (error) {
       console.error('Error loading tasks:', error);
@@ -44,19 +53,28 @@ export default function App() {
     }
   };
 
-  const addTask = () => {
+  const handleAddTask = () => {
     if (newTaskText.trim()) {
-      const newTask: Task = {
-        id: Date.now().toString(),
-        text: newTaskText.trim(),
-        completed: false,
-        createdAt: Date.now(),
-      };
-      const updatedTasks = [...tasks, newTask];
-      setTasks(updatedTasks);
-      saveTasks(updatedTasks);
-      setNewTaskText('');
+      setPendingTaskText(newTaskText.trim());
+      setShowTaskTypeModal(true);
     }
+  };
+
+  const handleTaskTypeSelect = (category: 'priority' | 'on' | 'off', color: 'green' | 'pink' | 'blue' | 'brown') => {
+    const newTask: Task = {
+      id: Date.now().toString(),
+      text: pendingTaskText,
+      completed: false,
+      createdAt: Date.now(),
+      category,
+      color,
+    };
+    const updatedTasks = [...tasks, newTask];
+    setTasks(updatedTasks);
+    saveTasks(updatedTasks);
+    setNewTaskText('');
+    setPendingTaskText('');
+    setShowTaskTypeModal(false);
   };
 
   const toggleTask = (id: string) => {
@@ -68,51 +86,74 @@ export default function App() {
   };
 
   const deleteTask = (id: string) => {
-    Alert.alert(
-      'Delete Task',
-      'Are you sure you want to delete this task?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            const updatedTasks = tasks.filter(task => task.id !== id);
-            setTasks(updatedTasks);
-            saveTasks(updatedTasks);
+    if (Platform.OS === 'web') {
+      // For web, use browser's confirm dialog
+      if (window.confirm('Are you sure you want to delete this task?')) {
+        const updatedTasks = tasks.filter(task => task.id !== id);
+        setTasks(updatedTasks);
+        saveTasks(updatedTasks);
+      }
+    } else {
+      // For mobile, use React Native Alert
+      Alert.alert(
+        'Delete Task',
+        'Are you sure you want to delete this task?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: () => {
+              const updatedTasks = tasks.filter(task => task.id !== id);
+              setTasks(updatedTasks);
+              saveTasks(updatedTasks);
+            },
           },
-        },
-      ]
-    );
+        ]
+      );
+    }
   };
 
   const clearCompleted = () => {
-    Alert.alert(
-      'Clear Completed',
-      'Are you sure you want to clear all completed tasks?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Clear',
-          style: 'destructive',
-          onPress: () => {
-            const updatedTasks = tasks.filter(task => !task.completed);
-            setTasks(updatedTasks);
-            saveTasks(updatedTasks);
+    if (Platform.OS === 'web') {
+      // For web, use browser's confirm dialog
+      if (window.confirm('Are you sure you want to clear all completed tasks?')) {
+        const updatedTasks = tasks.filter(task => !task.completed);
+        setTasks(updatedTasks);
+        saveTasks(updatedTasks);
+      }
+    } else {
+      // For mobile, use React Native Alert
+      Alert.alert(
+        'Clear Completed',
+        'Are you sure you want to clear all completed tasks?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Clear',
+            style: 'destructive',
+            onPress: () => {
+              const updatedTasks = tasks.filter(task => !task.completed);
+              setTasks(updatedTasks);
+              saveTasks(updatedTasks);
+            },
           },
-        },
-      ]
-    );
+        ]
+      );
+    }
   };
 
   const filteredTasks = tasks.filter(task => {
-    if (filter === 'active') return !task.completed;
     if (filter === 'completed') return task.completed;
-    return true;
+    return !task.completed && task.category === filter;
   });
 
-  const completedCount = tasks.filter(task => task.completed).length;
-  const activeCount = tasks.filter(task => !task.completed).length;
+  const getFilterCount = (filterType: FilterType) => {
+    if (filterType === 'completed') {
+      return tasks.filter(task => task.completed).length;
+    }
+    return tasks.filter(task => !task.completed && task.category === filterType).length;
+  };
 
   const renderTask = ({ item }: { item: Task }) => (
     <TaskItem
@@ -141,10 +182,10 @@ export default function App() {
           placeholder="Add a new task..."
           value={newTaskText}
           onChangeText={setNewTaskText}
-          onSubmitEditing={addTask}
+          onSubmitEditing={handleAddTask}
           returnKeyType="done"
         />
-        <TouchableOpacity style={styles.addButton} onPress={addTask}>
+        <TouchableOpacity style={styles.addButton} onPress={handleAddTask}>
           <Ionicons name="add" size={24} color="white" />
         </TouchableOpacity>
       </View>
@@ -152,27 +193,59 @@ export default function App() {
       {/* Filter Tabs */}
       <View style={styles.filterContainer}>
         <TouchableOpacity
-          style={[styles.filterTab, filter === 'all' && styles.activeFilterTab]}
-          onPress={() => setFilter('all')}
+          style={[styles.filterTab, filter === 'priority' && styles.activeFilterTab]}
+          onPress={() => setFilter('priority')}
         >
-          <Text style={[styles.filterText, filter === 'all' && styles.activeFilterText]}>
-            All ({tasks.length})
+          <Ionicons 
+            name="flag" 
+            size={16} 
+            color={filter === 'priority' ? 'white' : '#e74c3c'} 
+            style={styles.filterIcon}
+          />
+          <Text style={[styles.filterText, filter === 'priority' && styles.activeFilterText]}>
+            Priority ({getFilterCount('priority')})
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.filterTab, filter === 'active' && styles.activeFilterTab]}
-          onPress={() => setFilter('active')}
+          style={[styles.filterTab, filter === 'on' && styles.activeFilterTab]}
+          onPress={() => setFilter('on')}
         >
-          <Text style={[styles.filterText, filter === 'active' && styles.activeFilterText]}>
-            Active ({activeCount})
+          <Ionicons 
+            name="play" 
+            size={16} 
+            color={filter === 'on' ? 'white' : '#3498db'} 
+            style={styles.filterIcon}
+          />
+          <Text style={[styles.filterText, filter === 'on' && styles.activeFilterText]}>
+            On ({getFilterCount('on')})
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.filterTab, filter === 'off' && styles.activeFilterTab]}
+          onPress={() => setFilter('off')}
+        >
+          <Ionicons 
+            name="pause" 
+            size={16} 
+            color={filter === 'off' ? 'white' : '#95a5a6'} 
+            style={styles.filterIcon}
+          />
+          <Text style={[styles.filterText, filter === 'off' && styles.activeFilterText]}>
+            Off ({getFilterCount('off')})
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.filterTab, filter === 'completed' && styles.activeFilterTab]}
           onPress={() => setFilter('completed')}
         >
+          <Ionicons 
+            name="checkmark-circle" 
+            size={16} 
+            color={filter === 'completed' ? 'white' : '#4CAF50'} 
+            style={styles.filterIcon}
+          />
           <Text style={[styles.filterText, filter === 'completed' && styles.activeFilterText]}>
-            Completed ({completedCount})
+            Done ({getFilterCount('completed')})
           </Text>
         </TouchableOpacity>
       </View>
@@ -187,11 +260,21 @@ export default function App() {
       />
 
       {/* Clear Completed Button */}
-      {completedCount > 0 && (
+      {getFilterCount('completed') > 0 && (
         <TouchableOpacity style={styles.clearButton} onPress={clearCompleted}>
           <Text style={styles.clearButtonText}>Clear Completed</Text>
         </TouchableOpacity>
       )}
+
+      {/* Task Type Modal */}
+      <TaskTypeModal
+        visible={showTaskTypeModal}
+        onClose={() => {
+          setShowTaskTypeModal(false);
+          setPendingTaskText('');
+        }}
+        onSelectType={handleTaskTypeSelect}
+      />
     </KeyboardAvoidingView>
   );
 }
@@ -254,23 +337,32 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#e9ecef',
+    flexWrap: 'wrap',
+    gap: 8,
   },
   filterTab: {
-    flex: 1,
-    paddingVertical: 8,
+    flexDirection: 'row',
     alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     borderRadius: 20,
+    minWidth: 80,
+    justifyContent: 'center',
   },
   activeFilterTab: {
     backgroundColor: '#FF8C42',
   },
   filterText: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#7f8c8d',
     fontWeight: '500',
+    marginLeft: 4,
   },
   activeFilterText: {
     color: 'white',
+  },
+  filterIcon: {
+    marginRight: 4,
   },
   taskList: {
     flex: 1,

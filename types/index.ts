@@ -3,6 +3,8 @@ export interface Task {
   text: string;
   completed: boolean;
   createdAt: number;
+  category: 'priority' | 'on' | 'off';
+  color: 'green' | 'pink' | 'blue' | 'brown';
 }
 
-export type FilterType = 'all' | 'active' | 'completed'; 
+export type FilterType = 'priority' | 'on' | 'off' | 'completed'; 
