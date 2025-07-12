@@ -24,7 +24,7 @@ export default function App() {
   const [filter, setFilter] = useState<FilterType>('completed');
   const [showTaskTypeModal, setShowTaskTypeModal] = useState(false);
   const [pendingTaskText, setPendingTaskText] = useState('');
-  const [showAllCategories, setShowAllCategories] = useState(true);
+  const [showFilter, setShowFilter] = useState(false);
 
   useEffect(() => {
     loadTasks();
@@ -146,8 +146,8 @@ export default function App() {
   };
 
   const filteredTasks = tasks.filter(task => {
-    if (showAllCategories) {
-      // When showing all categories, only filter out completed tasks
+    if (!showFilter) {
+      // When filter is hidden, show all non-completed tasks
       return !task.completed;
     }
     if (filter === 'completed') return task.completed;
@@ -235,85 +235,91 @@ export default function App() {
         </TouchableOpacity>
       </View>
 
-      {/* Filter Tabs */}
-      <View style={styles.filterContainer}>
-        <View style={styles.filterTabsRow}>
-          <TouchableOpacity
-            style={[styles.filterTab, filter === 'priority' && styles.activeFilterTab]}
-            onPress={() => setFilter('priority')}
-          >
-            <Ionicons 
-              name="flag" 
-              size={16} 
-              color={filter === 'priority' ? 'white' : '#e74c3c'} 
-              style={styles.filterIcon}
-            />
-            <Text style={[styles.filterText, filter === 'priority' && styles.activeFilterText]}>
-              Priority ({getFilterCount('priority')})
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.filterTab, filter === 'on' && styles.activeFilterTab]}
-            onPress={() => setFilter('on')}
-          >
-            <Ionicons 
-              name="play" 
-              size={16} 
-              color={filter === 'on' ? 'white' : '#3498db'} 
-              style={styles.filterIcon}
-            />
-            <Text style={[styles.filterText, filter === 'on' && styles.activeFilterText]}>
-              On ({getFilterCount('on')})
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.filterTab, filter === 'off' && styles.activeFilterTab]}
-            onPress={() => setFilter('off')}
-          >
-            <Ionicons 
-              name="pause" 
-              size={16} 
-              color={filter === 'off' ? 'white' : '#95a5a6'} 
-              style={styles.filterIcon}
-            />
-            <Text style={[styles.filterText, filter === 'off' && styles.activeFilterText]}>
-              Off ({getFilterCount('off')})
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.filterTab, filter === 'completed' && styles.activeFilterTab]}
-            onPress={() => setFilter('completed')}
-          >
-            <Ionicons 
-              name="checkmark-circle" 
-              size={16} 
-              color={filter === 'completed' ? 'white' : '#4CAF50'} 
-              style={styles.filterIcon}
-            />
-            <Text style={[styles.filterText, filter === 'completed' && styles.activeFilterText]}>
-              Done ({getFilterCount('completed')})
-            </Text>
-          </TouchableOpacity>
-        </View>
-        
-        {/* Show All Button */}
+      {/* Filter Toggle Button */}
+      <View style={styles.filterToggleContainer}>
         <TouchableOpacity
-          style={[styles.showAllButton, showAllCategories && styles.showAllButtonActive]}
-          onPress={() => setShowAllCategories(!showAllCategories)}
+          style={styles.filterToggleButton}
+          onPress={() => setShowFilter(!showFilter)}
         >
           <Ionicons 
-            name="grid" 
-            size={16} 
-            color={showAllCategories ? 'white' : '#FF8C42'} 
+            name={showFilter ? "chevron-up" : "chevron-down"} 
+            size={20} 
+            color="#FF8C42" 
           />
-          <Text style={[styles.showAllText, showAllCategories && styles.showAllTextActive]}>
-            {showAllCategories ? 'Show Filtered' : 'Show All Categories'}
+          <Text style={styles.filterToggleText}>
+            {showFilter ? 'Show All Categories' : 'Show Filtered'}
           </Text>
         </TouchableOpacity>
       </View>
 
+      {/* Filter Tabs */}
+      {showFilter && (
+        <View style={styles.filterContainer}>
+          <View style={styles.filterTabsRow}>
+            <TouchableOpacity
+              style={[styles.filterTab, filter === 'priority' && styles.activeFilterTab]}
+              onPress={() => setFilter('priority')}
+            >
+              <Ionicons 
+                name="flag" 
+                size={16} 
+                color={filter === 'priority' ? 'white' : '#e74c3c'} 
+                style={styles.filterIcon}
+              />
+              <Text style={[styles.filterText, filter === 'priority' && styles.activeFilterText]}>
+                Priority ({getFilterCount('priority')})
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.filterTab, filter === 'on' && styles.activeFilterTab]}
+              onPress={() => setFilter('on')}
+            >
+              <Ionicons 
+                name="play" 
+                size={16} 
+                color={filter === 'on' ? 'white' : '#3498db'} 
+                style={styles.filterIcon}
+              />
+              <Text style={[styles.filterText, filter === 'on' && styles.activeFilterText]}>
+                On ({getFilterCount('on')})
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.filterTab, filter === 'off' && styles.activeFilterTab]}
+              onPress={() => setFilter('off')}
+            >
+              <Ionicons 
+                name="pause" 
+                size={16} 
+                color={filter === 'off' ? 'white' : '#95a5a6'} 
+                style={styles.filterIcon}
+              />
+              <Text style={[styles.filterText, filter === 'off' && styles.activeFilterText]}>
+                Off ({getFilterCount('off')})
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.filterTab, filter === 'completed' && styles.activeFilterTab]}
+              onPress={() => setFilter('completed')}
+            >
+              <Ionicons 
+                name="checkmark-circle" 
+                size={16} 
+                color={filter === 'completed' ? 'white' : '#4CAF50'} 
+                style={styles.filterIcon}
+              />
+              <Text style={[styles.filterText, filter === 'completed' && styles.activeFilterText]}>
+                Done ({getFilterCount('completed')})
+              </Text>
+            </TouchableOpacity>
+          </View>
+          
+
+        </View>
+      )}
+
       {/* Tasks List or All Categories View */}
-      {showAllCategories ? (
+      {!showFilter ? (
         renderAllCategoriesView()
       ) : (
         <FlatList
@@ -326,7 +332,7 @@ export default function App() {
       )}
 
       {/* Clear Completed Button */}
-      {getFilterCount('completed') > 0 && (
+      {showFilter && filter === 'completed' && getFilterCount('completed') > 0 && (
         <TouchableOpacity style={styles.clearButton} onPress={clearCompleted}>
           <Text style={styles.clearButtonText}>Clear Completed</Text>
         </TouchableOpacity>
@@ -351,17 +357,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
   },
   header: {
-    paddingTop: 60,
-    paddingBottom: 20,
-    paddingHorizontal: 20,
-    backgroundColor: 'white',
+    ...(Platform.OS === 'web' ? {
+      height: 100,
+      paddingHorizontal: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+    } : {
+      paddingTop: 40,
+      paddingBottom: 15,
+      paddingHorizontal: 20,
+    }),
+    backgroundColor: '#FF8C42',
     borderBottomWidth: 1,
     borderBottomColor: '#e9ecef',
   },
   title: {
-    fontSize: 32,
+    fontSize: Platform.OS === 'web' ? 48 : 32,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: 'white',
     textAlign: 'center',
   },
   subtitle: {
@@ -395,6 +408,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 10,
+  },
+  filterToggleContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+  },
+  filterToggleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    backgroundColor: '#f8f9fa',
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    alignSelf: 'center',
+  },
+  filterToggleText: {
+    color: '#FF8C42',
+    fontSize: 14,
+    fontWeight: '500',
+    marginLeft: 8,
   },
   filterContainer: {
     paddingHorizontal: 20,
@@ -432,29 +470,6 @@ const styles = StyleSheet.create({
   },
   filterIcon: {
     marginRight: 4,
-  },
-  showAllButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 25,
-    backgroundColor: '#FF8C42',
-    alignSelf: 'center',
-    minWidth: 140,
-  },
-  showAllButtonActive: {
-    backgroundColor: '#e74c3c',
-  },
-  showAllText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '500',
-    marginLeft: 4,
-  },
-  showAllTextActive: {
-    color: 'white',
   },
   taskList: {
     flex: 1,
