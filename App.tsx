@@ -11,12 +11,14 @@ import {
   Platform,
   StatusBar,
   ScrollView,
+  RefreshControl, // <-- Add this import
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { TaskItem } from './components/TaskItem';
 import { TaskTypeModal } from './components/TaskTypeModal';
 import { Task, FilterType } from './types';
+import { fetchTasks, createTask, updateTask, deleteTask as apiDeleteTask } from './api';
 
 export default function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -25,6 +27,7 @@ export default function App() {
   const [showTaskTypeModal, setShowTaskTypeModal] = useState(false);
   const [pendingTaskText, setPendingTaskText] = useState('');
   const [showFilter, setShowFilter] = useState(false);
+  const [refreshing, setRefreshing] = useState(false); // <-- Add this line
 
   useEffect(() => {
     loadTasks();
@@ -32,26 +35,30 @@ export default function App() {
 
   const loadTasks = async () => {
     try {
+      // Try to fetch from API
+      const apiTasks = await fetchTasks();
+      setTasks(apiTasks);
+      await AsyncStorage.setItem('tasks', JSON.stringify(apiTasks));
+    } catch (error) {
+      // If API fails, load from cache
+      console.error('Error fetching from API, loading from cache:', error);
       const storedTasks = await AsyncStorage.getItem('tasks');
       if (storedTasks) {
         const parsedTasks = JSON.parse(storedTasks);
-        // Add default color for existing tasks that don't have a color property
         const tasksWithColor = parsedTasks.map((task: Task) => ({
           ...task,
-          color: task.color || 'blue', // Default to blue for existing tasks
+          color: task.color || 'blue',
         }));
         setTasks(tasksWithColor);
       }
-    } catch (error) {
-      console.error('Error loading tasks:', error);
     }
   };
 
-  const saveTasks = async (newTasks: Task[]) => {
+  const saveTasksToCache = async (newTasks: Task[]) => {
     try {
       await AsyncStorage.setItem('tasks', JSON.stringify(newTasks));
     } catch (error) {
-      console.error('Error saving tasks:', error);
+      console.error('Error saving tasks to cache:', error);
     }
   };
 
@@ -62,84 +69,91 @@ export default function App() {
     }
   };
 
-  const handleTaskTypeSelect = (category: 'priority' | 'on' | 'off', color: 'green' | 'pink' | 'blue' | 'brown') => {
-    const newTask: Task = {
-      id: Date.now().toString(),
+  const handleTaskTypeSelect = async (category: 'priority' | 'on' | 'off', color: 'green' | 'pink' | 'blue' | 'brown') => {
+    const newTask = {
       text: pendingTaskText,
       completed: false,
       createdAt: Date.now(),
       category,
       color,
     };
-    const updatedTasks = [...tasks, newTask];
-    setTasks(updatedTasks);
-    saveTasks(updatedTasks);
+    try {
+      const created = await createTask(newTask);
+      const updatedTasks = [...tasks, created];
+      setTasks(updatedTasks);
+      saveTasksToCache(updatedTasks);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to create task.');
+    }
     setNewTaskText('');
     setPendingTaskText('');
     setShowTaskTypeModal(false);
   };
 
-  const toggleTask = (id: string) => {
-    const updatedTasks = tasks.map(task =>
-      task.id === id ? { ...task, completed: !task.completed } : task
-    );
-    setTasks(updatedTasks);
-    saveTasks(updatedTasks);
+  const toggleTask = async (id: string) => {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+    const updatedTask = { ...task, completed: !task.completed };
+    try {
+      const apiTask = await updateTask(updatedTask);
+      const updatedTasks = tasks.map(t => t.id === id ? apiTask : t);
+      setTasks(updatedTasks);
+      saveTasksToCache(updatedTasks);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to update task.');
+    }
   };
 
   const deleteTask = (id: string) => {
-    if (Platform.OS === 'web') {
-      // For web, use browser's confirm dialog
-      if (window.confirm('Are you sure you want to delete this task?')) {
+    const doDelete = async () => {
+      try {
+        await apiDeleteTask(id);
         const updatedTasks = tasks.filter(task => task.id !== id);
         setTasks(updatedTasks);
-        saveTasks(updatedTasks);
+        saveTasksToCache(updatedTasks);
+      } catch (error) {
+        Alert.alert('Error', 'Failed to delete task.');
+      }
+    };
+    if (Platform.OS === 'web') {
+      if (window.confirm('Are you sure you want to delete this task?')) {
+        doDelete();
       }
     } else {
-      // For mobile, use React Native Alert
       Alert.alert(
         'Delete Task',
         'Are you sure you want to delete this task?',
         [
           { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Delete',
-            style: 'destructive',
-            onPress: () => {
-              const updatedTasks = tasks.filter(task => task.id !== id);
-              setTasks(updatedTasks);
-              saveTasks(updatedTasks);
-            },
-          },
+          { text: 'Delete', style: 'destructive', onPress: doDelete },
         ]
       );
     }
   };
 
   const clearCompleted = () => {
-    if (Platform.OS === 'web') {
-      // For web, use browser's confirm dialog
-      if (window.confirm('Are you sure you want to clear all completed tasks?')) {
+    const doClear = async () => {
+      const completedTasks = tasks.filter(task => task.completed);
+      try {
+        await Promise.all(completedTasks.map(task => apiDeleteTask(task.id)));
         const updatedTasks = tasks.filter(task => !task.completed);
         setTasks(updatedTasks);
-        saveTasks(updatedTasks);
+        saveTasksToCache(updatedTasks);
+      } catch (error) {
+        Alert.alert('Error', 'Failed to clear completed tasks.');
+      }
+    };
+    if (Platform.OS === 'web') {
+      if (window.confirm('Are you sure you want to clear all completed tasks?')) {
+        doClear();
       }
     } else {
-      // For mobile, use React Native Alert
       Alert.alert(
         'Clear Completed',
         'Are you sure you want to clear all completed tasks?',
         [
           { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Clear',
-            style: 'destructive',
-            onPress: () => {
-              const updatedTasks = tasks.filter(task => !task.completed);
-              setTasks(updatedTasks);
-              saveTasks(updatedTasks);
-            },
-          },
+          { text: 'Clear', style: 'destructive', onPress: doClear },
         ]
       );
     }
@@ -176,7 +190,17 @@ export default function App() {
     );
 
     return (
-      <ScrollView style={styles.allCategoriesContainer} contentContainerStyle={styles.allCategoriesContent}>
+      <ScrollView
+        style={styles.allCategoriesContainer}
+        contentContainerStyle={styles.allCategoriesContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#FF8C42"]}
+          />
+        }
+      >
         <View style={styles.categoriesRow}>
           {categories.map((category, index) => (
             <View key={category} style={styles.categoryColumn}>
@@ -206,6 +230,13 @@ export default function App() {
         </View>
       </ScrollView>
     );
+  };
+
+  // Add onRefresh handler for pull-to-refresh
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadTasks();
+    setRefreshing(false);
   };
 
   return (
@@ -328,6 +359,8 @@ export default function App() {
           keyExtractor={item => item.id}
           style={styles.taskList}
           showsVerticalScrollIndicator={false}
+          refreshing={refreshing} // <-- Add this line
+          onRefresh={onRefresh}   // <-- Add this line
         />
       )}
 
