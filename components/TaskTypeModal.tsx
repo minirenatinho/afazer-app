@@ -13,7 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 interface TaskTypeModalProps {
   visible: boolean;
   onClose: () => void;
-  onSelectType: (type: 'priority' | 'on' | 'off', color: 'green' | 'pink' | 'blue' | 'brown') => void;
+  onSelectType: (type: 'priority' | 'on' | 'pay' | 'off', color: 'green' | 'pink' | 'blue' | 'brown') => void;
 }
 
 const { width } = Dimensions.get('window');
