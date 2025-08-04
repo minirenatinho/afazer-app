@@ -27,7 +27,13 @@ export default function App() {
   const [showTaskTypeModal, setShowTaskTypeModal] = useState(false);
   const [pendingTaskText, setPendingTaskText] = useState('');
   const [showFilter, setShowFilter] = useState(false);
-  const [refreshing, setRefreshing] = useState(false); // <-- Add this line
+  const [refreshing, setRefreshing] = useState(false);
+  // State to control visibility of each category column
+  const [categoryVisibility, setCategoryVisibility] = useState({
+    priority: true,
+    on: true,
+    off: true,
+  });
 
   useEffect(() => {
     loadTasks();
@@ -199,10 +205,19 @@ export default function App() {
   );
 
   const renderAllCategoriesView = () => {
-    const categories: FilterType[] = ['priority', 'on', 'off'];
+    // Only use categories that are valid for visibility toggling
+    const categories: Array<'priority' | 'on' | 'off'> = ['priority', 'on', 'off'];
     const tasksByCategory = categories.map(category => 
       tasks.filter(task => !task.completed && task.category === category)
     );
+
+    // Handler to toggle visibility of a category column
+    const handleToggleCategoryVisibility = (category: FilterType) => {
+      setCategoryVisibility(prev => ({
+        ...prev,
+        [category]: !prev[category as 'priority' | 'on' | 'off'],
+      }));
+    };
 
     return (
       <ScrollView
@@ -222,10 +237,15 @@ export default function App() {
               styles.categoryColumn,
               category === 'off' && styles.offCategoryColumn
             ]}>
-              <View style={[
-                styles.categoryHeader,
-                category === 'off' && styles.offCategoryHeader
-              ]}>
+              {/* Touchable title to toggle visibility */}
+              <TouchableOpacity
+                style={[
+                  styles.categoryHeader,
+                  category === 'off' && styles.offCategoryHeader
+                ]}
+                onPress={() => handleToggleCategoryVisibility(category)}
+                activeOpacity={0.7}
+              >
                 <Ionicons 
                   name={category === 'priority' ? 'flag' : category === 'on' ? 'play' : 'pause'}
                   size={16} 
@@ -243,18 +263,27 @@ export default function App() {
                 ]}>
                   ({tasksByCategory[index].length})
                 </Text>
-              </View>
-              <View style={styles.categoryTasksContainer}>
-                {tasksByCategory[index].map(task => (
-                  <TaskItem
-                    key={task.id}
-                    task={task}
-                    onToggle={toggleTask}
-                    onDelete={deleteTask}
-                    onUpdateCategory={handleUpdateCategory}
-                  />
-                ))}
-              </View>
+              <Ionicons
+                name={categoryVisibility[category as 'priority' | 'on' | 'off'] ? 'eye' : 'eye-off'}
+                size={16}
+                color="#FF8C42"
+                style={{ marginLeft: 8 }}
+              />
+              </TouchableOpacity>
+              {/* Only show tasks if visible */}
+              {categoryVisibility[category as 'priority' | 'on' | 'off'] && (
+                <View style={styles.categoryTasksContainer}>
+                  {tasksByCategory[index].map(task => (
+                    <TaskItem
+                      key={task.id}
+                      task={task}
+                      onToggle={toggleTask}
+                      onDelete={deleteTask}
+                      onUpdateCategory={handleUpdateCategory}
+                    />
+                  ))}
+                </View>
+              )}
             </View>
           ))}
         </View>
