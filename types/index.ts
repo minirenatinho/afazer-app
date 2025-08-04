@@ -1,4 +1,4 @@
-export type TaskCategory = 'priority' | 'on' | 'off';
+export type TaskCategory = 'priority' | 'on' | 'off' | 'pay';
 export type TaskColor = 'green' | 'pink' | 'blue' | 'brown';
 
 export interface Task {
@@ -10,4 +10,4 @@ export interface Task {
   color: TaskColor;
 }
 
-export type FilterType = 'priority' | 'on' | 'off' | 'completed'; 
+export type FilterType = 'priority' | 'on' | 'off' | 'pay' | 'completed'; 

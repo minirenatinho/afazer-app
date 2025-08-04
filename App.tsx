@@ -32,7 +32,8 @@ export default function App() {
   const [categoryVisibility, setCategoryVisibility] = useState({
     priority: true,
     on: true,
-    off: true,
+    pay: true,
+    off: false, // 'off' column hidden by default
   });
 
   useEffect(() => {
@@ -75,7 +76,7 @@ export default function App() {
     }
   };
 
-  const handleTaskTypeSelect = async (category: 'priority' | 'on' | 'off', color: 'green' | 'pink' | 'blue' | 'brown') => {
+  const handleTaskTypeSelect = async (category: 'priority' | 'on' | 'off' | 'pay', color: 'green' | 'pink' | 'blue' | 'brown') => {
     const newTask = {
       text: pendingTaskText,
       completed: false,
@@ -206,7 +207,7 @@ export default function App() {
 
   const renderAllCategoriesView = () => {
     // Only use categories that are valid for visibility toggling
-    const categories: Array<'priority' | 'on' | 'off'> = ['priority', 'on', 'off'];
+    const categories: Array<'priority' | 'on' | 'pay' | 'off'> = ['priority', 'on', 'pay', 'off']; // 'off' last
     const tasksByCategory = categories.map(category => 
       tasks.filter(task => !task.completed && task.category === category)
     );
@@ -215,7 +216,7 @@ export default function App() {
     const handleToggleCategoryVisibility = (category: FilterType) => {
       setCategoryVisibility(prev => ({
         ...prev,
-        [category]: !prev[category as 'priority' | 'on' | 'off'],
+        [category]: !prev[category as 'priority' | 'on' | 'off' | 'pay'],
       }));
     };
 
@@ -247,9 +248,9 @@ export default function App() {
                 activeOpacity={0.7}
               >
                 <Ionicons 
-                  name={category === 'priority' ? 'flag' : category === 'on' ? 'play' : 'pause'}
+                  name={category === 'priority' ? 'flag' : category === 'on' ? 'play' : category === 'off' ? 'pause' : 'card'}
                   size={16} 
-                  color={category === 'priority' ? '#e74c3c' : category === 'on' ? '#3498db' : '#95a5a6'}
+                  color={category === 'priority' ? '#e74c3c' : category === 'on' ? '#3498db' : category === 'off' ? '#95a5a6' : '#f1c40f'}
                 />
                 <Text style={[
                   styles.categoryTitle,
@@ -263,15 +264,15 @@ export default function App() {
                 ]}>
                   ({tasksByCategory[index].length})
                 </Text>
-              <Ionicons
-                name={categoryVisibility[category as 'priority' | 'on' | 'off'] ? 'eye' : 'eye-off'}
-                size={16}
-                color="#FF8C42"
-                style={{ marginLeft: 8 }}
-              />
+                <Ionicons
+                  name={categoryVisibility[category as 'priority' | 'on' | 'off' | 'pay'] ? 'eye' : 'eye-off'}
+                  size={16}
+                  color="#FF8C42"
+                  style={{ marginLeft: 8 }}
+                />
               </TouchableOpacity>
               {/* Only show tasks if visible */}
-              {categoryVisibility[category as 'priority' | 'on' | 'off'] && (
+              {categoryVisibility[category as 'priority' | 'on' | 'off' | 'pay'] && (
                 <View style={styles.categoryTasksContainer}>
                   {tasksByCategory[index].map(task => (
                     <TaskItem
@@ -594,10 +595,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: Platform.OS === 'web' ? 10 : 20,
   },
   categoryTitle: {
-    fontSize: Platform.OS === 'web' ? 14 : 16,
-    fontWeight: 'bold',
+    fontSize: Platform.OS === 'web' ? 20 : 24,
+    fontWeight: '900',
     color: '#34495e',
-    marginLeft: 5,
+    marginLeft: 8,
   },
   categoryCount: {
     fontSize: Platform.OS === 'web' ? 12 : 14,

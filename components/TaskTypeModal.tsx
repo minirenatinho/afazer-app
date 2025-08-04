@@ -23,7 +23,7 @@ export const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
   onClose,
   onSelectType,
 }) => {
-  const [selectedCategory, setSelectedCategory] = useState<'priority' | 'on' | 'off' | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<'priority' | 'on' | 'off' | 'pay' | null>(null);
   const [step, setStep] = useState<'category' | 'color'>('category');
 
   const taskTypes = [
@@ -47,6 +47,13 @@ export const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
       description: 'Tasks that are planned but not started',
       icon: 'pause',
       color: '#95a5a6',
+    },
+    {
+      type: 'pay' as const,
+      title: 'Pay',
+      description: 'Tasks related to payments or bills',
+      icon: 'card',
+      color: '#f1c40f',
     },
   ];
 
@@ -77,7 +84,7 @@ export const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
     },
   ];
 
-  const handleCategorySelect = (category: 'priority' | 'on' | 'off') => {
+  const handleCategorySelect = (category: 'priority' | 'on' | 'off' | 'pay') => {
     setSelectedCategory(category);
     setStep('color');
   };
