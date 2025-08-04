@@ -3,7 +3,7 @@ import { Task } from './types';
 import Constants from 'expo-constants';
 
 // Get the API URL from app.config.js
-const API_BASE = Constants.expoConfig?.extra?.apiUrl || 'http://192.168.1.14:8000/api/v1/tasks/';
+const API_BASE = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:8000/api/v1/tasks/';
 
 export async function fetchTasks(): Promise<Task[]> {
   const res = await fetch(API_BASE);

@@ -9,11 +9,7 @@ module.exports = ({ config }) => {
       eas: {
         projectId: "6c1a19bd-1c52-4b85-b95b-ef07cdf67aad"
       },
-      apiUrl: isProd 
-        ? 'http://localhost:8000/api/v1/tasks/'
-        : 'http://localhost:8000/api/v1/tasks/',
-//        : 'https://afazer-backend.onrender.com/api/v1/tasks/',
-
+      apiUrl: 'http://192.168.1.14:8000/api/v1/tasks/'
     },
   };
 };
