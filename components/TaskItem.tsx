@@ -26,6 +26,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
         return { icon: 'play', color: '#3498db', label: 'On' };
       case 'off':
         return { icon: 'pause', color: '#95a5a680', label: 'Off' };
+      case 'pay':
+        return { icon: 'card', color: '#f1c40f', label: 'Pay' };
       default:
         return { icon: 'ellipse', color: '#95a5a6', label: 'Task' };
     }

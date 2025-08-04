@@ -9,7 +9,7 @@ module.exports = ({ config }) => {
       eas: {
         projectId: "6c1a19bd-1c52-4b85-b95b-ef07cdf67aad"
       },
-      apiUrl: 'http://192.168.1.14:8000/api/v1/tasks/'
+      apiUrl: 'http://localhost:8000/api/v1/tasks/'
     },
   };
 };
