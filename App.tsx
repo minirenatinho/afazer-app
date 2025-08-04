@@ -97,6 +97,21 @@ export default function App() {
     setShowTaskTypeModal(false);
   };
 
+  // Edit task text handler
+  const handleUpdateText = async (id: string, newText: string) => {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+    const updatedTask = { ...task, text: newText };
+    try {
+      const apiTask = await updateTask(updatedTask);
+      const updatedTasks = tasks.map(t => t.id === id ? apiTask : t);
+      setTasks(updatedTasks);
+      saveTasksToCache(updatedTasks);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to update task text.');
+    }
+  };
+
   const handleUpdateCategory = async (id: string, category: TaskCategory) => {
     const task = tasks.find(t => t.id === id);
     if (!task) return;
@@ -202,13 +217,14 @@ export default function App() {
       onToggle={toggleTask}
       onDelete={deleteTask}
       onUpdateCategory={handleUpdateCategory}
+      onUpdateText={handleUpdateText}
     />
   );
 
   const renderAllCategoriesView = () => {
     // Only use categories that are valid for visibility toggling
     const categories: Array<'priority' | 'on' | 'pay' | 'off'> = ['priority', 'on', 'pay', 'off']; // 'off' last
-    const tasksByCategory = categories.map(category => 
+    const tasksByCategory = categories.map(category =>
       tasks.filter(task => !task.completed && task.category === category)
     );
 
@@ -247,9 +263,9 @@ export default function App() {
                 onPress={() => handleToggleCategoryVisibility(category)}
                 activeOpacity={0.7}
               >
-                <Ionicons 
+                <Ionicons
                   name={category === 'priority' ? 'flag' : category === 'on' ? 'play' : category === 'off' ? 'pause' : 'card'}
-                  size={16} 
+                  size={16}
                   color={category === 'priority' ? '#e74c3c' : category === 'on' ? '#3498db' : category === 'off' ? '#95a5a6' : '#f1c40f'}
                 />
                 <Text style={[
@@ -281,6 +297,7 @@ export default function App() {
                       onToggle={toggleTask}
                       onDelete={deleteTask}
                       onUpdateCategory={handleUpdateCategory}
+                      onUpdateText={handleUpdateText}
                     />
                   ))}
                 </View>
@@ -373,6 +390,20 @@ export default function App() {
               />
               <Text style={[styles.filterText, filter === 'on' && styles.activeFilterText]}>
                 On ({getFilterCount('on')})
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.filterTab, filter === 'pay' && styles.activeFilterTab]}
+              onPress={() => setFilter('pay')}
+            >
+              <Ionicons 
+                name="card" 
+                size={16} 
+                color={filter === 'pay' ? 'white' : '#f1c40f'} 
+                style={styles.filterIcon}
+              />
+              <Text style={[styles.filterText, filter === 'pay' && styles.activeFilterText]}>
+                Pay ({getFilterCount('pay')})
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
