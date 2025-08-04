@@ -1,15 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Task } from '../types';
+import { Task, TaskCategory } from '../types';
+import { CategorySelectorModal } from './CategorySelectorModal';
 
 interface TaskItemProps {
   task: Task;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
+  onUpdateCategory: (id: string, category: TaskCategory) => Promise<void>;
 }
 
-export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete }) => {
+export const TaskItem: React.FC<TaskItemProps> = ({ 
+  task, 
+  onToggle, 
+  onDelete, 
+  onUpdateCategory 
+}) => {
+  const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const getCategoryConfig = (category: Task['category']) => {
     switch (category) {
       case 'priority':
@@ -17,7 +25,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete }) 
       case 'on':
         return { icon: 'play', color: '#3498db', label: 'On' };
       case 'off':
-        return { icon: 'pause', color: '#95a5a6', label: 'Off' };
+        return { icon: 'pause', color: '#95a5a680', label: 'Off' };
       default:
         return { icon: 'ellipse', color: '#95a5a6', label: 'Task' };
     }
@@ -44,7 +52,11 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete }) 
   return (
     <View style={[
       styles.taskItem,
-      { backgroundColor: colorConfig.backgroundColor, borderColor: colorConfig.borderColor }
+      task.category === 'priority' && styles.priorityTaskItem,
+      { 
+        backgroundColor: colorConfig.backgroundColor, 
+        borderColor: task.category === 'priority' ? '#e74c3c' : colorConfig.borderColor 
+      }
     ]}>
       <TouchableOpacity
         style={styles.taskCheckbox}
@@ -61,6 +73,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete }) 
         <Text
           style={[
             styles.taskText,
+            task.category === 'priority' && styles.priorityTaskText,
             task.completed && styles.completedTaskText,
           ]}
         >
@@ -68,10 +81,13 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete }) 
         </Text>
         
         {!task.completed && (
-          <View style={[styles.categoryBadge, { backgroundColor: categoryConfig.color }]}>
+          <TouchableOpacity 
+            style={[styles.categoryBadge, { backgroundColor: categoryConfig.color }]}
+            onPress={() => setIsCategoryModalVisible(true)}
+          >
             <Ionicons name={categoryConfig.icon as any} size={12} color="white" />
             <Text style={styles.categoryText}>{categoryConfig.label}</Text>
-          </View>
+          </TouchableOpacity>
         )}
       </View>
       
@@ -81,6 +97,15 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete }) 
       >
         <Ionicons name="trash-outline" size={20} color="#FF6B6B" />
       </TouchableOpacity>
+      
+      <CategorySelectorModal
+        visible={isCategoryModalVisible}
+        onClose={() => setIsCategoryModalVisible(false)}
+        onSelectCategory={async (category) => {
+          await onUpdateCategory(task.id, category);
+        }}
+        currentCategory={task.category}
+      />
     </View>
   );
 };
@@ -102,6 +127,14 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
+  priorityTaskItem: {
+    padding: 18,
+    marginVertical: 6,
+    borderWidth: 2,
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
+  },
   taskCheckbox: {
     marginRight: 15,
   },
@@ -112,6 +145,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#2c3e50',
     marginBottom: 4,
+  },
+  priorityTaskText: {
+    fontSize: 18,
+    fontWeight: '600',
   },
   completedTaskText: {
     textDecorationLine: 'line-through',
