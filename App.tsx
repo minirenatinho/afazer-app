@@ -17,7 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { TaskItem } from './components/TaskItem';
 import { TaskTypeModal } from './components/TaskTypeModal';
-import { Task, FilterType } from './types';
+import { Task, FilterType, TaskCategory } from './types';
 import { fetchTasks, createTask, updateTask, deleteTask as apiDeleteTask } from './api';
 
 export default function App() {
@@ -88,6 +88,20 @@ export default function App() {
     setNewTaskText('');
     setPendingTaskText('');
     setShowTaskTypeModal(false);
+  };
+
+  const handleUpdateCategory = async (id: string, category: TaskCategory) => {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+    const updatedTask = { ...task, category };
+    try {
+      const apiTask = await updateTask(updatedTask);
+      const updatedTasks = tasks.map(t => t.id === id ? apiTask : t);
+      setTasks(updatedTasks);
+      saveTasksToCache(updatedTasks);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to update task category.');
+    }
   };
 
   const toggleTask = async (id: string) => {
@@ -180,6 +194,7 @@ export default function App() {
       task={item}
       onToggle={toggleTask}
       onDelete={deleteTask}
+      onUpdateCategory={handleUpdateCategory}
     />
   );
 
@@ -203,17 +218,31 @@ export default function App() {
       >
         <View style={styles.categoriesRow}>
           {categories.map((category, index) => (
-            <View key={category} style={styles.categoryColumn}>
-              <View style={styles.categoryHeader}>
+            <View key={category} style={[
+              styles.categoryColumn,
+              category === 'off' && styles.offCategoryColumn
+            ]}>
+              <View style={[
+                styles.categoryHeader,
+                category === 'off' && styles.offCategoryHeader
+              ]}>
                 <Ionicons 
-                  name={category === 'priority' ? 'flag' : category === 'on' ? 'play' : 'pause'} 
+                  name={category === 'priority' ? 'flag' : category === 'on' ? 'play' : 'pause'}
                   size={16} 
-                  color={category === 'priority' ? '#e74c3c' : category === 'on' ? '#3498db' : '#95a5a6'} 
+                  color={category === 'priority' ? '#e74c3c' : category === 'on' ? '#3498db' : '#95a5a6'}
                 />
-                <Text style={styles.categoryTitle}>
-                  {category === 'priority' ? 'Priority' : category === 'on' ? 'On' : 'Off'}
+                <Text style={[
+                  styles.categoryTitle,
+                  category === 'off' && styles.offCategoryText
+                ]}>
+                  {category.charAt(0).toUpperCase() + category.slice(1)}
                 </Text>
-                <Text style={styles.categoryCount}>({tasksByCategory[index].length})</Text>
+                <Text style={[
+                  styles.categoryCount,
+                  category === 'off' && styles.offCategoryText
+                ]}>
+                  ({tasksByCategory[index].length})
+                </Text>
               </View>
               <View style={styles.categoryTasksContainer}>
                 {tasksByCategory[index].map(task => (
@@ -222,6 +251,7 @@ export default function App() {
                     task={task}
                     onToggle={toggleTask}
                     onDelete={deleteTask}
+                    onUpdateCategory={handleUpdateCategory}
                   />
                 ))}
               </View>
@@ -556,5 +586,14 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
+  },
+  offCategoryColumn: {
+    opacity: 0.7,  // Make the entire column more transparent
+  },
+  offCategoryHeader: {
+    opacity: 0.7,  // Make the header match the column transparency
+  },
+  offCategoryText: {
+    color: '#95a5a6',  // Use a lighter gray for the text
   },
 });
