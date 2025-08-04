@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Task, TaskCategory } from '../types';
 import { CategorySelectorModal } from './CategorySelectorModal';
@@ -9,15 +9,24 @@ interface TaskItemProps {
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
   onUpdateCategory: (id: string, category: TaskCategory) => Promise<void>;
+  onUpdateText: (id: string, newText: string) => Promise<void>;
 }
 
 export const TaskItem: React.FC<TaskItemProps> = ({ 
-  task, 
-  onToggle, 
-  onDelete, 
-  onUpdateCategory 
+  task,
+  onToggle,
+  onDelete,
+  onUpdateCategory,
+  onUpdateText,
 }) => {
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState(task.text);
+
+  // Reset editText if task.text changes (e.g. after update)
+  React.useEffect(() => {
+    setEditText(task.text);
+  }, [task.text]);
   const getCategoryConfig = (category: Task['category']) => {
     switch (category) {
       case 'priority':
@@ -55,10 +64,10 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     <View style={[
       styles.taskItem,
       task.category === 'priority' && styles.priorityTaskItem,
-      { 
-        backgroundColor: colorConfig.backgroundColor, 
-        borderColor: task.category === 'priority' ? '#e74c3c' : colorConfig.borderColor 
-      }
+      {
+        backgroundColor: colorConfig.backgroundColor,
+        borderColor: task.category === 'priority' ? '#e74c3c' : colorConfig.borderColor,
+      },
     ]}>
       <TouchableOpacity
         style={styles.taskCheckbox}
@@ -70,20 +79,66 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           color={task.completed ? '#4CAF50' : '#666'}
         />
       </TouchableOpacity>
-      
+
       <View style={styles.taskContent}>
-        <Text
-          style={[
-            styles.taskText,
-            task.category === 'priority' && styles.priorityTaskText,
-            task.completed && styles.completedTaskText,
-          ]}
-        >
-          {task.text}
-        </Text>
-        
+        {isEditing ? (
+          <View style={styles.editContainer}>
+            <TextInput
+              style={[
+                styles.taskText,
+                task.category === 'priority' && styles.priorityTaskText,
+                task.completed && styles.completedTaskText,
+                { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e9ecef', borderRadius: 6, paddingHorizontal: 8 },
+              ]}
+              value={editText}
+              onChangeText={setEditText}
+              autoFocus
+              returnKeyType="done"
+            />
+            <View style={styles.editButtonsRow}>
+              <TouchableOpacity
+                style={[styles.editButton, styles.confirmButton]}
+                onPress={async () => {
+                  if (editText.trim() && editText !== task.text) {
+                    await onUpdateText(task.id, editText.trim());
+                  }
+                  setIsEditing(false);
+                }}
+              >
+                <Ionicons name="checkmark" size={18} color="white" />
+                <Text style={styles.editButtonText}>Confirm</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.editButton, styles.discardButton]}
+                onPress={() => {
+                  setEditText(task.text);
+                  setIsEditing(false);
+                }}
+              >
+                <Ionicons name="close" size={18} color="white" />
+                <Text style={styles.editButtonText}>Discard</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : (
+          <TouchableOpacity
+            onPress={() => !task.completed && setIsEditing(true)}
+            activeOpacity={task.completed ? 1 : 0.7}
+          >
+            <Text
+              style={[
+                styles.taskText,
+                task.category === 'priority' && styles.priorityTaskText,
+                task.completed && styles.completedTaskText,
+              ]}
+            >
+              {task.text}
+            </Text>
+          </TouchableOpacity>
+        )}
+
         {!task.completed && (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.categoryBadge, { backgroundColor: categoryConfig.color }]}
             onPress={() => setIsCategoryModalVisible(true)}
           >
@@ -92,14 +147,14 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           </TouchableOpacity>
         )}
       </View>
-      
+
       <TouchableOpacity
         style={styles.deleteButton}
         onPress={() => onDelete(task.id)}
       >
         <Ionicons name="trash-outline" size={20} color="#FF6B6B" />
       </TouchableOpacity>
-      
+
       <CategorySelectorModal
         visible={isCategoryModalVisible}
         onClose={() => setIsCategoryModalVisible(false)}
@@ -113,6 +168,35 @@ export const TaskItem: React.FC<TaskItemProps> = ({
 };
 
 const styles = StyleSheet.create({
+  editContainer: {
+    flexDirection: 'column',
+    gap: 8,
+  },
+  editButtonsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 6,
+  },
+  editButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  confirmButton: {
+    backgroundColor: '#4CAF50',
+  },
+  discardButton: {
+    backgroundColor: '#e74c3c',
+    marginLeft: 8,
+  },
+  editButtonText: {
+    color: 'white',
+    fontWeight: '600',
+    marginLeft: 4,
+    fontSize: 14,
+  },
   taskItem: {
     flexDirection: 'row',
     alignItems: 'center',
