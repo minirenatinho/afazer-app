@@ -4,7 +4,7 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   FlatList,
   Alert,
   KeyboardAvoidingView,
@@ -120,13 +120,13 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
     const isEditing = editingId === item.id;
     return (
       <View style={styles.itemContainer}>
-        <TouchableOpacity onPress={() => toggleSupermarket(item.id)}>
+        <Pressable onPress={() => toggleSupermarket(item.id)}>
           <Ionicons
             name={item.completed ? 'checkbox' : 'square-outline'}
             size={24}
             color={item.completed ? '#4CAF50' : '#ccc'}
           />
-        </TouchableOpacity>
+        </Pressable>
         {isEditing ? (
           <View style={{ flex: 1, flexDirection: 'column', marginLeft: 12, pointerEvents: 'box-none' }}>
             <TextInput
@@ -151,7 +151,7 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
               returnKeyType="done"
             />
             <View style={{ flexDirection: 'row', gap: 8, marginTop: 6 }}>
-              <TouchableOpacity
+              <Pressable
                 style={[styles.addButton, { backgroundColor: '#4CAF50', width: 40, height: 40 }]}
                 onPress={async () => {
                   if (editText.trim() && editText !== item.name) {
@@ -169,8 +169,8 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
                 }}
               >
                 <Ionicons name="checkmark" size={20} color="white" />
-              </TouchableOpacity>
-              <TouchableOpacity
+              </Pressable>
+              <Pressable
                 style={[styles.addButton, { backgroundColor: '#e74c3c', width: 40, height: 40 }]}
                 onPress={() => {
                   setEditText(item.name);
@@ -178,11 +178,11 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
                 }}
               >
                 <Ionicons name="close" size={20} color="white" />
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
         ) : (
-          <TouchableOpacity
+          <Pressable
             style={{ flex: 1 }}
             onPress={() => {
               if (!item.completed) {
@@ -193,9 +193,9 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
             disabled={item.completed}
           >
             <Text style={[styles.itemText, item.completed && styles.completedText]}>{item.name}</Text>
-          </TouchableOpacity>
+          </Pressable>
         )}
-        <TouchableOpacity
+        <Pressable
           onPress={() => {
             if (Platform.OS === 'web') {
               if (window.confirm('Are you sure you want to delete this supermarket item?')) {
@@ -215,7 +215,7 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
           }}
         >
           <Ionicons name="trash" size={20} color="#e74c3c" />
-        </TouchableOpacity>
+        </Pressable>
       </View>
     );
   };
@@ -228,9 +228,9 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
       <StatusBar barStyle="dark-content" backgroundColor="#f8f9fa" />
       <View style={styles.header}>
         {onBack ? (
-          <TouchableOpacity onPress={handleBackPress}>
+          <Pressable onPress={handleBackPress}>
             <Text style={styles.title}>Supermarket</Text>
-          </TouchableOpacity>
+          </Pressable>
         ) : (
           <Text style={styles.title}>Supermarket</Text>
         )}
@@ -244,9 +244,9 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
           onSubmitEditing={handleAddSupermarket}
           returnKeyType="done"
         />
-        <TouchableOpacity style={styles.addButton} onPress={handleAddSupermarket}>
+        <Pressable style={styles.addButton} onPress={handleAddSupermarket}>
           <Ionicons name="add" size={24} color="white" />
-        </TouchableOpacity>
+        </Pressable>
       </View>
       <FlatList
         data={supermarkets}
