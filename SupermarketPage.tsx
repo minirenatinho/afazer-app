@@ -23,6 +23,10 @@ export interface Supermarket {
   name: string;
   completed: boolean;
   createdAt: number;
+  quantity?: number;
+  unit?: string;
+  price?: number;
+  notes?: string;
 }
 
 type SupermarketPageProps = {
@@ -42,9 +46,17 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
   };
   const [supermarkets, setSupermarkets] = useState<Supermarket[]>([]);
   const [newSupermarketText, setNewSupermarketText] = useState('');
+  const [newQuantity, setNewQuantity] = useState('');
+  const [newUnit, setNewUnit] = useState('');
+  const [newPrice, setNewPrice] = useState('');
+  const [newNotes, setNewNotes] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState('');
+  const [editQuantity, setEditQuantity] = useState('');
+  const [editUnit, setEditUnit] = useState('');
+  const [editPrice, setEditPrice] = useState('');
+  const [editNotes, setEditNotes] = useState('');
 
   useEffect(() => {
     loadSupermarkets();
@@ -73,6 +85,10 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
       name: newSupermarketText.trim(),
       completed: false,
       createdAt: Date.now(),
+      quantity: newQuantity ? Number(newQuantity) : undefined,
+      unit: newUnit || undefined,
+      price: newPrice ? Number(newPrice) : undefined,
+      notes: newNotes || undefined,
     };
     try {
       const created = await createSupermarket(newSupermarket);
@@ -83,6 +99,10 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
       Alert.alert('Error', 'Failed to create supermarket item.');
     }
     setNewSupermarketText('');
+    setNewQuantity('');
+    setNewUnit('');
+    setNewPrice('');
+    setNewNotes('');
   };
 
   const toggleSupermarket = async (id: string) => {
@@ -134,36 +154,55 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
               value={editText}
               onChangeText={setEditText}
               autoFocus
-              onSubmitEditing={async () => {
-                if (editText.trim() && editText !== item.name) {
+              placeholder="Name"
+            />
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: 6 }}>
+              <TextInput
+                style={[styles.itemText, { flex: 1, backgroundColor: '#fff', borderWidth: 1, borderColor: '#e9ecef', borderRadius: 6, paddingHorizontal: 8 }]}
+                value={editQuantity}
+                onChangeText={setEditQuantity}
+                placeholder="Quantity"
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={[styles.itemText, { flex: 1, backgroundColor: '#fff', borderWidth: 1, borderColor: '#e9ecef', borderRadius: 6, paddingHorizontal: 8 }]}
+                value={editUnit}
+                onChangeText={setEditUnit}
+                placeholder="Unit"
+              />
+              <TextInput
+                style={[styles.itemText, { flex: 1, backgroundColor: '#fff', borderWidth: 1, borderColor: '#e9ecef', borderRadius: 6, paddingHorizontal: 8 }]}
+                value={editPrice}
+                onChangeText={setEditPrice}
+                placeholder="Price"
+                keyboardType="numeric"
+              />
+            </View>
+            <TextInput
+              style={[styles.itemText, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e9ecef', borderRadius: 6, paddingHorizontal: 8, marginTop: 6 }]}
+              value={editNotes}
+              onChangeText={setEditNotes}
+              placeholder="Notes"
+            />
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: 6 }}>
+              <Pressable
+                style={[styles.addButton, { backgroundColor: '#4CAF50', width: 40, height: 40 }]}
+                onPress={async () => {
                   try {
-                    const updated = { ...item, name: editText.trim() };
+                    const updated = {
+                      ...item,
+                      name: editText.trim(),
+                      quantity: editQuantity ? Number(editQuantity) : undefined,
+                      unit: editUnit || undefined,
+                      price: editPrice ? Number(editPrice) : undefined,
+                      notes: editNotes || undefined,
+                    };
                     const apiItem = await updateSupermarket(updated);
                     const updatedList = supermarkets.map(s => s.id === item.id ? apiItem : s);
                     setSupermarkets(updatedList);
                     saveSupermarketsToCache(updatedList);
                   } catch {
                     Alert.alert('Error', 'Failed to update item.');
-                  }
-                }
-                setEditingId(null);
-              }}
-              returnKeyType="done"
-            />
-            <View style={{ flexDirection: 'row', gap: 8, marginTop: 6 }}>
-              <Pressable
-                style={[styles.addButton, { backgroundColor: '#4CAF50', width: 40, height: 40 }]}
-                onPress={async () => {
-                  if (editText.trim() && editText !== item.name) {
-                    try {
-                      const updated = { ...item, name: editText.trim() };
-                      const apiItem = await updateSupermarket(updated);
-                      const updatedList = supermarkets.map(s => s.id === item.id ? apiItem : s);
-                      setSupermarkets(updatedList);
-                      saveSupermarketsToCache(updatedList);
-                    } catch {
-                      Alert.alert('Error', 'Failed to update item.');
-                    }
                   }
                   setEditingId(null);
                 }}
@@ -174,6 +213,10 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
                 style={[styles.addButton, { backgroundColor: '#e74c3c', width: 40, height: 40 }]}
                 onPress={() => {
                   setEditText(item.name);
+                  setEditQuantity(item.quantity ? String(item.quantity) : '');
+                  setEditUnit(item.unit || '');
+                  setEditPrice(item.price ? String(item.price) : '');
+                  setEditNotes(item.notes || '');
                   setEditingId(null);
                 }}
               >
@@ -188,11 +231,27 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
               if (!item.completed) {
                 setEditingId(item.id);
                 setEditText(item.name);
+                setEditQuantity(item.quantity ? String(item.quantity) : '');
+                setEditUnit(item.unit || '');
+                setEditPrice(item.price ? String(item.price) : '');
+                setEditNotes(item.notes || '');
               }
             }}
             disabled={item.completed}
           >
             <Text style={[styles.itemText, item.completed && styles.completedText]}>{item.name}</Text>
+            {item.quantity !== undefined && (
+              <Text style={{ marginLeft: 12, marginRight: 8, color: '#888' }}>Qty: {item.quantity} {item.unit}</Text>
+            )}
+            {item.price !== undefined && (
+              <Text style={{ marginLeft: 12, marginRight: 8, color: '#888' }}>Unit price: ${ (item.price / 100).toFixed(2) }</Text>
+            )}
+            {item.price !== undefined && (
+              <Text style={{ marginLeft: 12, marginRight: 8, color: '#888' }}>Total price: ${ ((item.price * (item.quantity || 1)) / 100).toFixed(2) }</Text>
+            )}
+            {item.notes && (
+              <Text style={{ marginLeft: 12, color: '#888', marginTop: 2 }}>Notes: {item.notes}</Text>
+            )}
           </Pressable>
         )}
         <Pressable
@@ -241,8 +300,33 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
           placeholder="Add a new item..."
           value={newSupermarketText}
           onChangeText={setNewSupermarketText}
-          onSubmitEditing={handleAddSupermarket}
           returnKeyType="done"
+        />
+        <TextInput
+          style={[styles.input, { width: 80, marginLeft: 8 }]}
+          placeholder="Qty"
+          value={newQuantity}
+          onChangeText={setNewQuantity}
+          keyboardType="numeric"
+        />
+        <TextInput
+          style={[styles.input, { width: 80, marginLeft: 8 }]}
+          placeholder="Unit"
+          value={newUnit}
+          onChangeText={setNewUnit}
+        />
+        <TextInput
+          style={[styles.input, { width: 80, marginLeft: 8 }]}
+          placeholder="Price"
+          value={newPrice}
+          onChangeText={setNewPrice}
+          keyboardType="numeric"
+        />
+        <TextInput
+          style={[styles.input, { width: 120, marginLeft: 8 }]}
+          placeholder="Notes"
+          value={newNotes}
+          onChangeText={setNewNotes}
         />
         <Pressable style={styles.addButton} onPress={handleAddSupermarket}>
           <Ionicons name="add" size={24} color="white" />

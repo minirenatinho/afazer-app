@@ -45,6 +45,10 @@ export interface Supermarket {
   name: string;
   completed: boolean;
   createdAt: number;
+  quantity?: number;
+  unit?: string;
+  price?: number;
+  notes?: string;
 }
 
 export async function fetchSupermarkets(): Promise<Supermarket[]> {
