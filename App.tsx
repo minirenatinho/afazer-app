@@ -19,8 +19,10 @@ import { TaskItem } from './components/TaskItem';
 import { TaskTypeModal } from './components/TaskTypeModal';
 import { Task, FilterType, TaskCategory } from './types';
 import { fetchTasks, createTask, updateTask, deleteTask as apiDeleteTask } from './api';
+import SupermarketPage from './SupermarketPage';
 
 export default function App() {
+  const [page, setPage] = useState<'afazer' | 'supermarket'>('afazer');
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskText, setNewTaskText] = useState('');
   const [filter, setFilter] = useState<FilterType>('completed');
@@ -316,18 +318,22 @@ export default function App() {
     setRefreshing(false);
   };
 
+  if (page === 'supermarket') {
+    return <SupermarketPage onBack={() => setPage('afazer')} />;
+  }
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <StatusBar barStyle="dark-content" backgroundColor="#f8f9fa" />
-      
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Afazer</Text>
+        <TouchableOpacity onPress={() => setPage('supermarket')}>
+          <Text style={styles.title}>Afazer</Text>
+        </TouchableOpacity>
       </View>
-
+      {/* ...existing code... */}
       {/* Add Task Input */}
       <View style={styles.inputContainer}>
         <TextInput
@@ -342,8 +348,7 @@ export default function App() {
           <Ionicons name="add" size={24} color="white" />
         </TouchableOpacity>
       </View>
-
-      {/* Filter Toggle Button */}
+      {/* ...existing code... */}
       <View style={styles.filterToggleContainer}>
         <TouchableOpacity
           style={styles.filterToggleButton}
@@ -359,8 +364,7 @@ export default function App() {
           </Text>
         </TouchableOpacity>
       </View>
-
-      {/* Filter Tabs */}
+      {/* ...existing code... */}
       {showFilter && (
         <View style={styles.filterContainer}>
           <View style={styles.filterTabsRow}>
@@ -435,12 +439,9 @@ export default function App() {
               </Text>
             </TouchableOpacity>
           </View>
-          
-
         </View>
       )}
-
-      {/* Tasks List or All Categories View */}
+      {/* ...existing code... */}
       {!showFilter ? (
         renderAllCategoriesView()
       ) : (
@@ -450,19 +451,17 @@ export default function App() {
           keyExtractor={item => item.id}
           style={styles.taskList}
           showsVerticalScrollIndicator={false}
-          refreshing={refreshing} // <-- Add this line
-          onRefresh={onRefresh}   // <-- Add this line
+          refreshing={refreshing}
+          onRefresh={onRefresh}
         />
       )}
-
-      {/* Clear Completed Button */}
+      {/* ...existing code... */}
       {showFilter && filter === 'completed' && getFilterCount('completed') > 0 && (
         <TouchableOpacity style={styles.clearButton} onPress={clearCompleted}>
           <Text style={styles.clearButtonText}>Clear Completed</Text>
         </TouchableOpacity>
       )}
-
-      {/* Task Type Modal */}
+      {/* ...existing code... */}
       <TaskTypeModal
         visible={showTaskTypeModal}
         onClose={() => {
