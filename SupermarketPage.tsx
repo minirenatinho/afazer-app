@@ -128,7 +128,7 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
           />
         </TouchableOpacity>
         {isEditing ? (
-          <View style={{ flex: 1, flexDirection: 'column', marginLeft: 12 }}>
+          <View style={{ flex: 1, flexDirection: 'column', marginLeft: 12, pointerEvents: 'box-none' }}>
             <TextInput
               style={[styles.itemText, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e9ecef', borderRadius: 6, paddingHorizontal: 8 }]}
               value={editText}
