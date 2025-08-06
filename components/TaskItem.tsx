@@ -105,8 +105,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                   setIsEditing(false);
                 }}
               >
-                <Ionicons name="checkmark" size={18} color="white" />
-                <Text style={styles.editButtonText}>Confirm</Text>
+                <Ionicons name="checkmark" size={20} color="white" />
               </Pressable>
               <Pressable
                 style={[styles.editButton, styles.discardButton]}
@@ -115,8 +114,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                   setIsEditing(false);
                 }}
               >
-                <Ionicons name="close" size={18} color="white" />
-                <Text style={styles.editButtonText}>Discard</Text>
+                <Ionicons name="close" size={20} color="white" />
               </Pressable>
             </View>
           </View>
@@ -178,24 +176,17 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   editButton: {
-    flexDirection: 'row',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
   },
   confirmButton: {
     backgroundColor: '#4CAF50',
   },
   discardButton: {
     backgroundColor: '#e74c3c',
-    marginLeft: 8,
-  },
-  editButtonText: {
-    color: 'white',
-    fontWeight: '600',
-    marginLeft: 4,
-    fontSize: 14,
   },
   taskItem: {
     flexDirection: 'row',
