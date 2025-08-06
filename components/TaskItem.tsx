@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Pressable, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Task, TaskCategory } from '../types';
 import { CategorySelectorModal } from './CategorySelectorModal';
@@ -69,7 +69,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
         borderColor: task.category === 'priority' ? '#e74c3c' : colorConfig.borderColor,
       },
     ]}>
-      <TouchableOpacity
+      <Pressable
         style={styles.taskCheckbox}
         onPress={() => onToggle(task.id)}
       >
@@ -78,7 +78,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           size={24}
           color={task.completed ? '#4CAF50' : '#666'}
         />
-      </TouchableOpacity>
+      </Pressable>
 
       <View style={styles.taskContent}>
         {isEditing ? (
@@ -93,10 +93,10 @@ export const TaskItem: React.FC<TaskItemProps> = ({
               value={editText}
               onChangeText={setEditText}
               autoFocus
-              returnKeyType="done"
+              enterKeyHint="done"
             />
             <View style={styles.editButtonsRow}>
-              <TouchableOpacity
+              <Pressable
                 style={[styles.editButton, styles.confirmButton]}
                 onPress={async () => {
                   if (editText.trim() && editText !== task.text) {
@@ -107,8 +107,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
               >
                 <Ionicons name="checkmark" size={18} color="white" />
                 <Text style={styles.editButtonText}>Confirm</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+              </Pressable>
+              <Pressable
                 style={[styles.editButton, styles.discardButton]}
                 onPress={() => {
                   setEditText(task.text);
@@ -117,13 +117,13 @@ export const TaskItem: React.FC<TaskItemProps> = ({
               >
                 <Ionicons name="close" size={18} color="white" />
                 <Text style={styles.editButtonText}>Discard</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
         ) : (
-          <TouchableOpacity
+          <Pressable
             onPress={() => !task.completed && setIsEditing(true)}
-            activeOpacity={task.completed ? 1 : 0.7}
+            disabled={task.completed}
           >
             <Text
               style={[
@@ -134,26 +134,26 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             >
               {task.text}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         )}
 
         {!task.completed && (
-          <TouchableOpacity
+          <Pressable
             style={[styles.categoryBadge, { backgroundColor: categoryConfig.color }]}
             onPress={() => setIsCategoryModalVisible(true)}
           >
             <Ionicons name={categoryConfig.icon as any} size={12} color="white" />
             <Text style={styles.categoryText}>{categoryConfig.label}</Text>
-          </TouchableOpacity>
+          </Pressable>
         )}
       </View>
 
-      <TouchableOpacity
+      <Pressable
         style={styles.deleteButton}
         onPress={() => onDelete(task.id)}
       >
         <Ionicons name="trash-outline" size={20} color="#FF6B6B" />
-      </TouchableOpacity>
+      </Pressable>
 
       <CategorySelectorModal
         visible={isCategoryModalVisible}
@@ -204,22 +204,31 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     borderRadius: 10,
     borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
     elevation: 2,
+    ...Platform.select({
+      ios: {},
+      android: {
+        elevation: 2,
+      },
+      web: {
+        boxShadow: '0px 1px 2px rgba(0,0,0,0.1)',
+      },
+    }),
   },
   priorityTaskItem: {
     padding: 18,
     marginVertical: 6,
     borderWidth: 2,
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
     elevation: 3,
+    ...Platform.select({
+      ios: {},
+      android: {
+        elevation: 3,
+      },
+      web: {
+        boxShadow: '0px 2px 3px rgba(0,0,0,0.2)',
+      },
+    }),
   },
   taskCheckbox: {
     marginRight: 15,
