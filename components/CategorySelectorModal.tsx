@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Modal, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { TaskCategory } from '../types';
 
@@ -41,14 +41,14 @@ export const CategorySelectorModal: React.FC<CategorySelectorModalProps> = ({
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Change Category</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <Pressable onPress={onClose} style={styles.closeButton}>
               <Ionicons name="close" size={24} color="#666" />
-            </TouchableOpacity>
+            </Pressable>
           </View>
           
           <View style={styles.categoryList}>
             {categoryOptions.map((option) => (
-              <TouchableOpacity
+              <Pressable
                 key={option.value}
                 style={[
                   styles.categoryOption,
@@ -66,7 +66,7 @@ export const CategorySelectorModal: React.FC<CategorySelectorModalProps> = ({
                 {currentCategory === option.value && (
                   <Ionicons name="checkmark" size={20} color="#4CAF50" style={styles.checkmark} />
                 )}
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </View>
         </View>

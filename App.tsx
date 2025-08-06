@@ -4,7 +4,7 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   FlatList,
   Alert,
   KeyboardAvoidingView,
@@ -257,13 +257,13 @@ export default function App() {
               category === 'off' && styles.offCategoryColumn
             ]}>
               {/* Touchable title to toggle visibility */}
-              <TouchableOpacity
-                style={[
+              <Pressable
+                style={({ pressed }) => [
                   styles.categoryHeader,
-                  category === 'off' && styles.offCategoryHeader
+                  category === 'off' && styles.offCategoryHeader,
+                  pressed && { opacity: 0.7 }
                 ]}
                 onPress={() => handleToggleCategoryVisibility(category)}
-                activeOpacity={0.7}
               >
                 <Ionicons
                   name={category === 'priority' ? 'flag' : category === 'on' ? 'play' : category === 'off' ? 'pause' : 'card'}
@@ -288,7 +288,7 @@ export default function App() {
                   color="#FF8C42"
                   style={{ marginLeft: 8 }}
                 />
-              </TouchableOpacity>
+              </Pressable>
               {/* Only show tasks if visible */}
               {categoryVisibility[category as 'priority' | 'on' | 'off' | 'pay'] && (
                 <View style={styles.categoryTasksContainer}>
@@ -329,9 +329,9 @@ export default function App() {
       <StatusBar barStyle="dark-content" backgroundColor="#f8f9fa" />
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => setPage('supermarket')}>
+        <Pressable onPress={() => setPage('supermarket')}>
           <Text style={styles.title}>Afazer</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
       {/* ...existing code... */}
       {/* Add Task Input */}
@@ -344,13 +344,13 @@ export default function App() {
           onSubmitEditing={handleAddTask}
           returnKeyType="done"
         />
-        <TouchableOpacity style={styles.addButton} onPress={handleAddTask}>
+        <Pressable style={styles.addButton} onPress={handleAddTask}>
           <Ionicons name="add" size={24} color="white" />
-        </TouchableOpacity>
+        </Pressable>
       </View>
       {/* ...existing code... */}
       <View style={styles.filterToggleContainer}>
-        <TouchableOpacity
+        <Pressable
           style={styles.filterToggleButton}
           onPress={() => setShowFilter(!showFilter)}
         >
@@ -362,13 +362,13 @@ export default function App() {
           <Text style={styles.filterToggleText}>
             {showFilter ? 'Show All Categories' : 'Show Filtered'}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
       {/* ...existing code... */}
       {showFilter && (
         <View style={styles.filterContainer}>
           <View style={styles.filterTabsRow}>
-            <TouchableOpacity
+            <Pressable
               style={[styles.filterTab, filter === 'priority' && styles.activeFilterTab]}
               onPress={() => setFilter('priority')}
             >
@@ -381,8 +381,8 @@ export default function App() {
               <Text style={[styles.filterText, filter === 'priority' && styles.activeFilterText]}>
                 Priority ({getFilterCount('priority')})
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </Pressable>
+            <Pressable
               style={[styles.filterTab, filter === 'on' && styles.activeFilterTab]}
               onPress={() => setFilter('on')}
             >
@@ -395,8 +395,8 @@ export default function App() {
               <Text style={[styles.filterText, filter === 'on' && styles.activeFilterText]}>
                 On ({getFilterCount('on')})
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </Pressable>
+            <Pressable
               style={[styles.filterTab, filter === 'pay' && styles.activeFilterTab]}
               onPress={() => setFilter('pay')}
             >
@@ -409,8 +409,8 @@ export default function App() {
               <Text style={[styles.filterText, filter === 'pay' && styles.activeFilterText]}>
                 Pay ({getFilterCount('pay')})
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </Pressable>
+            <Pressable
               style={[styles.filterTab, filter === 'off' && styles.activeFilterTab]}
               onPress={() => setFilter('off')}
             >
@@ -423,8 +423,8 @@ export default function App() {
               <Text style={[styles.filterText, filter === 'off' && styles.activeFilterText]}>
                 Off ({getFilterCount('off')})
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </Pressable>
+            <Pressable
               style={[styles.filterTab, filter === 'completed' && styles.activeFilterTab]}
               onPress={() => setFilter('completed')}
             >
@@ -437,7 +437,7 @@ export default function App() {
               <Text style={[styles.filterText, filter === 'completed' && styles.activeFilterText]}>
                 Done ({getFilterCount('completed')})
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       )}
@@ -457,9 +457,9 @@ export default function App() {
       )}
       {/* ...existing code... */}
       {showFilter && filter === 'completed' && getFilterCount('completed') > 0 && (
-        <TouchableOpacity style={styles.clearButton} onPress={clearCompleted}>
+        <Pressable style={styles.clearButton} onPress={clearCompleted}>
           <Text style={styles.clearButtonText}>Clear Completed</Text>
-        </TouchableOpacity>
+        </Pressable>
       )}
       {/* ...existing code... */}
       <TaskTypeModal

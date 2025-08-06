@@ -3,7 +3,7 @@ import {
   Modal,
   View,
   Text,
-  TouchableOpacity,
+  Pressable,
   StyleSheet,
   Dimensions,
   Platform,
@@ -108,9 +108,9 @@ export const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
     <>
       <View style={styles.header}>
         <Text style={styles.title}>Select Task Type</Text>
-        <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
+        <Pressable onPress={handleClose} style={styles.closeButton}>
           <Ionicons name="close" size={24} color="#666" />
-        </TouchableOpacity>
+        </Pressable>
       </View>
       
       <Text style={styles.subtitle}>
@@ -119,7 +119,7 @@ export const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
 
       <View style={styles.optionsContainer}>
         {taskTypes.map((taskType) => (
-          <TouchableOpacity
+          <Pressable
             key={taskType.type}
             style={styles.option}
             onPress={() => handleCategorySelect(taskType.type)}
@@ -132,7 +132,7 @@ export const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
               <Text style={styles.optionDescription}>{taskType.description}</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#ccc" />
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </View>
     </>
@@ -141,13 +141,13 @@ export const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
   const renderColorStep = () => (
     <>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => setStep('category')} style={styles.backButton}>
+        <Pressable onPress={() => setStep('category')} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#666" />
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.title}>Select Color</Text>
-        <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
+        <Pressable onPress={handleClose} style={styles.closeButton}>
           <Ionicons name="close" size={24} color="#666" />
-        </TouchableOpacity>
+        </Pressable>
       </View>
       
       <Text style={styles.subtitle}>
@@ -156,7 +156,7 @@ export const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
 
       <View style={styles.colorGrid}>
         {colorOptions.map((colorOption) => (
-          <TouchableOpacity
+          <Pressable
             key={colorOption.color}
             style={[
               styles.colorOption,
@@ -166,7 +166,7 @@ export const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
           >
             <View style={[styles.colorCircle, { backgroundColor: colorOption.borderColor }]} />
             <Text style={styles.colorName}>{colorOption.name}</Text>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </View>
     </>
