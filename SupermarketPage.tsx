@@ -11,6 +11,8 @@ import {
   Platform,
   StatusBar,
   RefreshControl,
+  Modal,
+  ScrollView,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
@@ -35,6 +37,7 @@ type SupermarketPageProps = {
 
 export default function SupermarketPage({ onBack }: SupermarketPageProps) {
   const backPressRef = useRef(false);
+  const [showItemModal, setShowItemModal] = useState(false);
 
   const handleBackPress = () => {
     if (backPressRef.current) return;
@@ -43,6 +46,25 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
     setTimeout(() => {
       backPressRef.current = false;
     }, 1000); // 1 second debounce
+  };
+
+  const openNewItemModal = () => {
+    if (Platform.OS !== 'web') {
+      setShowItemModal(true);
+    }
+  };
+
+  const closeNewItemModal = () => {
+    setShowItemModal(false);
+  };
+
+  const handleAddItem = () => {
+    if (Platform.OS === 'web') {
+      handleAddSupermarket();
+    } else {
+      handleAddSupermarket();
+      closeNewItemModal();
+    }
   };
   const [supermarkets, setSupermarkets] = useState<Supermarket[]>([]);
   const [newSupermarketText, setNewSupermarketText] = useState('');
@@ -296,42 +318,151 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
       </View>
       <View style={styles.inputContainer}>
         <TextInput
-          style={styles.input}
+          style={[styles.input, Platform.OS === 'web' && { flex: 2, marginRight: 8 }]}
           placeholder="Add a new item..."
           value={newSupermarketText}
           onChangeText={setNewSupermarketText}
+          onSubmitEditing={Platform.OS === 'web' ? handleAddSupermarket : undefined}
+          onFocus={Platform.OS !== 'web' ? openNewItemModal : undefined}
           returnKeyType="done"
         />
-        <TextInput
-          style={[styles.input, { width: 80, marginLeft: 8 }]}
-          placeholder="Qty"
-          value={newQuantity}
-          onChangeText={setNewQuantity}
-          keyboardType="numeric"
-        />
-        <TextInput
-          style={[styles.input, { width: 80, marginLeft: 8 }]}
-          placeholder="Unit"
-          value={newUnit}
-          onChangeText={setNewUnit}
-        />
-        <TextInput
-          style={[styles.input, { width: 80, marginLeft: 8 }]}
-          placeholder="Price"
-          value={newPrice}
-          onChangeText={setNewPrice}
-          keyboardType="numeric"
-        />
-        <TextInput
-          style={[styles.input, { width: 120, marginLeft: 8 }]}
-          placeholder="Notes"
-          value={newNotes}
-          onChangeText={setNewNotes}
-        />
-        <Pressable style={styles.addButton} onPress={handleAddSupermarket}>
-          <Ionicons name="add" size={24} color="white" />
-        </Pressable>
+        
+        {Platform.OS === 'web' ? (
+          <>
+            <TextInput
+              style={[styles.input, { width: 80, marginRight: 8 }]}
+              placeholder="Qty"
+              value={newQuantity}
+              onChangeText={setNewQuantity}
+              keyboardType="numeric"
+            />
+            <TextInput
+              style={[styles.input, { width: 80, marginRight: 8 }]}
+              placeholder="Unit"
+              value={newUnit}
+              onChangeText={setNewUnit}
+            />
+            <TextInput
+              style={[styles.input, { width: 100, marginRight: 8 }]}
+              placeholder="Price"
+              value={newPrice}
+              onChangeText={setNewPrice}
+              keyboardType="numeric"
+            />
+            <TextInput
+              style={[styles.input, { flex: 1, marginRight: 8 }]}
+              placeholder="Notes"
+              value={newNotes}
+              onChangeText={setNewNotes}
+            />
+            <Pressable 
+              style={[styles.addButton, { marginLeft: 8 }]}
+              onPress={handleAddItem}
+            >
+              <Ionicons name="add" size={24} color="white" />
+            </Pressable>
+          </>
+        ) : (
+          <Pressable 
+            style={[styles.addButton, { marginLeft: 8 }]}
+            onPress={openNewItemModal}
+          >
+            <Ionicons name="add" size={24} color="white" />
+          </Pressable>
+        )}
       </View>
+
+      {/* New Item Modal for Mobile */}
+      <Modal
+        visible={showItemModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={closeNewItemModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Add New Item</Text>
+              <Pressable onPress={closeNewItemModal}>
+                <Ionicons name="close" size={24} color="#FF8C42" />
+              </Pressable>
+            </View>
+            
+            <ScrollView style={styles.modalBody}>
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Item Name</Text>
+                <TextInput
+                  style={styles.modalInput}
+                  placeholder="Enter item name"
+                  value={newSupermarketText}
+                  onChangeText={setNewSupermarketText}
+                  autoFocus
+                />
+              </View>
+              
+              <View style={styles.formRow}>
+                <View style={[styles.formGroup, { flex: 1, marginRight: 8 }]}>
+                  <Text style={styles.label}>Quantity</Text>
+                  <TextInput
+                    style={styles.modalInput}
+                    placeholder="1"
+                    value={newQuantity}
+                    onChangeText={setNewQuantity}
+                    keyboardType="numeric"
+                  />
+                </View>
+                
+                <View style={[styles.formGroup, { flex: 1 }]}>
+                  <Text style={styles.label}>Unit</Text>
+                  <TextInput
+                    style={styles.modalInput}
+                    placeholder="pcs, kg, g, etc."
+                    value={newUnit}
+                    onChangeText={setNewUnit}
+                  />
+                </View>
+              </View>
+              
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Price (optional)</Text>
+                <TextInput
+                  style={styles.modalInput}
+                  placeholder="0.00"
+                  value={newPrice}
+                  onChangeText={setNewPrice}
+                  keyboardType="numeric"
+                />
+              </View>
+              
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Notes (optional)</Text>
+                <TextInput
+                  style={[styles.modalInput, { height: 80, textAlignVertical: 'top', paddingTop: 10 }]}
+                  placeholder="Additional notes"
+                  value={newNotes}
+                  onChangeText={setNewNotes}
+                  multiline
+                />
+              </View>
+            </ScrollView>
+            
+            <View style={styles.modalFooter}>
+              <Pressable 
+                style={[styles.button, styles.cancelButton]} 
+                onPress={closeNewItemModal}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </Pressable>
+              <Pressable 
+                style={[styles.button, styles.saveButton]} 
+                onPress={handleAddItem}
+              >
+                <Text style={styles.saveButtonText}>Add Item</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
       <FlatList
         data={supermarkets}
         renderItem={renderSupermarket}
@@ -346,6 +477,86 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
 }
 
 const styles = StyleSheet.create({
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '80%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#34495e',
+  },
+  modalBody: {
+    padding: 20,
+  },
+  formGroup: {
+    marginBottom: 20,
+  },
+  formRow: {
+    flexDirection: 'row',
+    marginHorizontal: -4,
+  },
+  label: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    marginBottom: 8,
+    fontWeight: '500',
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: '#f8f9fa',
+  },
+  modalFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#e9ecef',
+  },
+  button: {
+    flex: 1,
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#f8f9fa',
+    marginRight: 10,
+  },
+  saveButton: {
+    backgroundColor: '#FF8C42',
+  },
+  cancelButtonText: {
+    color: '#7f8c8d',
+    fontWeight: '600',
+  },
+  saveButtonText: {
+    color: 'white',
+    fontWeight: '600',
+  },
+  
+  // Existing styles
   container: {
     flex: 1,
     backgroundColor: '#f8f9fa',
@@ -399,6 +610,7 @@ const styles = StyleSheet.create({
   },
   list: {
     flex: 1,
+    paddingTop: 10,
     paddingHorizontal: 20,
   },
   itemContainer: {
