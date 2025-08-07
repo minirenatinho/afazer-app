@@ -11,7 +11,7 @@ import {
   Platform,
   StatusBar,
   ScrollView,
-  RefreshControl, // <-- Add this import
+  RefreshControl,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
@@ -30,6 +30,9 @@ export default function App() {
   const [pendingTaskText, setPendingTaskText] = useState('');
   const [showFilter, setShowFilter] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  // Web-specific state for category and color selection
+  const [selectedCategory, setSelectedCategory] = useState<TaskCategory>('on');
+  const [selectedColor, setSelectedColor] = useState<'green' | 'pink' | 'blue' | 'brown'>('blue');
   // State to control visibility of each category column
   const [categoryVisibility, setCategoryVisibility] = useState({
     priority: true,
@@ -72,9 +75,34 @@ export default function App() {
   };
 
   const handleAddTask = () => {
-    if (newTaskText.trim()) {
-      setPendingTaskText(newTaskText.trim());
-      setShowTaskTypeModal(true);
+    const text = newTaskText.trim();
+    if (text) {
+      if (Platform.OS === 'web') {
+        // On web, use the selected category and color directly
+        const newTask = {
+          text,
+          completed: false,
+          createdAt: Date.now(),
+          category: selectedCategory,
+          color: selectedColor,
+        };
+        
+        (async () => {
+          try {
+            const created = await createTask(newTask);
+            const updatedTasks = [...tasks, created];
+            setTasks(updatedTasks);
+            saveTasksToCache(updatedTasks);
+            setNewTaskText('');
+          } catch (error) {
+            Alert.alert('Error', 'Failed to create task.');
+          }
+        })();
+      } else {
+        // On mobile, show the type selection modal
+        setPendingTaskText(text);
+        setShowTaskTypeModal(true);
+      }
     }
   };
 
@@ -333,22 +361,89 @@ export default function App() {
           <Text style={styles.title}>Afazer</Text>
         </Pressable>
       </View>
-      {/* ...existing code... */}
       {/* Add Task Input */}
       <View style={styles.inputContainer}>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { flex: 2, marginRight: 8 }]}
           placeholder="Add a new task..."
           value={newTaskText}
           onChangeText={setNewTaskText}
           onSubmitEditing={handleAddTask}
           returnKeyType="done"
         />
-        <Pressable style={styles.addButton} onPress={handleAddTask}>
+        
+        {Platform.OS === 'web' ? (
+          <View style={styles.webControlsContainer}>
+            {/* Category Selection */}
+            <View style={styles.selectionGroup}>
+              <Text style={styles.selectionLabel}>Category:</Text>
+              <View style={styles.checkboxGroup}>
+                {['priority', 'on', 'pay', 'off'].map((category) => (
+                  <Pressable
+                    key={category}
+                    style={({ pressed }) => ({
+                      ...styles.categoryOption,
+                      ...(selectedCategory === category ? styles[`${category}Selected` as keyof typeof styles] : {}),
+                      ...(pressed ? { opacity: 0.7 } : {}),
+                    })}
+                    onPress={() => setSelectedCategory(category as TaskCategory)}
+                  >
+                    <Ionicons 
+                      name={
+                        category === 'priority' ? 'flag' : 
+                        category === 'on' ? 'play' : 
+                        category === 'pay' ? 'card' : 'pause'
+                      } 
+                      size={16} 
+                      color={
+                        selectedCategory === category ? 'white' : 
+                        category === 'priority' ? '#e74c3c' :
+                        category === 'on' ? '#3498db' :
+                        category === 'pay' ? '#f1c40f' : '#95a5a6'
+                      } 
+                    />
+                  </Pressable>
+                ))}
+              </View>
+            </View>
+            
+            {/* Color Selection */}
+            <View style={styles.selectionGroup}>
+              <Text style={styles.selectionLabel}>Color:</Text>
+              <View style={styles.checkboxGroup}>
+                {[
+                  { id: 'blue', color: '#3498db' },
+                  { id: 'green', color: '#2ecc71' },
+                  { id: 'pink', color: '#e84393' },
+                  { id: 'brown', color: '#8B4513' }
+                ].map((item) => (
+                  <Pressable
+                    key={item.id}
+                    style={({ pressed }) => ({
+                      ...styles.colorOption,
+                      backgroundColor: selectedColor === item.id ? item.color : `${item.color}33`,
+                      ...(selectedColor === item.id ? styles[`${item.id}ColorSelected` as keyof typeof styles] : {}),
+                      ...(pressed ? { opacity: 0.7 } : {}),
+                    })}
+                    onPress={() => setSelectedColor(item.id as 'green' | 'pink' | 'blue' | 'brown')}
+                  >
+                    {selectedColor === item.id && (
+                      <Ionicons name="checkmark" size={16} color="white" />
+                    )}
+                  </Pressable>
+                ))}
+              </View>
+            </View>
+          </View>
+        ) : null}
+        
+        <Pressable 
+          style={[styles.addButton, { marginLeft: 8 }]} 
+          onPress={handleAddTask}
+        >
           <Ionicons name="add" size={24} color="white" />
         </Pressable>
       </View>
-      {/* ...existing code... */}
       <View style={styles.filterToggleContainer}>
         <Pressable
           style={styles.filterToggleButton}
@@ -364,7 +459,6 @@ export default function App() {
           </Text>
         </Pressable>
       </View>
-      {/* ...existing code... */}
       {showFilter && (
         <View style={styles.filterContainer}>
           <View style={styles.filterTabsRow}>
@@ -441,7 +535,6 @@ export default function App() {
           </View>
         </View>
       )}
-      {/* ...existing code... */}
       {!showFilter ? (
         renderAllCategoriesView()
       ) : (
@@ -455,13 +548,11 @@ export default function App() {
           onRefresh={onRefresh}
         />
       )}
-      {/* ...existing code... */}
       {showFilter && filter === 'completed' && getFilterCount('completed') > 0 && (
         <Pressable style={styles.clearButton} onPress={clearCompleted}>
           <Text style={styles.clearButtonText}>Clear Completed</Text>
         </Pressable>
       )}
-      {/* ...existing code... */}
       <TaskTypeModal
         visible={showTaskTypeModal}
         onClose={() => {
@@ -531,6 +622,77 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 10,
+  },
+  // Web Controls
+  webControlsContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    marginRight: 8,
+  },
+  selectionGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  selectionLabel: {
+    fontSize: 12,
+    color: '#7f8c8d',
+    marginRight: 8,
+    minWidth: 60,
+  },
+  checkboxGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  categoryOption: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 6,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  colorOption: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 6,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  // Category selected states
+  prioritySelected: {
+    backgroundColor: '#e74c3c',
+  },
+  onSelected: {
+    backgroundColor: '#3498db',
+  },
+  paySelected: {
+    backgroundColor: '#f1c40f',
+  },
+  offSelected: {
+    backgroundColor: '#95a5a6',
+  },
+  // Color selected states
+  blueColorSelected: {
+    backgroundColor: '#3498db',
+    borderColor: '#2980b9',
+  },
+  greenColorSelected: {
+    backgroundColor: '#2ecc71',
+    borderColor: '#27ae60',
+  },
+  pinkColorSelected: {
+    backgroundColor: '#e84393',
+    borderColor: '#fd79a8',
+  },
+  brownColorSelected: {
+    backgroundColor: '#8B4513',
+    borderColor: '#654321',
   },
   filterToggleContainer: {
     paddingHorizontal: 20,
