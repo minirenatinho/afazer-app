@@ -10,4 +10,15 @@ export interface Task {
   color: TaskColor;
 }
 
+export interface Supermarket {
+  id: string;
+  name: string;
+  completed: boolean;
+  createdAt: number;
+  quantity?: number;
+  unit?: string;
+  price?: number;
+  notes?: string;
+}
+
 export type FilterType = 'priority' | 'on' | 'off' | 'pay' | 'completed'; 
