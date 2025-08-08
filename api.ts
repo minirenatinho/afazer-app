@@ -1,19 +1,23 @@
-// api.ts
-import { Task } from './types';
+import { Task, Supermarket } from './types';
 import Constants from 'expo-constants';
 
-// Get the API URL from app.config.js
-const API_BASE = 'http://192.168.1.14:8000/api/v1/tasks/';
-const SUPERMARKET_API_BASE = 'http://192.168.1.14:8000/api/v1/supermarket/';
+const API_URL = Constants.expoConfig?.extra?.EXPO_API_URL;
+if (!API_URL) {
+  throw new Error('API_URL is not set. Check .env and app.config.js');
+}
 
+const TASK_API_BASE = `${API_URL}/tasks`;
+const SUPERMARKET_API_BASE = `${API_URL}/supermarket`;
+
+// --- Task CRUD ---
 export async function fetchTasks(): Promise<Task[]> {
-  const res = await fetch(API_BASE);
+  const res = await fetch(`${TASK_API_BASE}/`);
   if (!res.ok) throw new Error('Failed to fetch tasks');
   return res.json();
 }
 
 export async function createTask(task: Omit<Task, 'id'>): Promise<Task> {
-  const res = await fetch(API_BASE, {
+  const res = await fetch(`${TASK_API_BASE}/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(task),
@@ -23,7 +27,7 @@ export async function createTask(task: Omit<Task, 'id'>): Promise<Task> {
 }
 
 export async function updateTask(task: Task): Promise<Task> {
-  const res = await fetch(`${API_BASE}${task.id}`, {
+  const res = await fetch(`${TASK_API_BASE}/${task.id}/`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(task),
@@ -33,32 +37,21 @@ export async function updateTask(task: Task): Promise<Task> {
 }
 
 export async function deleteTask(id: string): Promise<void> {
-  const res = await fetch(`${API_BASE}${id}`, {
+  const res = await fetch(`${TASK_API_BASE}/${id}/`, {
     method: 'DELETE',
   });
   if (!res.ok) throw new Error('Failed to delete task');
 } 
 
 // --- Supermarket CRUD ---
-export interface Supermarket {
-  id: string;
-  name: string;
-  completed: boolean;
-  createdAt: number;
-  quantity?: number;
-  unit?: string;
-  price?: number;
-  notes?: string;
-}
-
 export async function fetchSupermarkets(): Promise<Supermarket[]> {
-  const res = await fetch(SUPERMARKET_API_BASE);
+  const res = await fetch(`${SUPERMARKET_API_BASE}/`);
   if (!res.ok) throw new Error('Failed to fetch supermarkets');
   return res.json();
 }
 
 export async function createSupermarket(supermarket: Omit<Supermarket, 'id'>): Promise<Supermarket> {
-  const res = await fetch(SUPERMARKET_API_BASE, {
+  const res = await fetch(`${SUPERMARKET_API_BASE}/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(supermarket),
@@ -68,7 +61,7 @@ export async function createSupermarket(supermarket: Omit<Supermarket, 'id'>): P
 }
 
 export async function updateSupermarket(supermarket: Supermarket): Promise<Supermarket> {
-  const res = await fetch(`${SUPERMARKET_API_BASE}${supermarket.id}`, {
+  const res = await fetch(`${SUPERMARKET_API_BASE}/${supermarket.id}/`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(supermarket),
@@ -78,7 +71,7 @@ export async function updateSupermarket(supermarket: Supermarket): Promise<Super
 }
 
 export async function deleteSupermarket(id: string): Promise<void> {
-  const res = await fetch(`${SUPERMARKET_API_BASE}${id}`, {
+  const res = await fetch(`${SUPERMARKET_API_BASE}/${id}/`, {
     method: 'DELETE',
   });
   if (!res.ok) throw new Error('Failed to delete supermarket');
