@@ -17,7 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { TaskItem } from './components/TaskItem';
 import { TaskTypeModal } from './components/TaskTypeModal';
-import { Task, FilterType, TaskCategory } from './types';
+import { Task, FilterType } from './types';
 import { fetchTasks, createTask, updateTask, deleteTask as apiDeleteTask } from './api';
 import SupermarketPage from './SupermarketPage';
 
@@ -31,14 +31,14 @@ export default function App() {
   const [showFilter, setShowFilter] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   // Web-specific state for category and color selection
-  const [selectedCategory, setSelectedCategory] = useState<TaskCategory>('on');
-  const [selectedColor, setSelectedColor] = useState<'green' | 'pink' | 'blue' | 'brown'>('blue');
+  const [selectedCategory, setSelectedCategory] = useState<string>('ON');
+  const [selectedColor, setSelectedColor] = useState<string>('BLUE');
   // State to control visibility of each category column
   const [categoryVisibility, setCategoryVisibility] = useState({
-    priority: true,
-    on: true,
-    pay: true,
-    off: false, // 'off' column hidden by default
+    PRIORITY: true,
+    ON: true,
+    PAY: true,
+    OFF: false, // 'OFF' column hidden by default
   });
 
   useEffect(() => {
@@ -59,7 +59,7 @@ export default function App() {
         const parsedTasks = JSON.parse(storedTasks);
         const tasksWithColor = parsedTasks.map((task: Task) => ({
           ...task,
-          color: task.color || 'blue',
+          color: task.color || 'BLUE',
         }));
         setTasks(tasksWithColor);
       }
@@ -85,6 +85,7 @@ export default function App() {
           createdAt: Date.now(),
           category: selectedCategory,
           color: selectedColor,
+          type: selectedCategory,
         };
         
         (async () => {
@@ -106,13 +107,14 @@ export default function App() {
     }
   };
 
-  const handleTaskTypeSelect = async (category: 'priority' | 'on' | 'off' | 'pay', color: 'green' | 'pink' | 'blue' | 'brown') => {
+  const handleTaskTypeSelect = async (category: 'PRIORITY' | 'ON' | 'OFF' | 'PAY', color: 'GREEN' | 'PINK' | 'BLUE' | 'BROWN') => {
     const newTask = {
       text: pendingTaskText,
       completed: false,
       createdAt: Date.now(),
       category,
       color,
+      type: category,
     };
     try {
       const created = await createTask(newTask);
@@ -142,7 +144,7 @@ export default function App() {
     }
   };
 
-  const handleUpdateCategory = async (id: string, category: TaskCategory) => {
+  const handleUpdateCategory = async (id: string, category: string) => {
     const task = tasks.find(t => t.id === id);
     if (!task) return;
     const updatedTask = { ...task, category };
@@ -253,7 +255,7 @@ export default function App() {
 
   const renderAllCategoriesView = () => {
     // Only use categories that are valid for visibility toggling
-    const categories: Array<'priority' | 'on' | 'pay' | 'off'> = ['priority', 'on', 'pay', 'off']; // 'off' last
+    const categories: Array<'PRIORITY' | 'ON' | 'PAY' | 'OFF'> = ['PRIORITY', 'ON', 'PAY', 'OFF']; // 'off' last
     const tasksByCategory = categories.map(category =>
       tasks.filter(task => !task.completed && task.category === category)
     );
@@ -262,7 +264,7 @@ export default function App() {
     const handleToggleCategoryVisibility = (category: FilterType) => {
       setCategoryVisibility(prev => ({
         ...prev,
-        [category]: !prev[category as 'priority' | 'on' | 'off' | 'pay'],
+        [category]: !prev[category as 'PRIORITY' | 'ON' | 'OFF' | 'PAY'],
       }));
     };
 
@@ -282,43 +284,43 @@ export default function App() {
           {categories.map((category, index) => (
             <View key={category} style={[
               styles.categoryColumn,
-              category === 'off' && styles.offCategoryColumn
+              category === 'OFF' && styles.offCategoryColumn
             ]}>
               {/* Touchable title to toggle visibility */}
               <Pressable
                 style={({ pressed }) => [
                   styles.categoryHeader,
-                  category === 'off' && styles.offCategoryHeader,
+                  category === 'OFF' && styles.offCategoryHeader,
                   pressed && { opacity: 0.7 }
                 ]}
                 onPress={() => handleToggleCategoryVisibility(category)}
               >
                 <Ionicons
-                  name={category === 'priority' ? 'flag' : category === 'on' ? 'play' : category === 'off' ? 'pause' : 'card'}
+                  name={category === 'PRIORITY' ? 'flag' : category === 'ON' ? 'play' : category === 'OFF' ? 'pause' : 'card'}
                   size={16}
-                  color={category === 'priority' ? '#e74c3c' : category === 'on' ? '#3498db' : category === 'off' ? '#95a5a6' : '#f1c40f'}
+                  color={category === 'PRIORITY' ? '#e74c3c' : category === 'ON' ? '#3498db' : category === 'OFF' ? '#95a5a6' : '#f1c40f'}
                 />
                 <Text style={[
                   styles.categoryTitle,
-                  category === 'off' && styles.offCategoryText
+                  category === 'OFF' && styles.offCategoryText
                 ]}>
                   {category.charAt(0).toUpperCase() + category.slice(1)}
                 </Text>
                 <Text style={[
                   styles.categoryCount,
-                  category === 'off' && styles.offCategoryText
+                  category === 'OFF' && styles.offCategoryText
                 ]}>
                   ({tasksByCategory[index].length})
                 </Text>
                 <Ionicons
-                  name={categoryVisibility[category as 'priority' | 'on' | 'off' | 'pay'] ? 'eye' : 'eye-off'}
+                  name={categoryVisibility[category as 'PRIORITY' | 'ON' | 'OFF' | 'PAY'] ? 'eye' : 'eye-off'}
                   size={16}
                   color="#FF8C42"
                   style={{ marginLeft: 8 }}
                 />
               </Pressable>
               {/* Only show tasks if visible */}
-              {categoryVisibility[category as 'priority' | 'on' | 'off' | 'pay'] && (
+              {categoryVisibility[category as 'PRIORITY' | 'ON' | 'OFF' | 'PAY'] && (
                 <View style={styles.categoryTasksContainer}>
                   {tasksByCategory[index].map(task => (
                     <TaskItem
@@ -378,7 +380,7 @@ export default function App() {
             <View style={styles.selectionGroup}>
               <Text style={styles.selectionLabel}>Category:</Text>
               <View style={styles.checkboxGroup}>
-                {['priority', 'on', 'pay', 'off'].map((category) => (
+                {['PRIORITY', 'ON', 'PAY', 'OFF', 'SUPERMARKET'].map((category) => (
                   <Pressable
                     key={category}
                     style={({ pressed }) => ({
@@ -386,20 +388,20 @@ export default function App() {
                       ...(selectedCategory === category ? styles[`${category}Selected` as keyof typeof styles] : {}),
                       ...(pressed ? { opacity: 0.7 } : {}),
                     })}
-                    onPress={() => setSelectedCategory(category as TaskCategory)}
+                    onPress={() => setSelectedCategory(category)}
                   >
                     <Ionicons 
                       name={
-                        category === 'priority' ? 'flag' : 
-                        category === 'on' ? 'play' : 
-                        category === 'pay' ? 'card' : 'pause'
+                        category === 'PRIORITY' ? 'flag' : 
+                        category === 'ON' ? 'play' : 
+                        category === 'PAY' ? 'card' : 'pause'
                       } 
                       size={16} 
                       color={
                         selectedCategory === category ? 'white' : 
-                        category === 'priority' ? '#e74c3c' :
-                        category === 'on' ? '#3498db' :
-                        category === 'pay' ? '#f1c40f' : '#95a5a6'
+                        category === 'PRIORITY' ? '#e74c3c' :
+                        category === 'ON' ? '#3498db' :
+                        category === 'PAY' ? '#f1c40f' : '#95a5a6'
                       } 
                     />
                   </Pressable>
@@ -412,10 +414,10 @@ export default function App() {
               <Text style={styles.selectionLabel}>Color:</Text>
               <View style={styles.checkboxGroup}>
                 {[
-                  { id: 'blue', color: '#3498db' },
-                  { id: 'green', color: '#2ecc71' },
-                  { id: 'pink', color: '#e84393' },
-                  { id: 'brown', color: '#8B4513' }
+                  { id: 'BLUE', color: '#3498db' },
+                  { id: 'GREEN', color: '#2ecc71' },
+                  { id: 'PINK', color: '#e84393' },
+                  { id: 'BROWN', color: '#8B4513' }
                 ].map((item) => (
                   <Pressable
                     key={item.id}
@@ -425,7 +427,7 @@ export default function App() {
                       ...(selectedColor === item.id ? styles[`${item.id}ColorSelected` as keyof typeof styles] : {}),
                       ...(pressed ? { opacity: 0.7 } : {}),
                     })}
-                    onPress={() => setSelectedColor(item.id as 'green' | 'pink' | 'blue' | 'brown')}
+                    onPress={() => setSelectedColor(item.id as 'GREEN' | 'PINK' | 'BLUE' | 'BROWN')}
                   >
                     {selectedColor === item.id && (
                       <Ionicons name="checkmark" size={16} color="white" />
@@ -463,59 +465,59 @@ export default function App() {
         <View style={styles.filterContainer}>
           <View style={styles.filterTabsRow}>
             <Pressable
-              style={[styles.filterTab, filter === 'priority' && styles.activeFilterTab]}
-              onPress={() => setFilter('priority')}
+              style={[styles.filterTab, filter === 'PRIORITY' && styles.activeFilterTab]}
+              onPress={() => setFilter('PRIORITY')}
             >
               <Ionicons 
                 name="flag" 
                 size={16} 
-                color={filter === 'priority' ? 'white' : '#e74c3c'} 
+                color={filter === 'PRIORITY' ? 'white' : '#e74c3c'} 
                 style={styles.filterIcon}
               />
-              <Text style={[styles.filterText, filter === 'priority' && styles.activeFilterText]}>
-                Priority ({getFilterCount('priority')})
+              <Text style={[styles.filterText, filter === 'PRIORITY' && styles.activeFilterText]}>
+                Priority ({getFilterCount('PRIORITY')})
               </Text>
             </Pressable>
             <Pressable
-              style={[styles.filterTab, filter === 'on' && styles.activeFilterTab]}
-              onPress={() => setFilter('on')}
+              style={[styles.filterTab, filter === 'ON' && styles.activeFilterTab]}
+              onPress={() => setFilter('ON')}
             >
               <Ionicons 
                 name="play" 
                 size={16} 
-                color={filter === 'on' ? 'white' : '#3498db'} 
+                color={filter === 'ON' ? 'white' : '#3498db'} 
                 style={styles.filterIcon}
               />
-              <Text style={[styles.filterText, filter === 'on' && styles.activeFilterText]}>
-                On ({getFilterCount('on')})
+              <Text style={[styles.filterText, filter === 'ON' && styles.activeFilterText]}>
+                On ({getFilterCount('ON')})
               </Text>
             </Pressable>
             <Pressable
-              style={[styles.filterTab, filter === 'pay' && styles.activeFilterTab]}
-              onPress={() => setFilter('pay')}
+              style={[styles.filterTab, filter === 'PAY' && styles.activeFilterTab]}
+              onPress={() => setFilter('PAY')}
             >
               <Ionicons 
                 name="card" 
                 size={16} 
-                color={filter === 'pay' ? 'white' : '#f1c40f'} 
+                color={filter === 'PAY' ? 'white' : '#f1c40f'} 
                 style={styles.filterIcon}
               />
-              <Text style={[styles.filterText, filter === 'pay' && styles.activeFilterText]}>
-                Pay ({getFilterCount('pay')})
+              <Text style={[styles.filterText, filter === 'PAY' && styles.activeFilterText]}>
+                Pay ({getFilterCount('PAY')})
               </Text>
             </Pressable>
             <Pressable
-              style={[styles.filterTab, filter === 'off' && styles.activeFilterTab]}
-              onPress={() => setFilter('off')}
+              style={[styles.filterTab, filter === 'OFF' && styles.activeFilterTab]}
+              onPress={() => setFilter('OFF')}
             >
               <Ionicons 
                 name="pause" 
                 size={16} 
-                color={filter === 'off' ? 'white' : '#95a5a6'} 
+                color={filter === 'OFF' ? 'white' : '#95a5a6'} 
                 style={styles.filterIcon}
               />
-              <Text style={[styles.filterText, filter === 'off' && styles.activeFilterText]}>
-                Off ({getFilterCount('off')})
+              <Text style={[styles.filterText, filter === 'OFF' && styles.activeFilterText]}>
+                Off ({getFilterCount('OFF')})
               </Text>
             </Pressable>
             <Pressable

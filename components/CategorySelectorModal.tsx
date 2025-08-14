@@ -18,10 +18,10 @@ interface CategorySelectorModalProps {
 }
 
 const categoryOptions: CategoryOption[] = [
-  { value: 'priority', label: 'Priority', icon: 'flag', color: '#e74c3c' },
-  { value: 'on', label: 'On', icon: 'play', color: '#3498db' },
-  { value: 'off', label: 'Off', icon: 'pause', color: '#95a5a6' },
-  { value: 'pay', label: 'Pay', icon: 'card', color: '#f1c40f' },
+  { value: 'PRIORITY', label: 'Priority', icon: 'flag', color: '#e74c3c' },
+  { value: 'ON', label: 'On', icon: 'play', color: '#3498db' },
+  { value: 'OFF', label: 'Off', icon: 'pause', color: '#95a5a6' },
+  { value: 'PAY', label: 'Pay', icon: 'card', color: '#f1c40f' },
 ];
 
 export const CategorySelectorModal: React.FC<CategorySelectorModalProps> = ({

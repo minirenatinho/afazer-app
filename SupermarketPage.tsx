@@ -22,9 +22,19 @@ import { fetchSupermarkets, createSupermarket, updateSupermarket, deleteSupermar
 
 export interface Supermarket {
   id: string;
-  name: string;
+  text: string;
   completed: boolean;
   createdAt: number;
+  category: string;
+  color: string;
+  type: string;
+  dynamics?: {
+    quantity?: number;
+    unit?: string;
+    price?: number;
+    notes?: string;
+  };
+  // Keep these for backward compatibility
   quantity?: number;
   unit?: string;
   price?: number;
@@ -104,13 +114,18 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
   const handleAddSupermarket = async () => {
     if (!newSupermarketText.trim()) return;
     const newSupermarket = {
-      name: newSupermarketText.trim(),
+      text: newSupermarketText.trim(),
       completed: false,
       createdAt: Date.now(),
-      quantity: newQuantity ? Number(newQuantity) : undefined,
-      unit: newUnit || undefined,
-      price: newPrice ? Number(newPrice) : undefined,
-      notes: newNotes || undefined,
+      type: 'supermarket',
+      category: 'SUPERMARKET',
+      color: 'BLUE',
+      dynamics: {
+        quantity: newQuantity ? Number(newQuantity) : undefined,
+        unit: newUnit || undefined,
+        price: newPrice ? Number(newPrice) : undefined,
+        notes: newNotes || undefined,
+      },
     };
     try {
       const created = await createSupermarket(newSupermarket);
@@ -160,6 +175,11 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
 
   const renderSupermarket = ({ item }: { item: Supermarket }) => {
     const isEditing = editingId === item.id;
+    const quantity = item.dynamics?.quantity ?? item.quantity;
+    const unit = item.dynamics?.unit ?? item.unit;
+    const price = item.dynamics?.price ?? item.price;
+    const notes = item.dynamics?.notes ?? item.notes;
+    
     return (
       <View style={styles.itemContainer}>
         <Pressable onPress={() => toggleSupermarket(item.id)}>
@@ -211,15 +231,22 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
                 style={[styles.addButton, { backgroundColor: '#4CAF50', width: 40, height: 40 }]}
                 onPress={async () => {
                   try {
-                    const updated = {
-                      ...item,
-                      name: editText.trim(),
-                      quantity: editQuantity ? Number(editQuantity) : undefined,
-                      unit: editUnit || undefined,
-                      price: editPrice ? Number(editPrice) : undefined,
-                      notes: editNotes || undefined,
+                    const updatedSupermarket = {
+                      id: item.id,
+                      text: editText.trim(),
+                      completed: item.completed,
+                      createdAt: item.createdAt,
+                      type: 'supermarket',
+                      category: 'SUPERMARKET',
+                      color: 'BLUE',
+                      dynamics: {
+                        quantity: editQuantity ? Number(editQuantity) : undefined,
+                        unit: editUnit || undefined,
+                        price: editPrice ? Number(editPrice) : undefined,
+                        notes: editNotes || undefined,
+                      },
                     };
-                    const apiItem = await updateSupermarket(updated);
+                    const apiItem = await updateSupermarket(updatedSupermarket);
                     const updatedList = supermarkets.map(s => s.id === item.id ? apiItem : s);
                     setSupermarkets(updatedList);
                     saveSupermarketsToCache(updatedList);
@@ -234,11 +261,11 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
               <Pressable
                 style={[styles.addButton, { backgroundColor: '#e74c3c', width: 40, height: 40 }]}
                 onPress={() => {
-                  setEditText(item.name);
-                  setEditQuantity(item.quantity ? String(item.quantity) : '');
-                  setEditUnit(item.unit || '');
-                  setEditPrice(item.price ? String(item.price) : '');
-                  setEditNotes(item.notes || '');
+                  setEditText(item.text);
+                  setEditQuantity(quantity ? String(quantity) : '');
+                  setEditUnit(unit || '');
+                  setEditPrice(price ? String(price) : '');
+                  setEditNotes(notes || '');
                   setEditingId(null);
                 }}
               >
@@ -252,28 +279,33 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
             onPress={() => {
               if (!item.completed) {
                 setEditingId(item.id);
-                setEditText(item.name);
-                setEditQuantity(item.quantity ? String(item.quantity) : '');
-                setEditUnit(item.unit || '');
-                setEditPrice(item.price ? String(item.price) : '');
-                setEditNotes(item.notes || '');
+                setEditText(item.text);
+                setEditQuantity(quantity ? String(quantity) : '');
+                setEditUnit(unit || '');
+                setEditPrice(price ? String(price) : '');
+                setEditNotes(notes || '');
               }
             }}
             disabled={item.completed}
           >
-            <Text style={[styles.itemText, item.completed && styles.completedText]}>{item.name}</Text>
-            {item.quantity !== undefined && (
-              <Text style={{ marginLeft: 12, marginRight: 8, color: '#888' }}>Qty: {item.quantity} {item.unit}</Text>
-            )}
-            {item.price !== undefined && (
-              <Text style={{ marginLeft: 12, marginRight: 8, color: '#888' }}>Unit price: ${ (item.price / 100).toFixed(2) }</Text>
-            )}
-            {item.price !== undefined && (
-              <Text style={{ marginLeft: 12, marginRight: 8, color: '#888' }}>Total price: ${ ((item.price * (item.quantity || 1)) / 100).toFixed(2) }</Text>
-            )}
-            {item.notes && (
-              <Text style={{ marginLeft: 12, color: '#888', marginTop: 2 }}>Notes: {item.notes}</Text>
-            )}
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.itemText, item.completed && styles.completedText]}>{item.text}</Text>
+              {(quantity !== undefined || item.quantity !== undefined) ? (
+                <Text style={{ marginLeft: 12, marginRight: 8, color: '#888' }}>
+                  Qty: {quantity} {unit || ''}
+                </Text>
+              ) : null}
+              {(price !== undefined || item.price !== undefined) ? (
+                <Text style={{ marginLeft: 12, marginRight: 8, color: '#888' }}>
+                  Unit price: {Number(price).toFixed(2)}
+                </Text>
+              ) : null}
+              {notes?.trim() ? (
+                <Text style={{ marginLeft: 12, color: '#888', marginTop: 4 }}>
+                  {notes.trim()}
+                </Text>
+              ) : null}
+            </View>
           </Pressable>
         )}
         <Pressable
