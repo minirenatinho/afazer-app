@@ -13,7 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 interface TaskTypeModalProps {
   visible: boolean;
   onClose: () => void;
-  onSelectType: (type: 'priority' | 'on' | 'pay' | 'off', color: 'green' | 'pink' | 'blue' | 'brown') => void;
+  onSelectType: (type: 'PRIORITY' | 'ON' | 'PAY' | 'OFF', color: 'GREEN' | 'PINK' | 'BLUE' | 'BROWN') => void;
 }
 
 const { width } = Dimensions.get('window');
@@ -23,33 +23,33 @@ export const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
   onClose,
   onSelectType,
 }) => {
-  const [selectedCategory, setSelectedCategory] = useState<'priority' | 'on' | 'off' | 'pay' | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<'PRIORITY' | 'ON' | 'OFF' | 'PAY' | null>(null);
   const [step, setStep] = useState<'category' | 'color'>('category');
 
   const taskTypes = [
     {
-      type: 'priority' as const,
+      type: 'PRIORITY' as const,
       title: 'Priority',
       description: 'High priority tasks that need immediate attention',
       icon: 'flag',
       color: '#e74c3c',
     },
     {
-      type: 'on' as const,
+      type: 'ON' as const,
       title: 'On',
       description: 'Tasks that are currently in progress',
       icon: 'play',
       color: '#3498db',
     },
     {
-      type: 'off' as const,
+      type: 'OFF' as const,
       title: 'Off',
       description: 'Tasks that are planned but not started',
       icon: 'pause',
       color: '#95a5a6',
     },
     {
-      type: 'pay' as const,
+      type: 'PAY' as const,
       title: 'Pay',
       description: 'Tasks related to payments or bills',
       icon: 'card',
@@ -59,37 +59,37 @@ export const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
 
   const colorOptions = [
     {
-      color: 'green' as const,
-      name: 'Green',
+      color: 'GREEN' as const,
+      name: 'GREEN',
       backgroundColor: '#E8F5E8',
       borderColor: '#A8D5A8',
     },
     {
-      color: 'pink' as const,
-      name: 'Pink',
+      color: 'PINK' as const,
+      name: 'PINK',
       backgroundColor: '#FCE8F0',
       borderColor: '#F5B8D1',
     },
     {
-      color: 'blue' as const,
-      name: 'Blue',
+      color: 'BLUE' as const,
+      name: 'BLUE',
       backgroundColor: '#E8F2FC',
       borderColor: '#B8D5F5',
     },
     {
-      color: 'brown' as const,
-      name: 'Brown',
+      color: 'BROWN' as const,
+      name: 'BROWN',
       backgroundColor: '#F5F0E8',
       borderColor: '#D5C5B8',
     },
   ];
 
-  const handleCategorySelect = (category: 'priority' | 'on' | 'off' | 'pay') => {
+  const handleCategorySelect = (category: 'PRIORITY' | 'ON' | 'OFF' | 'PAY') => {
     setSelectedCategory(category);
     setStep('color');
   };
 
-  const handleColorSelect = (color: 'green' | 'pink' | 'blue' | 'brown') => {
+  const handleColorSelect = (color: 'GREEN' | 'PINK' | 'BLUE' | 'BROWN') => {
     if (selectedCategory) {
       onSelectType(selectedCategory, color);
       // Reset modal state

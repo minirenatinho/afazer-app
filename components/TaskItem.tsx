@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Pressable, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Task, TaskCategory } from '../types';
+import { Task } from '../types';
 import { CategorySelectorModal } from './CategorySelectorModal';
 
 interface TaskItemProps {
   task: Task;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
-  onUpdateCategory: (id: string, category: TaskCategory) => Promise<void>;
+  onUpdateCategory: (id: string, category: string) => Promise<void>;
   onUpdateText: (id: string, newText: string) => Promise<void>;
 }
 
@@ -29,13 +29,13 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   }, [task.text]);
   const getCategoryConfig = (category: Task['category']) => {
     switch (category) {
-      case 'priority':
+      case 'PRIORITY':
         return { icon: 'flag', color: '#e74c3c', label: 'Priority' };
-      case 'on':
+      case 'ON':
         return { icon: 'play', color: '#3498db', label: 'On' };
-      case 'off':
+      case 'OFF':
         return { icon: 'pause', color: '#95a5a680', label: 'Off' };
-      case 'pay':
+      case 'PAY':
         return { icon: 'card', color: '#f1c40f', label: 'Pay' };
       default:
         return { icon: 'ellipse', color: '#95a5a6', label: 'Task' };
@@ -44,13 +44,13 @@ export const TaskItem: React.FC<TaskItemProps> = ({
 
   const getColorConfig = (color: Task['color']) => {
     switch (color) {
-      case 'green':
+      case 'GREEN':
         return { backgroundColor: '#E8F5E8', borderColor: '#A8D5A8' };
-      case 'pink':
+      case 'PINK':
         return { backgroundColor: '#FCE8F0', borderColor: '#F5B8D1' };
-      case 'blue':
+      case 'BLUE':
         return { backgroundColor: '#E8F2FC', borderColor: '#B8D5F5' };
-      case 'brown':
+      case 'BROWN':
         return { backgroundColor: '#F5F0E8', borderColor: '#D5C5B8' };
       default:
         return { backgroundColor: '#f8f9fa', borderColor: '#e9ecef' };
@@ -63,10 +63,10 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   return (
     <View style={[
       styles.taskItem,
-      task.category === 'priority' && styles.priorityTaskItem,
+      task.category === 'PRIORITY' && styles.priorityTaskItem,
       {
         backgroundColor: colorConfig.backgroundColor,
-        borderColor: task.category === 'priority' ? '#e74c3c' : colorConfig.borderColor,
+        borderColor: task.category === 'PRIORITY' ? '#e74c3c' : colorConfig.borderColor,
       },
     ]}>
       <Pressable
@@ -86,7 +86,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             <TextInput
               style={[
                 styles.taskText,
-                task.category === 'priority' && styles.priorityTaskText,
+                task.category === 'PRIORITY' && styles.priorityTaskText,
                 task.completed && styles.completedTaskText,
                 { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e9ecef', borderRadius: 6, paddingHorizontal: 8 },
               ]}
@@ -126,7 +126,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             <Text
               style={[
                 styles.taskText,
-                task.category === 'priority' && styles.priorityTaskText,
+                task.category === 'PRIORITY' && styles.priorityTaskText,
                 task.completed && styles.completedTaskText,
               ]}
             >
