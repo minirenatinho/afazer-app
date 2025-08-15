@@ -1,4 +1,4 @@
-import { Task } from './types';
+import { Task, Country } from './types';
 import Constants from 'expo-constants';
 
 const API_URL = Constants.expoConfig?.extra?.EXPO_API_URL;
@@ -131,4 +131,70 @@ export async function deleteSupermarket(id: string): Promise<void> {
     method: 'DELETE',
   });
   if (!res.ok) throw new Error('Failed to delete supermarket');
+}
+
+export async function fetchCountries(): Promise<Country[]> {
+  const res = await fetch(`${TASK_API_BASE}/?type=country`);
+  if (!res.ok) throw new Error('Failed to fetch countries');
+  return res.json();
+}
+
+export async function createCountry(country: Omit<Country, 'id'>): Promise<Country> {
+  const taskData: Omit<Country, 'id'> = {
+    text: country.text,
+    type: 'country',
+    completed: country.completed || false,
+    createdAt: country.createdAt || Date.now(),
+    category: 'COUNTRY',
+    color: 'GREEN',
+    dynamics: {
+      capital: country.dynamics?.capital,
+      population: country.dynamics?.population,
+      language: country.dynamics?.language,
+      notes: country.dynamics?.notes,
+    },
+  };
+
+  const res = await fetch(`${TASK_API_BASE}/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(taskData),
+  });
+  
+  if (!res.ok) throw new Error('Failed to create country');
+  return res.json();
+}
+
+export async function updateCountry(country: Country): Promise<Country> {
+  const taskData: Country = {
+    id: country.id,
+    text: country.text,
+    type: 'country',
+    completed: country.completed,
+    createdAt: country.createdAt,
+    category: 'COUNTRY',
+    color: 'GREEN',
+    dynamics: {
+      capital: country.dynamics?.capital,
+      population: country.dynamics?.population,
+      language: country.dynamics?.language,
+      notes: country.dynamics?.notes,
+    },
+  };
+
+  const res = await fetch(`${TASK_API_BASE}/${country.id}/`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(taskData),
+  });
+  
+  if (!res.ok) throw new Error('Failed to update country');
+  return res.json();
+}
+
+export async function deleteCountry(id: string): Promise<void> {
+  const res = await fetch(`${TASK_API_BASE}/${id}/`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to delete country');
 }
