@@ -339,15 +339,6 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <StatusBar barStyle="dark-content" backgroundColor="#f8f9fa" />
-      <View style={styles.header}>
-        {onBack ? (
-          <Pressable onPress={handleBackPress}>
-            <Text style={styles.title}>Supermarket</Text>
-          </Pressable>
-        ) : (
-          <Text style={styles.title}>Supermarket</Text>
-        )}
-      </View>
       <View style={styles.inputContainer}>
         <TextInput
           style={[styles.input, Platform.OS === 'web' && { flex: 2, marginRight: 8 }]}
@@ -594,25 +585,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
   },
   header: {
-    ...(Platform.OS === 'web' ? {
-      height: 100,
-      paddingHorizontal: 20,
-      justifyContent: 'center',
-      alignItems: 'center',
-    } : {
-      paddingTop: 40,
-      paddingBottom: 15,
-      paddingHorizontal: 20,
-    }),
-    backgroundColor: '#FF8C42',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    display: 'none',
   },
   title: {
-    fontSize: Platform.OS === 'web' ? 48 : 32,
-    fontWeight: 'bold',
-    color: 'white',
-    textAlign: 'center',
+    display: 'none',
   },
   inputContainer: {
     flexDirection: 'row',
