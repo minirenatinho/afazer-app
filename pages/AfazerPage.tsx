@@ -268,6 +268,8 @@ export default function AfazerPage() {
       <ScrollView
         style={styles.allCategoriesContainer}
         contentContainerStyle={styles.allCategoriesContent}
+        scrollEnabled={true}
+        nestedScrollEnabled={true}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
