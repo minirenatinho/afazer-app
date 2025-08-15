@@ -72,6 +72,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
       <Pressable
         style={styles.taskCheckbox}
         onPress={() => onToggle(task.id)}
+        hitSlop={10}
+        pressRetentionOffset={10}
       >
         <Ionicons
           name={task.completed ? 'checkmark-circle' : 'ellipse-outline'}
@@ -122,6 +124,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           <Pressable
             onPress={() => !task.completed && setIsEditing(true)}
             disabled={task.completed}
+            hitSlop={10}
+            pressRetentionOffset={10}
           >
             <Text
               style={[
@@ -139,6 +143,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           <Pressable
             style={[styles.categoryBadge, { backgroundColor: categoryConfig.color }]}
             onPress={() => setIsCategoryModalVisible(true)}
+            hitSlop={10}
+            pressRetentionOffset={10}
           >
             <Ionicons name={categoryConfig.icon as any} size={12} color="white" />
             <Text style={styles.categoryText}>{categoryConfig.label}</Text>
@@ -149,6 +155,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
       <Pressable
         style={styles.deleteButton}
         onPress={() => onDelete(task.id)}
+        hitSlop={10}
+        pressRetentionOffset={10}
       >
         <Ionicons name="trash-outline" size={20} color="#FF6B6B" />
       </Pressable>
