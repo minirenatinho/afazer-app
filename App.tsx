@@ -17,6 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { TaskItem } from './components/TaskItem';
 import { TaskTypeModal } from './components/TaskTypeModal';
+import { PageCarousel } from './components/PageCarousel';
 import { Task, FilterType } from './types';
 import { fetchTasks, createTask, updateTask, deleteTask as apiDeleteTask } from './api';
 import SupermarketPage from './SupermarketPage';
@@ -348,213 +349,154 @@ export default function App() {
     setRefreshing(false);
   };
 
-  if (page === 'supermarket') {
-    return <SupermarketPage onBack={() => setPage('afazer')} />;
-  }
-  return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <StatusBar barStyle="dark-content" backgroundColor="#f8f9fa" />
-      {/* Header */}
-      <View style={styles.header}>
-        <Pressable onPress={() => setPage('supermarket')}>
-          <Text style={styles.title}>Afazer</Text>
-        </Pressable>
-      </View>
-      {/* Add Task Input */}
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={[styles.input, { flex: 2, marginRight: 8 }]}
-          placeholder="Add a new task..."
-          value={newTaskText}
-          onChangeText={setNewTaskText}
-          onSubmitEditing={handleAddTask}
-          returnKeyType="done"
-        />
-        
-        {Platform.OS === 'web' ? (
-          <View style={styles.webControlsContainer}>
-            {/* Category Selection */}
-            <View style={styles.selectionGroup}>
-              <Text style={styles.selectionLabel}>Category:</Text>
-              <View style={styles.checkboxGroup}>
-                {['PRIORITY', 'ON', 'PAY', 'OFF', 'SUPERMARKET'].map((category) => (
-                  <Pressable
-                    key={category}
-                    style={({ pressed }) => ({
-                      ...styles.categoryOption,
-                      ...(selectedCategory === category ? styles[`${category}Selected` as keyof typeof styles] : {}),
-                      ...(pressed ? { opacity: 0.7 } : {}),
-                    })}
-                    onPress={() => setSelectedCategory(category)}
-                  >
-                    <Ionicons 
-                      name={
-                        category === 'PRIORITY' ? 'flag' : 
-                        category === 'ON' ? 'play' : 
-                        category === 'PAY' ? 'card' : 'pause'
-                      } 
-                      size={16} 
-                      color={
-                        selectedCategory === category ? 'white' : 
-                        category === 'PRIORITY' ? '#e74c3c' :
-                        category === 'ON' ? '#3498db' :
-                        category === 'PAY' ? '#f1c40f' : '#95a5a6'
-                      } 
-                    />
-                  </Pressable>
-                ))}
-              </View>
-            </View>
-            
-            {/* Color Selection */}
-            <View style={styles.selectionGroup}>
-              <Text style={styles.selectionLabel}>Color:</Text>
-              <View style={styles.checkboxGroup}>
-                {[
-                  { id: 'BLUE', color: '#3498db' },
-                  { id: 'GREEN', color: '#2ecc71' },
-                  { id: 'PINK', color: '#e84393' },
-                  { id: 'BROWN', color: '#8B4513' }
-                ].map((item) => (
-                  <Pressable
-                    key={item.id}
-                    style={({ pressed }) => ({
-                      ...styles.colorOption,
-                      backgroundColor: selectedColor === item.id ? item.color : `${item.color}33`,
-                      ...(selectedColor === item.id ? styles[`${item.id}ColorSelected` as keyof typeof styles] : {}),
-                      ...(pressed ? { opacity: 0.7 } : {}),
-                    })}
-                    onPress={() => setSelectedColor(item.id as 'GREEN' | 'PINK' | 'BLUE' | 'BROWN')}
-                  >
-                    {selectedColor === item.id && (
-                      <Ionicons name="checkmark" size={16} color="white" />
-                    )}
-                  </Pressable>
-                ))}
-              </View>
+  const pages = [
+    { id: 'afazer', title: 'Afazer' },
+    { id: 'supermarket', title: 'Supermarket' },
+  ];
+
+  const renderTaskInput = () => (
+    <View style={styles.inputContainer}>
+      <TextInput
+        style={[styles.input, { flex: 2, marginRight: 8 }]}
+        placeholder="Add a new task..."
+        value={newTaskText}
+        onChangeText={setNewTaskText}
+        onSubmitEditing={handleAddTask}
+        returnKeyType="done"
+      />
+      
+      {Platform.OS === 'web' ? (
+        <View style={styles.webControlsContainer}>
+          {/* Category Selection */}
+          <View style={styles.selectionGroup}>
+            <Text style={styles.selectionLabel}>Category:</Text>
+            <View style={styles.checkboxGroup}>
+              {['PRIORITY', 'ON', 'PAY', 'OFF', 'SUPERMARKET'].map((category) => (
+                <Pressable
+                  key={category}
+                  style={({ pressed }) => ({
+                    ...styles.categoryOption,
+                    ...(selectedCategory === category ? styles[`${category}Selected` as keyof typeof styles] : {}),
+                    ...(pressed ? { opacity: 0.7 } : {}),
+                  })}
+                  onPress={() => setSelectedCategory(category)}
+                >
+                  <Ionicons 
+                    name={
+                      category === 'PRIORITY' ? 'flag' : 
+                      category === 'ON' ? 'play' : 
+                      category === 'PAY' ? 'card' : 'pause'
+                    } 
+                    size={16} 
+                    color={
+                      selectedCategory === category ? 'white' : 
+                      category === 'PRIORITY' ? '#e74c3c' :
+                      category === 'ON' ? '#3498db' :
+                      category === 'PAY' ? '#f1c40f' : '#95a5a6'
+                    } 
+                  />
+                </Pressable>
+              ))}
             </View>
           </View>
-        ) : null}
-        
-        <Pressable 
-          style={[styles.addButton, { marginLeft: 8 }]} 
-          onPress={handleAddTask}
-        >
-          <Ionicons name="add" size={24} color="white" />
-        </Pressable>
-      </View>
-      <View style={styles.filterToggleContainer}>
-        <Pressable
-          style={styles.filterToggleButton}
-          onPress={() => setShowFilter(!showFilter)}
-        >
-          <Ionicons 
-            name={showFilter ? "chevron-up" : "chevron-down"} 
-            size={20} 
-            color="#FF8C42" 
-          />
-          <Text style={styles.filterToggleText}>
-            {showFilter ? 'Show All Categories' : 'Show Filtered'}
-          </Text>
-        </Pressable>
-      </View>
-      {showFilter && (
-        <View style={styles.filterContainer}>
-          <View style={styles.filterTabsRow}>
-            <Pressable
-              style={[styles.filterTab, filter === 'PRIORITY' && styles.activeFilterTab]}
-              onPress={() => setFilter('PRIORITY')}
-            >
-              <Ionicons 
-                name="flag" 
-                size={16} 
-                color={filter === 'PRIORITY' ? 'white' : '#e74c3c'} 
-                style={styles.filterIcon}
-              />
-              <Text style={[styles.filterText, filter === 'PRIORITY' && styles.activeFilterText]}>
-                Priority ({getFilterCount('PRIORITY')})
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[styles.filterTab, filter === 'ON' && styles.activeFilterTab]}
-              onPress={() => setFilter('ON')}
-            >
-              <Ionicons 
-                name="play" 
-                size={16} 
-                color={filter === 'ON' ? 'white' : '#3498db'} 
-                style={styles.filterIcon}
-              />
-              <Text style={[styles.filterText, filter === 'ON' && styles.activeFilterText]}>
-                On ({getFilterCount('ON')})
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[styles.filterTab, filter === 'PAY' && styles.activeFilterTab]}
-              onPress={() => setFilter('PAY')}
-            >
-              <Ionicons 
-                name="card" 
-                size={16} 
-                color={filter === 'PAY' ? 'white' : '#f1c40f'} 
-                style={styles.filterIcon}
-              />
-              <Text style={[styles.filterText, filter === 'PAY' && styles.activeFilterText]}>
-                Pay ({getFilterCount('PAY')})
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[styles.filterTab, filter === 'OFF' && styles.activeFilterTab]}
-              onPress={() => setFilter('OFF')}
-            >
-              <Ionicons 
-                name="pause" 
-                size={16} 
-                color={filter === 'OFF' ? 'white' : '#95a5a6'} 
-                style={styles.filterIcon}
-              />
-              <Text style={[styles.filterText, filter === 'OFF' && styles.activeFilterText]}>
-                Off ({getFilterCount('OFF')})
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[styles.filterTab, filter === 'completed' && styles.activeFilterTab]}
-              onPress={() => setFilter('completed')}
-            >
-              <Ionicons 
-                name="checkmark-circle" 
-                size={16} 
-                color={filter === 'completed' ? 'white' : '#4CAF50'} 
-                style={styles.filterIcon}
-              />
-              <Text style={[styles.filterText, filter === 'completed' && styles.activeFilterText]}>
-                Done ({getFilterCount('completed')})
-              </Text>
-            </Pressable>
+          
+          {/* Color Selection */}
+          <View style={styles.selectionGroup}>
+            <Text style={styles.selectionLabel}>Color:</Text>
+            <View style={styles.checkboxGroup}>
+              {[
+                { id: 'BLUE', color: '#3498db' },
+                { id: 'GREEN', color: '#2ecc71' },
+                { id: 'PINK', color: '#e84393' },
+                { id: 'BROWN', color: '#8B4513' }
+              ].map((item) => (
+                <Pressable
+                  key={item.id}
+                  style={({ pressed }) => ({
+                    ...styles.colorOption,
+                    backgroundColor: selectedColor === item.id ? item.color : `${item.color}33`,
+                    ...(selectedColor === item.id ? styles[`${item.id}ColorSelected` as keyof typeof styles] : {}),
+                    ...(pressed ? { opacity: 0.7 } : {}),
+                  })}
+                  onPress={() => setSelectedColor(item.id as 'GREEN' | 'PINK' | 'BLUE' | 'BROWN')}
+                >
+                  {selectedColor === item.id && (
+                    <Ionicons name="checkmark" size={16} color="white" />
+                  )}
+                </Pressable>
+              ))}
+            </View>
           </View>
         </View>
-      )}
-      {!showFilter ? (
-        renderAllCategoriesView()
-      ) : (
-        <FlatList
-          data={filteredTasks}
-          renderItem={renderTask}
-          keyExtractor={item => item.id}
-          style={styles.taskList}
-          showsVerticalScrollIndicator={false}
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-        />
-      )}
-      {showFilter && filter === 'completed' && getFilterCount('completed') > 0 && (
-        <Pressable style={styles.clearButton} onPress={clearCompleted}>
-          <Text style={styles.clearButtonText}>Clear Completed</Text>
-        </Pressable>
-      )}
+      ) : null}
+      
+      <Pressable 
+        style={[styles.addButton, { marginLeft: 8 }]} 
+        onPress={handleAddTask}
+      >
+        <Ionicons name="add" size={24} color="white" />
+      </Pressable>
+    </View>
+  );
+
+  const renderPage = () => {
+    if (page === 'supermarket') {
+      return <SupermarketPage />;
+    }
+    
+    return (
+      <>
+        {renderTaskInput()}
+        <View style={styles.filterToggleContainer}>
+          <Pressable
+            style={styles.filterToggleButton}
+            onPress={() => setShowFilter(!showFilter)}
+          >
+            <Ionicons 
+              name={showFilter ? "chevron-up" : "chevron-down"} 
+              size={20} 
+              color="#FF8C42" 
+            />
+            <Text style={styles.filterToggleText}>
+              {showFilter ? 'Show All Categories' : 'Show Filtered'}
+            </Text>
+          </Pressable>
+        </View>
+        {showFilter ? (
+          <FlatList
+            data={filteredTasks}
+            renderItem={renderTask}
+            keyExtractor={item => item.id}
+            style={styles.taskList}
+            showsVerticalScrollIndicator={false}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        ) : (
+          renderAllCategoriesView()
+        )}
+        {showFilter && filter === 'completed' && getFilterCount('completed') > 0 && (
+          <Pressable style={styles.clearButton} onPress={clearCompleted}>
+            <Text style={styles.clearButtonText}>Clear Completed</Text>
+          </Pressable>
+        )}
+      </>
+    );
+  };
+
+  return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+    >
+      <StatusBar barStyle="light-content" />
+<PageCarousel 
+        pages={pages} 
+        currentPageId={page} 
+        onPageChange={(pageId) => setPage(pageId as 'afazer' | 'supermarket')} 
+      />
+      {renderPage()}
       <TaskTypeModal
         visible={showTaskTypeModal}
         onClose={() => {
