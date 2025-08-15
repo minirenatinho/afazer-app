@@ -8,22 +8,26 @@ import {
 import { PageCarousel } from './components/PageCarousel';
 import SupermarketPage from './pages/SupermarketPage';
 import AfazerPage from './pages/AfazerPage';
+import CountryPage from './pages/CountryPage';
 
 export default function App() {
-  const [page, setPage] = useState<'afazer' | 'supermarket'>('afazer');
+  const [page, setPage] = useState<'afazer' | 'supermarket' | 'country'>('afazer');
  
   const pages = [
     { id: 'afazer', title: 'Afazer' },
     { id: 'supermarket', title: 'Supermarket' },
+    { id: 'country', title: 'Countries' },
   ];
 
   const renderPage = () => {
-    if (page === 'supermarket') {
-      return <SupermarketPage />;
-    }
-    
-    if (page === 'afazer') {
-      return <AfazerPage />;
+    switch (page) {
+      case 'supermarket':
+        return <SupermarketPage />;
+      case 'country':
+        return <CountryPage />;
+      case 'afazer':
+      default:
+        return <AfazerPage />;
     }
   };
 
@@ -37,7 +41,7 @@ export default function App() {
 <PageCarousel 
         pages={pages} 
         currentPageId={page} 
-        onPageChange={(pageId) => setPage(pageId as 'afazer' | 'supermarket')} 
+        onPageChange={(pageId) => setPage(pageId as 'afazer' | 'supermarket' | 'country')} 
       />
       {renderPage()}
     </KeyboardAvoidingView>

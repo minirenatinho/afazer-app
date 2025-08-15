@@ -11,7 +11,19 @@ export interface Task {
     unit?: string;
     price?: number;
     notes?: string;
+    capital?: string;
+    population?: number;
+    language?: string;
   };
 }
 
-export type FilterType = 'PRIORITY' | 'ON' | 'OFF' | 'PAY' | 'SUPERMARKET' | 'completed'; 
+export interface Country extends Omit<Task, 'dynamics'> {
+  dynamics?: {
+    capital?: string;
+    population?: number;
+    language?: string;
+    notes?: string;
+  };
+}
+
+export type FilterType = 'PRIORITY' | 'ON' | 'OFF' | 'PAY' | 'SUPERMARKET' | 'COUNTRY' | 'completed';
