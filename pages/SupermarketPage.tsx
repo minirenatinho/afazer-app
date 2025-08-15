@@ -18,7 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 // SupermarketItem will be a copy of TaskItem but for supermarket
 // We'll create it after this step
-import { fetchSupermarkets, createSupermarket, updateSupermarket, deleteSupermarket } from './api';
+import { fetchSupermarkets, createSupermarket, updateSupermarket, deleteSupermarket } from '../api';
 
 export interface Supermarket {
   id: string;
