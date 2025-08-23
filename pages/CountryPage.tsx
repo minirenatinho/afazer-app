@@ -45,7 +45,6 @@ type CountryPageProps = {
 export default function CountryPage({ onBack }: CountryPageProps) {
   const [countries, setCountries] = useState<Country[]>([]);
   const [newCountryText, setNewCountryText] = useState('');
-  const [newCapital, setNewCapital] = useState('');
   const [newPopulation, setNewPopulation] = useState('');
   const [newLanguage, setNewLanguage] = useState('');
   const [newNotes, setNewNotes] = useState('');
@@ -80,7 +79,6 @@ export default function CountryPage({ onBack }: CountryPageProps) {
       category: 'COUNTRY',
       color: 'GREEN',
       dynamics: {
-        capital: newCapital || undefined,
         population: newPopulation ? Number(newPopulation) : undefined,
         language: newLanguage || undefined,
         notes: newNotes || undefined,
@@ -90,7 +88,6 @@ export default function CountryPage({ onBack }: CountryPageProps) {
       const created = await createCountry(newCountry);
       setCountries([...countries, created]);
       setNewCountryText('');
-      setNewCapital('');
       setNewPopulation('');
       setNewLanguage('');
       setNewNotes('');
@@ -144,12 +141,6 @@ export default function CountryPage({ onBack }: CountryPageProps) {
         
         {Platform.OS === 'web' ? (
           <>
-            <TextInput
-              style={[styles.input, { width: 120, marginRight: 8 }]}
-              placeholder="Capital"
-              value={newCapital}
-              onChangeText={setNewCapital}
-            />
             <Pressable style={styles.addButton} onPress={handleAddCountry}>
               <Ionicons name="add" size={24} color="white" />
             </Pressable>
@@ -229,7 +220,7 @@ const styles = StyleSheet.create({
   addButton: {
     width: 50,
     height: 50,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#FF8C42',
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
