@@ -70,8 +70,10 @@ export const TaskItem: React.FC<TaskItemProps> = ({
       },
     ]}>
       <Pressable
-        style={styles.taskCheckbox}
+        style={[styles.taskCheckbox, { opacity: task.completed ? 0.7 : 1 }]}
         onPress={() => onToggle(task.id)}
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
         hitSlop={10}
         pressRetentionOffset={10}
       >
@@ -124,6 +126,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           <Pressable
             onPress={() => !task.completed && setIsEditing(true)}
             disabled={task.completed}
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
             hitSlop={10}
             pressRetentionOffset={10}
           >
@@ -143,6 +147,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           <Pressable
             style={[styles.categoryBadge, { backgroundColor: categoryConfig.color }]}
             onPress={() => setIsCategoryModalVisible(true)}
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
             hitSlop={10}
             pressRetentionOffset={10}
           >
@@ -155,6 +161,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
       <Pressable
         style={styles.deleteButton}
         onPress={() => onDelete(task.id)}
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
         hitSlop={10}
         pressRetentionOffset={10}
       >
