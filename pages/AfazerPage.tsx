@@ -363,32 +363,44 @@ export default function AfazerPage() {
           <View style={styles.selectionGroup}>
             <Text style={styles.selectionLabel}>Category:</Text>
             <View style={styles.checkboxGroup}>
-              {['PRIORITY', 'ON', 'PAY', 'OFF', 'SUPERMARKET'].map((category) => (
-                <Pressable
-                  key={category}
-                  style={({ pressed }) => ({
-                    ...styles.categoryOption,
-                    ...(selectedCategory === category ? styles[`${category}Selected` as keyof typeof styles] : {}),
-                    ...(pressed ? { opacity: 0.7 } : {}),
-                  })}
-                  onPress={() => setSelectedCategory(category)}
-                >
-                  <Ionicons 
-                    name={
-                      category === 'PRIORITY' ? 'flag' : 
-                      category === 'ON' ? 'play' : 
-                      category === 'PAY' ? 'card' : 'pause'
-                    } 
-                    size={16} 
-                    color={
-                      selectedCategory === category ? 'white' : 
-                      category === 'PRIORITY' ? '#e74c3c' :
-                      category === 'ON' ? '#3498db' :
-                      category === 'PAY' ? '#f1c40f' : '#95a5a6'
-                    } 
-                  />
-                </Pressable>
-              ))}
+              {['PRIORITY', 'ON', 'PAY', 'OFF'].map((category) => {
+                const isSelected = selectedCategory === category;
+                const iconName = 
+                  category === 'PRIORITY' ? 'flag' : 
+                  category === 'ON' ? 'play' : 
+                  category === 'PAY' ? 'card' : 'pause';
+                const iconColor = 
+                  isSelected ? 'white' :
+                  category === 'PRIORITY' ? '#e74c3c' :
+                  category === 'ON' ? '#3498db' :
+                  category === 'PAY' ? '#f1c40f' : '#95a5a6';
+                
+                return (
+                  <Pressable
+                    key={category}
+                    style={({ pressed }) => ({
+                      ...styles.categoryOption,
+                      ...(isSelected ? styles[`${category}Selected` as keyof typeof styles] : {}),
+                      ...(pressed ? { opacity: 0.8, transform: [{ scale: 0.95 }] } : {}),
+                      borderWidth: isSelected ? 2 : 1,
+                      borderColor: isSelected ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.1)',
+                      boxShadow: isSelected ? `0 2px 4px ${iconColor}4D` : 'none',
+                      elevation: isSelected ? 3 : 0,
+                    })}
+                    onPress={() => setSelectedCategory(category)}
+                  >
+                    <Ionicons 
+                      name={iconName}
+                      size={16} 
+                      color={iconColor}
+                      style={{
+                        opacity: isSelected ? 1 : 0.8,
+                        transform: [{ scale: isSelected ? 1.2 : 1 }]
+                      }}
+                    />
+                  </Pressable>
+                );
+              })}
             </View>
           </View>
           
@@ -446,7 +458,7 @@ export default function AfazerPage() {
               color="#FF8C42" 
             />
             <Text style={styles.filterToggleText}>
-              {showFilter ? 'Show All Categories' : 'Show Filtered'}
+              {showFilter ? 'Show All Categories' : 'Show History'}
             </Text>
           </Pressable>
         </View>
@@ -566,37 +578,43 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   categoryOption: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 6,
+    marginHorizontal: 4,
+    backgroundColor: 'white',
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: 'rgba(0,0,0,0.1)',
   },
   colorOption: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 6,
+    marginHorizontal: 4,
+    backgroundColor: 'white',
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: 'rgba(0,0,0,0.1)',
   },
   // Category selected states
-  prioritySelected: {
+  PRIORITYSelected: {
     backgroundColor: '#e74c3c',
+    transform: [{ scale: 1.1 }],
   },
-  onSelected: {
+  ONSelected: {
     backgroundColor: '#3498db',
+    transform: [{ scale: 1.1 }],
   },
-  paySelected: {
+  PAYSelected: {
     backgroundColor: '#f1c40f',
+    transform: [{ scale: 1.1 }],
   },
-  offSelected: {
+  OFFSelected: {
     backgroundColor: '#95a5a6',
+    transform: [{ scale: 1.1 }],
   },
   // Color selected states
   blueColorSelected: {

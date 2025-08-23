@@ -27,3 +27,4 @@ export interface Country extends Omit<Task, 'dynamics'> {
 }
 
 export type FilterType = 'PRIORITY' | 'ON' | 'OFF' | 'PAY' | 'SUPERMARKET' | 'COUNTRY' | 'completed';
+export type TaskCategory = 'PRIORITY' | 'ON' | 'OFF' | 'PAY';
