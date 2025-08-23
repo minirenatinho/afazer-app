@@ -32,7 +32,7 @@ export default function AfazerPage() {
   // State to control visibility of each category column
   const [categoryVisibility, setCategoryVisibility] = useState({
     PRIORITY: true,
-    ON: false,
+    ON: true,
     PAY: false,
     OFF: false,
   });
@@ -608,6 +608,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#e9ecef',
+    ...(Platform.OS === 'web' ? {
+      alignItems: 'center',
+      gap: 10,
+      paddingVertical: 16,
+      paddingHorizontal: 20,
+      height: 82, // Match height with other pages
+    } : {}),
   },
   input: {
     flex: 1,
@@ -618,6 +625,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     fontSize: 16,
     backgroundColor: '#f8f9fa',
+    ...(Platform.OS === 'web' ? {
+      height: 50, // Ensure consistent height on web
+    } : {}),
   },
   addButton: {
     width: 50,
@@ -630,20 +640,23 @@ const styles = StyleSheet.create({
   },
   // Web Controls
   webControlsContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    marginRight: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 24,
+    margin: 0,
+    paddingVertical: 4,
+    paddingHorizontal: 0,
   },
   selectionGroup: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 0,
+    gap: 8,
   },
   selectionLabel: {
     fontSize: 12,
     color: '#7f8c8d',
     marginRight: 8,
-    minWidth: 60,
   },
   checkboxGroup: {
     flexDirection: 'row',
