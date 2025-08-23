@@ -32,9 +32,9 @@ export default function AfazerPage() {
   // State to control visibility of each category column
   const [categoryVisibility, setCategoryVisibility] = useState({
     PRIORITY: true,
-    ON: true,
-    PAY: true,
-    OFF: false, // 'OFF' column hidden by default
+    ON: false,
+    PAY: false,
+    OFF: false,
   });
 
   useEffect(() => {
@@ -251,10 +251,16 @@ export default function AfazerPage() {
 
   const renderAllCategoriesView = () => {
     // Only use categories that are valid for visibility toggling
-    const categories: Array<'PRIORITY' | 'ON' | 'PAY' | 'OFF'> = ['PRIORITY', 'ON', 'PAY', 'OFF']; // 'off' last
+    const categories: Array<'PRIORITY' | 'ON' | 'PAY' | 'OFF'> = ['PRIORITY', 'ON', 'PAY', 'OFF'];
     const tasksByCategory = categories.map(category =>
       tasks.filter(task => !task.completed && task.category === category)
     );
+
+    // Calculate visible categories count for web layout
+    const visibleCategories = Platform.OS === 'web' 
+      ? categories.filter(cat => categoryVisibility[cat as 'PRIORITY' | 'ON' | 'OFF' | 'PAY']).length 
+      : 1; // For mobile, we'll use full width
+    const columnFlex = Platform.OS === 'web' ? 1 : 1;
 
     // Handler to toggle visibility of a category column
     const handleToggleCategoryVisibility = (category: FilterType) => {
@@ -264,78 +270,144 @@ export default function AfazerPage() {
       }));
     };
 
+    // Web-specific header with all category toggles
+    const renderWebHeader = () => (
+      <View style={styles.webCategoriesHeader}>
+        {categories.map((category, index) => {
+          const isVisible = categoryVisibility[category as 'PRIORITY' | 'ON' | 'OFF' | 'PAY'];
+          const iconName = category === 'PRIORITY' ? 'flag' : 
+                         category === 'ON' ? 'play' : 
+                         category === 'OFF' ? 'pause' : 'card';
+          const iconColor = category === 'PRIORITY' ? '#e74c3c' : 
+                          category === 'ON' ? '#3498db' : 
+                          category === 'OFF' ? '#95a5a6' : '#f1c40f';
+          
+          return (
+            <Pressable
+              key={category}
+              style={({ pressed }) => [
+                styles.webCategoryHeaderItem,
+                { 
+                  borderBottomWidth: isVisible ? 2 : 1,
+                  borderBottomColor: isVisible ? iconColor : '#e9ecef',
+                  opacity: isVisible ? 1 : 0.5,
+                  width: `${100 / categories.length}%`,
+                  ...(pressed && { opacity: 0.7 })
+                }
+              ]}
+              onPress={() => handleToggleCategoryVisibility(category)}
+            >
+              <Ionicons name={iconName} size={16} color={iconColor} />
+              <Text style={[
+                styles.webCategoryHeaderText,
+                { color: iconColor }
+              ]}>
+                {category.charAt(0).toUpperCase() + category.slice(1)}
+              </Text>
+              <Text style={styles.webCategoryHeaderCount}>
+                ({tasksByCategory[index].length})
+              </Text>
+              <Ionicons
+                name={isVisible ? 'eye' : 'eye-off'}
+                size={14}
+                color="#7f8c8d"
+                style={{ marginLeft: 4 }}
+              />
+            </Pressable>
+          );
+        })}
+      </View>
+    );
+
+    // Render the main content
     return (
-      <ScrollView
-        style={styles.allCategoriesContainer}
-        contentContainerStyle={styles.allCategoriesContent}
-        scrollEnabled={true}
-        nestedScrollEnabled={true}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={["#FF8C42"]}
-          />
-        }
-      >
-        <View style={styles.categoriesRow}>
-          {categories.map((category, index) => (
-            <View key={category} style={[
-              styles.categoryColumn,
-              category === 'OFF' && styles.offCategoryColumn
-            ]}>
-              {/* Touchable title to toggle visibility */}
-              <Pressable
-                style={({ pressed }) => [
-                  styles.categoryHeader,
-                  category === 'OFF' && styles.offCategoryHeader,
-                  pressed && { opacity: 0.7 }
-                ]}
-                onPress={() => handleToggleCategoryVisibility(category)}
-              >
-                <Ionicons
-                  name={category === 'PRIORITY' ? 'flag' : category === 'ON' ? 'play' : category === 'OFF' ? 'pause' : 'card'}
-                  size={16}
-                  color={category === 'PRIORITY' ? '#e74c3c' : category === 'ON' ? '#3498db' : category === 'OFF' ? '#95a5a6' : '#f1c40f'}
-                />
-                <Text style={[
-                  styles.categoryTitle,
-                  category === 'OFF' && styles.offCategoryText
-                ]}>
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
-                </Text>
-                <Text style={[
-                  styles.categoryCount,
-                  category === 'OFF' && styles.offCategoryText
-                ]}>
-                  ({tasksByCategory[index].length})
-                </Text>
-                <Ionicons
-                  name={categoryVisibility[category as 'PRIORITY' | 'ON' | 'OFF' | 'PAY'] ? 'eye' : 'eye-off'}
-                  size={16}
-                  color="#FF8C42"
-                  style={{ marginLeft: 8 }}
-                />
-              </Pressable>
-              {/* Only show tasks if visible */}
-              {categoryVisibility[category as 'PRIORITY' | 'ON' | 'OFF' | 'PAY'] && (
-                <View style={styles.categoryTasksContainer}>
-                  {tasksByCategory[index].map(task => (
-                    <TaskItem
-                      key={task.id}
-                      task={task}
-                      onToggle={toggleTask}
-                      onDelete={deleteTask}
-                      onUpdateCategory={handleUpdateCategory}
-                      onUpdateText={handleUpdateText}
-                    />
-                  ))}
+      <View style={styles.allCategoriesContainer}>
+        {Platform.OS === 'web' && renderWebHeader()}
+        <ScrollView
+          style={styles.allCategoriesScrollView}
+          contentContainerStyle={styles.allCategoriesContent}
+          scrollEnabled={true}
+          nestedScrollEnabled={true}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={["#FF8C42"]}
+            />
+          }
+        >
+          <View style={styles.categoriesRow}>
+            {categories.map((category, index) => {
+              if (Platform.OS === 'web' && !categoryVisibility[category as 'PRIORITY' | 'ON' | 'OFF' | 'PAY']) {
+                return null; // Skip rendering hidden categories on web
+              }
+              
+              return (
+                <View 
+                  key={category} 
+                  style={[
+                    styles.categoryColumn,
+                    { flex: columnFlex },
+                    category === 'OFF' && styles.offCategoryColumn
+                  ]}
+                >
+                                  {/* Category header for mobile */}
+                  {Platform.OS !== 'web' && (
+                    <Pressable
+                      style={({ pressed }) => [
+                        styles.categoryHeader,
+                        category === 'OFF' && styles.offCategoryHeader,
+                        pressed && { backgroundColor: '#f8f9fa' }
+                      ]}
+                      onPress={() => handleToggleCategoryVisibility(category)}
+                    >
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Ionicons
+                          name={category === 'PRIORITY' ? 'flag' : category === 'ON' ? 'play' : category === 'OFF' ? 'pause' : 'card'}
+                          size={20}
+                          color={category === 'PRIORITY' ? '#e74c3c' : category === 'ON' ? '#3498db' : category === 'OFF' ? '#95a5a6' : '#f1c40f'}
+                        />
+                        <Text style={[
+                          styles.categoryTitle,
+                          category === 'OFF' && styles.offCategoryText,
+                          { marginLeft: 12 }
+                        ]}>
+                          {category.charAt(0).toUpperCase() + category.slice(1)}
+                        </Text>
+                        <Text style={[
+                          styles.categoryCount,
+                          category === 'OFF' && styles.offCategoryText
+                        ]}>
+                          ({tasksByCategory[index].length})
+                        </Text>
+                      </View>
+                      <Ionicons
+                        name={categoryVisibility[category as 'PRIORITY' | 'ON' | 'OFF' | 'PAY'] ? 'chevron-up' : 'chevron-down'}
+                        size={20}
+                        color="#95a5a6"
+                      />
+                    </Pressable>
+                  )}
+                  
+                  {/* Tasks list */}
+                  <View style={[styles.categoryTasksContainer, { display: categoryVisibility[category as 'PRIORITY' | 'ON' | 'OFF' | 'PAY'] ? 'flex' : 'none' }]}>
+                    {tasksByCategory[index].map(task => (
+                      <TaskItem
+                        key={task.id}
+                        task={task}
+                        onToggle={toggleTask}
+                        onDelete={deleteTask}
+                        onUpdateCategory={handleUpdateCategory}
+                        onUpdateText={handleUpdateText}
+                      />
+                    ))}
+                  </View>
                 </View>
-              )}
-            </View>
-          ))}
-        </View>
-      </ScrollView>
+              );
+            })}
+          </View>
+        </ScrollView>
+      </View>
     );
   };
 
@@ -701,29 +773,76 @@ const styles = StyleSheet.create({
   },
   allCategoriesContainer: {
     flex: 1,
+    backgroundColor: '#fff',
+  },
+  allCategoriesScrollView: {
+    flex: 1,
   },
   allCategoriesContent: {
     paddingBottom: 20,
+    ...(Platform.OS === 'web' ? { minHeight: '100%' } : {}),
+  },
+  // Categories header - different styles for web and mobile
+  webCategoriesHeader: {
+    display: 'flex',
+    flexDirection: Platform.OS === 'web' ? 'row' : 'column',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+    backgroundColor: '#f8f9fa',
+    paddingHorizontal: Platform.OS === 'web' ? 10 : 0,
+  },
+  webCategoryHeaderItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: Platform.OS === 'web' ? 'center' : 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: Platform.OS === 'web' ? 8 : 20,
+    marginHorizontal: Platform.OS === 'web' ? 2 : 0,
+    borderBottomWidth: Platform.OS === 'web' ? 0 : 1,
+    borderBottomColor: '#e9ecef',
+  },
+  webCategoryHeaderText: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 6,
+  },
+  webCategoryHeaderCount: {
+    fontSize: 12,
+    color: '#7f8c8d',
+    marginLeft: 4,
   },
   categoriesRow: {
     flexDirection: Platform.OS === 'web' ? 'row' : 'column',
-    justifyContent: 'space-around',
-    marginBottom: 10,
+    alignItems: Platform.OS === 'web' ? 'flex-start' : 'stretch',
+    flex: 1,
   },
   categoryColumn: {
-    flex: Platform.OS === 'web' ? 1 : undefined,
-    marginHorizontal: Platform.OS === 'web' ? 5 : 0,
-    marginBottom: Platform.OS === 'web' ? 0 : 20,
-    minHeight: Platform.OS === 'web' ? undefined : 'auto',
+    ...(Platform.OS === 'web' 
+      ? { 
+          height: '100%',
+          paddingHorizontal: 8,
+        } 
+      : {
+          width: '100%',
+          marginBottom: 0,
+          paddingHorizontal: 0,
+          borderBottomWidth: 1,
+          borderBottomColor: '#e9ecef',
+        }
+    ),
   },
   categoryHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
-    paddingHorizontal: Platform.OS === 'web' ? 10 : 20,
+    justifyContent: 'space-between',
+    padding: 16,
+    width: '100%',
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
   },
   categoryTasksContainer: {
-    paddingHorizontal: Platform.OS === 'web' ? 10 : 20,
+    paddingHorizontal: Platform.OS === 'web' ? 10 : 12,
   },
   categoryTitle: {
     fontSize: Platform.OS === 'web' ? 20 : 24,
