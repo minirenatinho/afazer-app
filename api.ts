@@ -5,7 +5,7 @@ const API_URL = Constants.expoConfig?.extra?.EXPO_API_URL;
 if (!API_URL) {
   throw new Error('API_URL is not set. Check .env and app.config.js');
 }
-const API_BASE = `${API_URL}/tasks`;
+const API_BASE = `${API_URL}/items`;
 
 // --- Task CRUD ---
 
@@ -142,7 +142,7 @@ export async function fetchCountries(): Promise<Country[]> {
 }
 
 export async function createCountry(country: Omit<Country, 'id'>): Promise<Country> {
-  const taskData: Omit<Country, 'id'> = {
+  const countryData: Omit<Country, 'id'> = {
     text: country.text,
     type: 'country',
     completed: country.completed || false,
@@ -160,7 +160,7 @@ export async function createCountry(country: Omit<Country, 'id'>): Promise<Count
   const res = await fetch(`${API_BASE}/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(taskData),
+    body: JSON.stringify(countryData),
   });
   
   if (!res.ok) throw new Error('Failed to create country');
@@ -168,7 +168,7 @@ export async function createCountry(country: Omit<Country, 'id'>): Promise<Count
 }
 
 export async function updateCountry(country: Country): Promise<Country> {
-  const taskData: Country = {
+  const countryData: Country = {
     id: country.id,
     text: country.text,
     type: 'country',
@@ -187,7 +187,7 @@ export async function updateCountry(country: Country): Promise<Country> {
   const res = await fetch(`${API_BASE}/${country.id}/`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(taskData),
+    body: JSON.stringify(countryData),
   });
   
   if (!res.ok) throw new Error('Failed to update country');
