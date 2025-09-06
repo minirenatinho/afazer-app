@@ -17,6 +17,15 @@ export interface Task {
   };
 }
 
+export interface Supermarket extends Omit<Task, 'dynamics'> {
+  dynamics?: {
+    quantity?: number;
+    unit?: string;
+    price?: number;
+    notes?: string;
+  };
+}
+
 export interface Country extends Omit<Task, 'dynamics'> {
   dynamics?: {
     capital?: string;

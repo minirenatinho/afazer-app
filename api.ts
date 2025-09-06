@@ -1,22 +1,22 @@
-import { Task, Country } from './types';
+import { Task, Supermarket, Country } from './types';
 import Constants from 'expo-constants';
 
 const API_URL = Constants.expoConfig?.extra?.EXPO_API_URL;
 if (!API_URL) {
   throw new Error('API_URL is not set. Check .env and app.config.js');
 }
-
-const TASK_API_BASE = `${API_URL}/tasks`;
+const API_BASE = `${API_URL}/tasks`;
 
 // --- Task CRUD ---
+
 export async function fetchTasks(): Promise<Task[]> {
-  const res = await fetch(`${TASK_API_BASE}/`);
+  const res = await fetch(`${API_BASE}/`);
   if (!res.ok) throw new Error('Failed to fetch tasks');
   return res.json();
 }
 
 export async function createTask(task: Omit<Task, 'id'>): Promise<Task> {
-  const res = await fetch(`${TASK_API_BASE}/`, {
+  const res = await fetch(`${API_BASE}/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(task),
@@ -26,7 +26,7 @@ export async function createTask(task: Omit<Task, 'id'>): Promise<Task> {
 }
 
 export async function updateTask(task: Task): Promise<Task> {
-  const res = await fetch(`${TASK_API_BASE}/${task.id}/`, {
+  const res = await fetch(`${API_BASE}/${task.id}/`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(task),
@@ -36,29 +36,29 @@ export async function updateTask(task: Task): Promise<Task> {
 }
 
 export async function deleteTask(id: string): Promise<void> {
-  const res = await fetch(`${TASK_API_BASE}/${id}/`, {
+  const res = await fetch(`${API_BASE}/${id}/`, {
     method: 'DELETE',
   });
   if (!res.ok) throw new Error('Failed to delete task');
 }
 
-export async function fetchSupermarkets(): Promise<Task[]> {
-  const res = await fetch(`${TASK_API_BASE}/?type=supermarket`);
+// --- Supermarket CRUD ---
+
+export async function fetchSupermarkets(): Promise<Supermarket[]> {
+  const res = await fetch(`${API_BASE}/?type=supermarket`);
   if (!res.ok) throw new Error('Failed to fetch supermarkets');
-  const tasks: Task[] = await res.json();
-  
-  // Convert Task with dynamics to Supermarket format
-  return tasks;
+  const supermarkets: Supermarket[] = await res.json();
+  return supermarkets;
 }
 
-export async function createSupermarket(supermarket: Omit<Task, 'id'>): Promise<Task> {
-  const taskData: Omit<Task, 'id'> = {
-    text: supermarket.text, // Map name to text
+export async function createSupermarket(supermarket: Omit<Supermarket, 'id'>): Promise<Supermarket> {
+  const supermarketData: Omit<Supermarket, 'id'> = {
+    text: supermarket.text,
     type: 'supermarket',
     completed: supermarket.completed || false,
     createdAt: supermarket.createdAt || Date.now(),
-    category: 'SUPERMARKET', // Default category
-    color: 'BLUE', // Default color
+    category: 'SUPERMARKET',
+    color: 'BLUE',
     dynamics: {
       quantity: supermarket.dynamics?.quantity,
       unit: supermarket.dynamics?.unit,
@@ -67,36 +67,36 @@ export async function createSupermarket(supermarket: Omit<Task, 'id'>): Promise<
     },
   };
 
-  const res = await fetch(`${TASK_API_BASE}/`, {
+  const res = await fetch(`${API_BASE}/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(taskData),
+    body: JSON.stringify(supermarketData),
   });
   
   if (!res.ok) throw new Error('Failed to create supermarket');
   
-  const createdTask: Task = await res.json();
+  const createdSupermarket: Supermarket = await res.json();
   return {
-    id: createdTask.id,
-    text: createdTask.text, // Map text back to name
-    completed: createdTask.completed,
-    createdAt: createdTask.createdAt,
-    dynamics: createdTask.dynamics,
-    category: createdTask.category,
-    color: createdTask.color,
-    type: createdTask.type,
+    id: createdSupermarket.id,
+    text: createdSupermarket.text,
+    completed: createdSupermarket.completed,
+    createdAt: createdSupermarket.createdAt,
+    dynamics: createdSupermarket.dynamics,
+    category: createdSupermarket.category,
+    color: createdSupermarket.color,
+    type: createdSupermarket.type,
   };
 }
 
-export async function updateSupermarket(supermarket: Task): Promise<Task> {
-  const taskData: Task = {
+export async function updateSupermarket(supermarket: Supermarket): Promise<Supermarket> {
+  const supermarketData: Supermarket = {
     id: supermarket.id,
-    text: supermarket.text, // Map name to text
+    text: supermarket.text,
     type: 'supermarket',
     completed: supermarket.completed,
     createdAt: supermarket.createdAt,
-    category: 'SUPERMARKET', // Default category
-    color: 'BLUE', // Default color
+    category: 'SUPERMARKET',
+    color: 'BLUE',
     dynamics: {
       quantity: supermarket.dynamics?.quantity,
       unit: supermarket.dynamics?.unit,
@@ -105,36 +105,38 @@ export async function updateSupermarket(supermarket: Task): Promise<Task> {
     },
   };
 
-  const res = await fetch(`${TASK_API_BASE}/${supermarket.id}/`, {
+  const res = await fetch(`${API_BASE}/${supermarket.id}/`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(taskData),
+    body: JSON.stringify(supermarketData),
   });
   
   if (!res.ok) throw new Error('Failed to update supermarket');
   
-  const updatedTask: Task = await res.json();
+  const updatedSupermarket: Supermarket = await res.json();
   return {
-    id: updatedTask.id,
-    text: updatedTask.text, // Map text back to name
-    completed: updatedTask.completed,
-    createdAt: updatedTask.createdAt,
-    dynamics: updatedTask.dynamics,
-    category: updatedTask.category,
-    color: updatedTask.color,
-    type: updatedTask.type,
+    id: updatedSupermarket.id,
+    text: updatedSupermarket.text,
+    completed: updatedSupermarket.completed,
+    createdAt: updatedSupermarket.createdAt,
+    dynamics: updatedSupermarket.dynamics,
+    category: updatedSupermarket.category,
+    color: updatedSupermarket.color,
+    type: updatedSupermarket.type,
   };
 }
 
 export async function deleteSupermarket(id: string): Promise<void> {
-  const res = await fetch(`${TASK_API_BASE}/${id}/`, {
+  const res = await fetch(`${API_BASE}/${id}/`, {
     method: 'DELETE',
   });
   if (!res.ok) throw new Error('Failed to delete supermarket');
 }
 
+// --- Country CRUD ---
+
 export async function fetchCountries(): Promise<Country[]> {
-  const res = await fetch(`${TASK_API_BASE}/?type=country`);
+  const res = await fetch(`${API_BASE}/?type=country`);
   if (!res.ok) throw new Error('Failed to fetch countries');
   return res.json();
 }
@@ -155,7 +157,7 @@ export async function createCountry(country: Omit<Country, 'id'>): Promise<Count
     },
   };
 
-  const res = await fetch(`${TASK_API_BASE}/`, {
+  const res = await fetch(`${API_BASE}/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(taskData),
@@ -182,7 +184,7 @@ export async function updateCountry(country: Country): Promise<Country> {
     },
   };
 
-  const res = await fetch(`${TASK_API_BASE}/${country.id}/`, {
+  const res = await fetch(`${API_BASE}/${country.id}/`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(taskData),
@@ -193,7 +195,7 @@ export async function updateCountry(country: Country): Promise<Country> {
 }
 
 export async function deleteCountry(id: string): Promise<void> {
-  const res = await fetch(`${TASK_API_BASE}/${id}/`, {
+  const res = await fetch(`${API_BASE}/${id}/`, {
     method: 'DELETE',
   });
   if (!res.ok) throw new Error('Failed to delete country');
