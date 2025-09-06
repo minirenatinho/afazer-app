@@ -4,18 +4,17 @@ A beautiful and intuitive TODO app built with React Native and Expo that works s
 
 ## Features
 
-- ✅ Add, complete, and delete tasks
-- 🔄 Filter tasks by status (All, Active, Completed)
-- 💾 Persistent storage using AsyncStorage
+- ✅ Add, complete, and delete tasks, products and countries
+- 🔄 Filter tasks by category (Priority, On, Off, Pay)
+- 💾 Persistent storage using Postgres and AsyncStorage
 - 🎨 Modern and responsive UI design
 - 📱 Cross-platform support (iOS, Android, Web)
-- 🗑️ Clear completed tasks functionality
 - ⌨️ Keyboard-friendly input
 
 ## Screenshots
 
 The app features a clean, modern interface with:
-- Beautiful header with app branding
+- Beautiful headers
 - Intuitive task input with add button
 - Filter tabs to organize your tasks
 - Card-based task items with checkboxes
@@ -72,15 +71,22 @@ Then scan the QR code with the Expo Go app on your mobile device.
 
 #### Web Build
 ```bash
+# For Web
+eas build -p web
+# or
 npx expo export:web
 ```
 
 #### Mobile Builds
 ```bash
 # For iOS
+eas build -p ios
+# or
 npx expo build:ios
 
 # For Android
+eas build -p android
+# or
 npx expo build:android
 ```
 
@@ -106,15 +112,14 @@ afazer-app/
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test on multiple platforms
-5. Submit a pull request
+1. Create a branch
+1. Make your changes
+3. Test on multiple platforms
+4. Submit a pull request
 
 ## License
 
-This project is licensed under the MIT License.
+This is free and unencumbered software released into the public domain. For more information, please refer to <https://unlicense.org>
 
 ## Support
 
