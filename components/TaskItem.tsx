@@ -10,6 +10,7 @@ interface TaskItemProps {
   onDelete: (id: string) => void;
   onUpdateCategory: (id: string, category: string) => Promise<void>;
   onUpdateText: (id: string, newText: string) => Promise<void>;
+  onUpdateColor: () => void;
 }
 
 export const TaskItem: React.FC<TaskItemProps> = ({ 
@@ -18,6 +19,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   onDelete,
   onUpdateCategory,
   onUpdateText,
+  onUpdateColor,
 }) => {
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -144,17 +146,29 @@ export const TaskItem: React.FC<TaskItemProps> = ({
         )}
 
         {!task.completed && (
-          <Pressable
-            style={[styles.categoryBadge, { backgroundColor: categoryConfig.color }]}
-            onPress={() => setIsCategoryModalVisible(true)}
-            onTouchStart={(e) => e.stopPropagation()}
-            onTouchEnd={(e) => e.stopPropagation()}
-            hitSlop={10}
-            pressRetentionOffset={10}
-          >
-            <Ionicons name={categoryConfig.icon as any} size={12} color="white" />
-            <Text style={styles.categoryText}>{categoryConfig.label}</Text>
-          </Pressable>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Pressable
+              style={[styles.categoryBadge, { backgroundColor: categoryConfig.color }]}
+              onPress={() => setIsCategoryModalVisible(true)}
+              onTouchStart={(e) => e.stopPropagation()}
+              onTouchEnd={(e) => e.stopPropagation()}
+              hitSlop={10}
+              pressRetentionOffset={10}
+            >
+              <Ionicons name={categoryConfig.icon as any} size={12} color="white" />
+              <Text style={styles.categoryText}>{categoryConfig.label}</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.colorBadge, { backgroundColor: colorConfig.backgroundColor, borderColor: colorConfig.borderColor }]}
+              onPress={onUpdateColor}
+              onTouchStart={(e) => e.stopPropagation()}
+              onTouchEnd={(e) => e.stopPropagation()}
+              hitSlop={10}
+              pressRetentionOffset={10}
+            >
+              <Ionicons name="color-palette" size={12} color="#555" />
+            </Pressable>
+          </View>
         )}
       </View>
 
@@ -175,10 +189,20 @@ export const TaskItem: React.FC<TaskItemProps> = ({
         onSelectCategory={async (category) => {
           await onUpdateCategory(task.id, category);
         }}
-        currentCategory={task.category}
+        currentCategory={task.category as any}
       />
     </View>
   );
+};
+
+const colorBadgeStyle = {
+  width: 24,
+  height: 24,
+  borderRadius: 12,
+  borderWidth: 2,
+  justifyContent: 'center' as const,
+  alignItems: 'center' as const,
+  marginLeft: 4,
 };
 
 const styles = StyleSheet.create({
@@ -273,4 +297,13 @@ const styles = StyleSheet.create({
   deleteButton: {
     padding: 5,
   },
-}); 
+  colorBadge: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 4,
+  },
+});

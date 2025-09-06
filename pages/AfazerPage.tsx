@@ -15,7 +15,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { TaskItem } from '../components/TaskItem';
 import { TaskTypeModal } from '../components/TaskTypeModal';
-import { Task, FilterType } from '../types';
+import { ColorSelectorModal } from '../components/ColorSelectorModal';
+import { Task, FilterType, TaskColor } from '../types';
 import { fetchTasks, createTask, updateTask, deleteTask as apiDeleteTask } from '../api';
 
 export default function AfazerPage() {
@@ -36,6 +37,25 @@ export default function AfazerPage() {
     PAY: false,
     OFF: false,
   });
+
+  // State for color modal
+  const [showColorModal, setShowColorModal] = useState(false);
+  const [colorTaskId, setColorTaskId] = useState<string | null>(null);
+  const [colorTaskCurrent, setColorTaskCurrent] = useState<TaskColor>('BLUE');
+  // Handler to update color
+  const handleUpdateColor = async (id: string, color: TaskColor) => {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+    const updatedTask = { ...task, color };
+    try {
+      const apiTask = await updateTask(updatedTask);
+      const updatedTasks = tasks.map(t => t.id === id ? apiTask : t);
+      setTasks(updatedTasks);
+      saveTasksToCache(updatedTasks);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to update task color.');
+    }
+  };
 
   useEffect(() => {
     loadTasks();
@@ -246,6 +266,11 @@ export default function AfazerPage() {
       onDelete={deleteTask}
       onUpdateCategory={handleUpdateCategory}
       onUpdateText={handleUpdateText}
+      onUpdateColor={() => {
+        setColorTaskId(item.id);
+        setColorTaskCurrent(item.color as TaskColor);
+        setShowColorModal(true);
+      }}
     />
   );
 
@@ -399,6 +424,11 @@ export default function AfazerPage() {
                         onDelete={deleteTask}
                         onUpdateCategory={handleUpdateCategory}
                         onUpdateText={handleUpdateText}
+                        onUpdateColor={() => {
+                          setColorTaskId(task.id);
+                          setColorTaskCurrent(task.color as TaskColor);
+                          setShowColorModal(true);
+                        }}
                       />
                     ))}
                   </View>
@@ -567,6 +597,15 @@ export default function AfazerPage() {
           }}
           onSelectType={handleTaskTypeSelect}
         />
+    <ColorSelectorModal
+      visible={showColorModal}
+      onClose={() => setShowColorModal(false)}
+      onSelectColor={(color) => {
+        if (colorTaskId) handleUpdateColor(colorTaskId, color);
+        setShowColorModal(false);
+      }}
+      currentColor={colorTaskCurrent}
+    />
     </>);
 }
 
