@@ -101,7 +101,7 @@ export default function AfazerPage() {
           createdAt: Date.now(),
           category: selectedCategory,
           color: selectedColor,
-          type: selectedCategory,
+          type: 'task',
         };
         
         (async () => {
@@ -130,7 +130,7 @@ export default function AfazerPage() {
       createdAt: Date.now(),
       category,
       color,
-      type: category,
+      type: 'task',
     };
     try {
       const created = await createTask(newTask);
