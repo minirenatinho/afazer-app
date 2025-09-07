@@ -1,35 +1,37 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Pressable, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Task } from '../types';
+import { Item } from '../types';
 import { CategorySelectorModal } from './CategorySelectorModal';
 
-interface TaskItemProps {
-  task: Task;
+interface ItemItemProps {
+  item: Item;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
   onUpdateCategory: (id: string, category: string) => Promise<void>;
   onUpdateText: (id: string, newText: string) => Promise<void>;
   onUpdateColor: () => void;
+  isHistory?: boolean;
 }
 
-export const TaskItem: React.FC<TaskItemProps> = ({ 
-  task,
+export const ItemItem: React.FC<ItemItemProps> = ({ 
+  item,
   onToggle,
   onDelete,
   onUpdateCategory,
   onUpdateText,
   onUpdateColor,
+  isHistory = false,
 }) => {
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editText, setEditText] = useState(task.text);
+  const [editText, setEditText] = useState(item.text);
 
-  // Reset editText if task.text changes (e.g. after update)
+  // Reset editText if item.text changes (e.g. after update)
   React.useEffect(() => {
-    setEditText(task.text);
-  }, [task.text]);
-  const getCategoryConfig = (category: Task['category']) => {
+    setEditText(item.text);
+  }, [item.text]);
+  const getCategoryConfig = (category: Item['category']) => {
     switch (category) {
       case 'PRIORITY':
         return { icon: 'flag', color: '#e74c3c', label: 'Priority' };
@@ -40,11 +42,11 @@ export const TaskItem: React.FC<TaskItemProps> = ({
       case 'PAY':
         return { icon: 'card', color: '#f1c40f', label: 'Pay' };
       default:
-        return { icon: 'ellipse', color: '#95a5a6', label: 'Task' };
+        return { icon: 'ellipse', color: '#95a5a6', label: 'Item' };
     }
   };
 
-  const getColorConfig = (color: Task['color']) => {
+  const getColorConfig = (color: Item['color']) => {
     switch (color) {
       case 'GREEN':
         return { backgroundColor: '#E8F5E8', borderColor: '#A8D5A8' };
@@ -59,41 +61,41 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     }
   };
 
-  const categoryConfig = getCategoryConfig(task.category);
-  const colorConfig = getColorConfig(task.color);
+  const categoryConfig = getCategoryConfig(item.category);
+  const colorConfig = getColorConfig(item.color);
 
   return (
     <View style={[
-      styles.taskItem,
-      task.category === 'PRIORITY' && styles.priorityTaskItem,
+      styles.itemItem,
+      item.category === 'PRIORITY' && !isHistory && styles.priorityItemItem,
       {
         backgroundColor: colorConfig.backgroundColor,
-        borderColor: task.category === 'PRIORITY' ? '#e74c3c' : colorConfig.borderColor,
+        borderColor: item.category === 'PRIORITY' && !isHistory ? '#e74c3c' : colorConfig.borderColor,
       },
     ]}>
       <Pressable
-        style={[styles.taskCheckbox, { opacity: task.completed ? 0.7 : 1 }]}
-        onPress={() => onToggle(task.id)}
+        style={[styles.itemCheckbox, { opacity: item.completed ? 0.7 : 1 }]}
+        onPress={() => onToggle(item.id)}
         onTouchStart={(e) => e.stopPropagation()}
         onTouchEnd={(e) => e.stopPropagation()}
         hitSlop={10}
         pressRetentionOffset={10}
       >
         <Ionicons
-          name={task.completed ? 'checkmark-circle' : 'ellipse-outline'}
+          name={item.completed ? 'checkmark-circle' : 'ellipse-outline'}
           size={24}
-          color={task.completed ? '#4CAF50' : '#666'}
+          color={item.completed ? '#4CAF50' : '#666'}
         />
       </Pressable>
 
-      <View style={styles.taskContent}>
+      <View style={styles.itemContent}>
         {isEditing ? (
           <View style={styles.editContainer}>
             <TextInput
               style={[
-                styles.taskText,
-                task.category === 'PRIORITY' && styles.priorityTaskText,
-                task.completed && styles.completedTaskText,
+                styles.itemText,
+                item.category === 'PRIORITY' && styles.priorityItemText,
+                item.completed && styles.completedItemText,
                 { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e9ecef', borderRadius: 6, paddingHorizontal: 8 },
               ]}
               value={editText}
@@ -105,8 +107,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
               <Pressable
                 style={[styles.editButton, styles.confirmButton]}
                 onPress={async () => {
-                  if (editText.trim() && editText !== task.text) {
-                    await onUpdateText(task.id, editText.trim());
+                  if (editText.trim() && editText !== item.text) {
+                    await onUpdateText(item.id, editText.trim());
                   }
                   setIsEditing(false);
                 }}
@@ -116,7 +118,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
               <Pressable
                 style={[styles.editButton, styles.discardButton]}
                 onPress={() => {
-                  setEditText(task.text);
+                  setEditText(item.text);
                   setIsEditing(false);
                 }}
               >
@@ -126,26 +128,26 @@ export const TaskItem: React.FC<TaskItemProps> = ({
           </View>
         ) : (
           <Pressable
-            onPress={() => !task.completed && setIsEditing(true)}
-            disabled={task.completed}
+            onPress={() => !item.completed && setIsEditing(true)}
+            disabled={item.completed}
             onTouchStart={(e) => e.stopPropagation()}
             onTouchEnd={(e) => e.stopPropagation()}
             hitSlop={10}
             pressRetentionOffset={10}
           >
             <Text
-              style={[
-                styles.taskText,
-                task.category === 'PRIORITY' && styles.priorityTaskText,
-                task.completed && styles.completedTaskText,
+              style={[ 
+                styles.itemText,
+                item.category === 'PRIORITY' && !isHistory && styles.priorityItemText,
+                item.completed && styles.completedItemText,
               ]}
             >
-              {task.text}
+              {item.text}
             </Text>
           </Pressable>
         )}
 
-        {!task.completed && (
+        {!item.completed && (
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Pressable
               style={[styles.categoryBadge, { backgroundColor: categoryConfig.color }]}
@@ -174,7 +176,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
 
       <Pressable
         style={styles.deleteButton}
-        onPress={() => onDelete(task.id)}
+        onPress={() => onDelete(item.id)}
         onTouchStart={(e) => e.stopPropagation()}
         onTouchEnd={(e) => e.stopPropagation()}
         hitSlop={10}
@@ -187,9 +189,9 @@ export const TaskItem: React.FC<TaskItemProps> = ({
         visible={isCategoryModalVisible}
         onClose={() => setIsCategoryModalVisible(false)}
         onSelectCategory={async (category) => {
-          await onUpdateCategory(task.id, category);
+          await onUpdateCategory(item.id, category);
         }}
-        currentCategory={task.category as any}
+        currentCategory={item.category as any}
       />
     </View>
   );
@@ -228,7 +230,7 @@ const styles = StyleSheet.create({
   discardButton: {
     backgroundColor: '#e74c3c',
   },
-  taskItem: {
+  itemItem: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 15,
@@ -246,7 +248,7 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  priorityTaskItem: {
+  priorityItemItem: {
     padding: 18,
     marginVertical: 6,
     borderWidth: 2,
@@ -261,22 +263,22 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  taskCheckbox: {
+  itemCheckbox: {
     marginRight: 15,
   },
-  taskContent: {
+  itemContent: {
     flex: 1,
   },
-  taskText: {
+  itemText: {
     fontSize: 16,
     color: '#2c3e50',
     marginBottom: 4,
   },
-  priorityTaskText: {
+  priorityItemText: {
     fontSize: 18,
     fontWeight: '600',
   },
-  completedTaskText: {
+  completedItemText: {
     textDecorationLine: 'line-through',
     color: '#7f8c8d',
   },

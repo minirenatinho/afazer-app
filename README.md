@@ -1,11 +1,11 @@
-# Afazer - Your Personal Task Manager
+# Afazer - Your Personal Item Manager
 
 A beautiful and intuitive TODO app built with React Native and Expo that works seamlessly across mobile and web platforms.
 
 ## Features
 
-- ✅ Add, complete, and delete tasks, products and countries
-- 🔄 Filter tasks by category (Priority, On, Off, Pay)
+- ✅ Add, complete, and delete items, products and countries
+- 🔄 Filter items by category (Priority, On, Off, Pay)
 - 💾 Persistent storage using Postgres and AsyncStorage
 - 🎨 Modern and responsive UI design
 - 📱 Cross-platform support (iOS, Android, Web)
@@ -15,9 +15,9 @@ A beautiful and intuitive TODO app built with React Native and Expo that works s
 
 The app features a clean, modern interface with:
 - Beautiful headers
-- Intuitive task input with add button
-- Filter tabs to organize your tasks
-- Card-based task items with checkboxes
+- Intuitive item input with add button
+- Filter tabs to organize your items
+- Card-based item items with checkboxes
 - Smooth animations and interactions
 
 ## Getting Started

@@ -1,4 +1,4 @@
-import { Task, Supermarket, Country } from './types';
+import { Item, Supermarket, Country } from './types';
 import Constants from 'expo-constants';
 
 const API_URL = Constants.expoConfig?.extra?.EXPO_API_URL;
@@ -6,46 +6,47 @@ if (!API_URL) {
   throw new Error('API_URL is not set. Check .env and app.config.js');
 }
 const API_BASE = `${API_URL}/items`;
+const ITEMS_LIMIT = 200;
 
-// --- Task CRUD ---
+// --- Item CRUD ---
 
-export async function fetchTasks(): Promise<Task[]> {
-  const res = await fetch(`${API_BASE}/`);
-  if (!res.ok) throw new Error('Failed to fetch tasks');
+export async function fetchItems(): Promise<Item[]> {
+  const res = await fetch(`${API_BASE}/?limit=${ITEMS_LIMIT}`);
+  if (!res.ok) throw new Error('Failed to fetch items');
   return res.json();
 }
 
-export async function createTask(task: Omit<Task, 'id'>): Promise<Task> {
+export async function createItem(item: Omit<Item, 'id'>): Promise<Item> {
   const res = await fetch(`${API_BASE}/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(task),
+    body: JSON.stringify(item),
   });
-  if (!res.ok) throw new Error('Failed to create task');
+  if (!res.ok) throw new Error('Failed to create item');
   return res.json();
 }
 
-export async function updateTask(task: Task): Promise<Task> {
-  const res = await fetch(`${API_BASE}/${task.id}/`, {
+export async function updateItem(item: Item): Promise<Item> {
+  const res = await fetch(`${API_BASE}/${item.id}/`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(task),
+    body: JSON.stringify(item),
   });
-  if (!res.ok) throw new Error('Failed to update task');
+  if (!res.ok) throw new Error('Failed to update item');
   return res.json();
 }
 
-export async function deleteTask(id: string): Promise<void> {
+export async function deleteItem(id: string): Promise<void> {
   const res = await fetch(`${API_BASE}/${id}/`, {
     method: 'DELETE',
   });
-  if (!res.ok) throw new Error('Failed to delete task');
+  if (!res.ok) throw new Error('Failed to delete item');
 }
 
 // --- Supermarket CRUD ---
 
 export async function fetchSupermarkets(): Promise<Supermarket[]> {
-  const res = await fetch(`${API_BASE}/?type=supermarket`);
+  const res = await fetch(`${API_BASE}/?type=supermarket&limit=${ITEMS_LIMIT}`);
   if (!res.ok) throw new Error('Failed to fetch supermarkets');
   const supermarkets: Supermarket[] = await res.json();
   return supermarkets;
@@ -136,7 +137,7 @@ export async function deleteSupermarket(id: string): Promise<void> {
 // --- Country CRUD ---
 
 export async function fetchCountries(): Promise<Country[]> {
-  const res = await fetch(`${API_BASE}/?type=country`);
+  const res = await fetch(`${API_BASE}/?type=country&limit=${ITEMS_LIMIT}`);
   if (!res.ok) throw new Error('Failed to fetch countries');
   return res.json();
 }

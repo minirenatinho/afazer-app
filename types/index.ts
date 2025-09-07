@@ -1,4 +1,4 @@
-export interface Task {
+export interface Item {
   id: string;
   text: string;
   completed: boolean;
@@ -17,7 +17,7 @@ export interface Task {
   };
 }
 
-export interface Supermarket extends Omit<Task, 'dynamics'> {
+export interface Supermarket extends Omit<Item, 'dynamics'> {
   dynamics?: {
     quantity?: number;
     unit?: string;
@@ -26,7 +26,7 @@ export interface Supermarket extends Omit<Task, 'dynamics'> {
   };
 }
 
-export interface Country extends Omit<Task, 'dynamics'> {
+export interface Country extends Omit<Item, 'dynamics'> {
   dynamics?: {
     capital?: string;
     population?: number;
@@ -36,5 +36,5 @@ export interface Country extends Omit<Task, 'dynamics'> {
 }
 
 export type FilterType = 'PRIORITY' | 'ON' | 'OFF' | 'PAY' | 'SUPERMARKET' | 'COUNTRY' | 'completed';
-export type TaskCategory = 'PRIORITY' | 'ON' | 'OFF' | 'PAY';
-export type TaskColor = 'BLUE' | 'GREEN' | 'PINK' | 'BROWN';
+export type ItemCategory = 'PRIORITY' | 'ON' | 'OFF' | 'PAY';
+export type ItemColor = 'BLUE' | 'GREEN' | 'PINK' | 'BROWN';
