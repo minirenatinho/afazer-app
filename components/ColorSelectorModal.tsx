@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, Modal, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { TaskColor } from '../types';
+import { ItemColor } from '../types';
 
 interface ColorOption {
-  value: TaskColor;
+  value: ItemColor;
   label: string;
   color: string;
 }
@@ -12,8 +12,8 @@ interface ColorOption {
 interface ColorSelectorModalProps {
   visible: boolean;
   onClose: () => void;
-  onSelectColor: (color: TaskColor) => void;
-  currentColor: TaskColor;
+  onSelectColor: (color: ItemColor) => void;
+  currentColor: ItemColor;
 }
 
 const colorOptions: ColorOption[] = [

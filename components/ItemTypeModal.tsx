@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-interface TaskTypeModalProps {
+interface ItemTypeModalProps {
   visible: boolean;
   onClose: () => void;
   onSelectType: (type: 'PRIORITY' | 'ON' | 'PAY' | 'OFF', color: 'GREEN' | 'PINK' | 'BLUE' | 'BROWN') => void;
@@ -18,7 +18,7 @@ interface TaskTypeModalProps {
 
 const { width } = Dimensions.get('window');
 
-export const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
+export const ItemTypeModal: React.FC<ItemTypeModalProps> = ({
   visible,
   onClose,
   onSelectType,
@@ -26,32 +26,32 @@ export const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<'PRIORITY' | 'ON' | 'OFF' | 'PAY' | null>(null);
   const [step, setStep] = useState<'category' | 'color'>('category');
 
-  const taskTypes = [
+  const itemTypes = [
     {
       type: 'PRIORITY' as const,
       title: 'Priority',
-      description: 'High priority tasks that need immediate attention',
+      description: 'High priority items that need immediate attention',
       icon: 'flag',
       color: '#e74c3c',
     },
     {
       type: 'ON' as const,
       title: 'On',
-      description: 'Tasks that are currently in progress',
+      description: 'Items that are currently in progress',
       icon: 'play',
       color: '#3498db',
     },
     {
       type: 'OFF' as const,
       title: 'Off',
-      description: 'Tasks that are planned but not started',
+      description: 'Items that are planned but not started',
       icon: 'pause',
       color: '#95a5a6',
     },
     {
       type: 'PAY' as const,
       title: 'Pay',
-      description: 'Tasks related to payments or bills',
+      description: 'Items related to payments or bills',
       icon: 'card',
       color: '#f1c40f',
     },
@@ -107,29 +107,29 @@ export const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
   const renderCategoryStep = () => (
     <>
       <View style={styles.header}>
-        <Text style={styles.title}>Select Task Type</Text>
+        <Text style={styles.title}>Select Item Type</Text>
         <Pressable onPress={handleClose} style={styles.closeButton}>
           <Ionicons name="close" size={24} color="#666" />
         </Pressable>
       </View>
       
       <Text style={styles.subtitle}>
-        Choose the category for your new task:
+        Choose the category for your new item:
       </Text>
 
       <View style={styles.optionsContainer}>
-        {taskTypes.map((taskType) => (
+        {itemTypes.map((itemType) => (
           <Pressable
-            key={taskType.type}
+            key={itemType.type}
             style={styles.option}
-            onPress={() => handleCategorySelect(taskType.type)}
+            onPress={() => handleCategorySelect(itemType.type)}
           >
-            <View style={[styles.iconContainer, { backgroundColor: taskType.color }]}>
-              <Ionicons name={taskType.icon as any} size={24} color="white" />
+            <View style={[styles.iconContainer, { backgroundColor: itemType.color }]}>
+              <Ionicons name={itemType.icon as any} size={24} color="white" />
             </View>
             <View style={styles.optionContent}>
-              <Text style={styles.optionTitle}>{taskType.title}</Text>
-              <Text style={styles.optionDescription}>{taskType.description}</Text>
+              <Text style={styles.optionTitle}>{itemType.title}</Text>
+              <Text style={styles.optionDescription}>{itemType.description}</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#ccc" />
           </Pressable>
@@ -151,7 +151,7 @@ export const TaskTypeModal: React.FC<TaskTypeModalProps> = ({
       </View>
       
       <Text style={styles.subtitle}>
-        Choose a color for your task:
+        Choose a color for your item:
       </Text>
 
       <View style={styles.colorGrid}>

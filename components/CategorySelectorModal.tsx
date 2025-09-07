@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, Modal, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { TaskCategory } from '../types';
+import { ItemCategory } from '../types';
 
 interface CategoryOption {
-  value: TaskCategory;
+  value: ItemCategory;
   label: string;
   icon: string;
   color: string;
@@ -13,8 +13,8 @@ interface CategoryOption {
 interface CategorySelectorModalProps {
   visible: boolean;
   onClose: () => void;
-  onSelectCategory: (category: TaskCategory) => void;
-  currentCategory: TaskCategory;
+  onSelectCategory: (category: ItemCategory) => void;
+  currentCategory: ItemCategory;
 }
 
 const categoryOptions: CategoryOption[] = [

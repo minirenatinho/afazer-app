@@ -13,18 +13,18 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
-import { TaskItem } from '../components/TaskItem';
-import { TaskTypeModal } from '../components/TaskTypeModal';
+import { ItemItem } from '../components/ItemItem';
+import { ItemTypeModal } from '../components/ItemTypeModal';
 import { ColorSelectorModal } from '../components/ColorSelectorModal';
-import { Task, FilterType, TaskColor } from '../types';
-import { fetchTasks, createTask, updateTask, deleteTask as apiDeleteTask } from '../api';
+import { Item, FilterType, ItemColor } from '../types';
+import { fetchItems, createItem, updateItem, deleteItem as apiDeleteItem } from '../api';
 
 export default function AfazerPage() {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [newTaskText, setNewTaskText] = useState('');
+  const [items, setItems] = useState<Item[]>([]);
+  const [newItemText, setNewItemText] = useState('');
   const [filter, setFilter] = useState<FilterType>('completed');
-  const [showTaskTypeModal, setShowTaskTypeModal] = useState(false);
-  const [pendingTaskText, setPendingTaskText] = useState('');
+  const [showItemTypeModal, setShowItemTypeModal] = useState(false);
+  const [pendingItemText, setPendingItemText] = useState('');
   const [showFilter, setShowFilter] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   // Web-specific state for category and color selection
@@ -40,173 +40,174 @@ export default function AfazerPage() {
 
   // State for color modal
   const [showColorModal, setShowColorModal] = useState(false);
-  const [colorTaskId, setColorTaskId] = useState<string | null>(null);
-  const [colorTaskCurrent, setColorTaskCurrent] = useState<TaskColor>('BLUE');
+  const [colorItemId, setColorItemId] = useState<string | null>(null);
+  const [colorItemCurrent, setColorItemCurrent] = useState<ItemColor>('BLUE');
   // Handler to update color
-  const handleUpdateColor = async (id: string, color: TaskColor) => {
-    const task = tasks.find(t => t.id === id);
-    if (!task) return;
-    const updatedTask = { ...task, color };
+  const handleUpdateColor = async (id: string, color: ItemColor) => {
+    const item = items.find(t => t.id === id);
+    if (!item) return;
+    const updatedItem = { ...item, color };
     try {
-      const apiTask = await updateTask(updatedTask);
-      const updatedTasks = tasks.map(t => t.id === id ? apiTask : t);
-      setTasks(updatedTasks);
-      saveTasksToCache(updatedTasks);
+      const apiItem = await updateItem(updatedItem);
+      const updatedItems = items.map(t => t.id === id ? apiItem : t);
+      setItems(updatedItems);
+      saveItemsToCache(updatedItems);
     } catch (error) {
-      Alert.alert('Error', 'Failed to update task color.');
+      Alert.alert('Error', 'Failed to update item color.');
     }
   };
 
   useEffect(() => {
-    loadTasks();
+    loadItems();
   }, []);
 
-  const loadTasks = async () => {
+  const loadItems = async () => {
     try {
       // Try to fetch from API
-      const apiTasks = await fetchTasks();
-      setTasks(apiTasks);
-      await AsyncStorage.setItem('tasks', JSON.stringify(apiTasks));
+      const apiItems = await fetchItems();
+      const priorityItems = apiItems.filter(i => i.category === 'PRIORITY');
+      setItems(apiItems);
+      await AsyncStorage.setItem('items', JSON.stringify(apiItems));
     } catch (error) {
       // If API fails, load from cache
       console.error('Error fetching from API, loading from cache:', error);
-      const storedTasks = await AsyncStorage.getItem('tasks');
-      if (storedTasks) {
-        const parsedTasks = JSON.parse(storedTasks);
-        const tasksWithColor = parsedTasks.map((task: Task) => ({
-          ...task,
-          color: task.color || 'BLUE',
+      const storedItems = await AsyncStorage.getItem('items');
+      if (storedItems) {
+        const parsedItems = JSON.parse(storedItems);
+        const itemsWithColor = parsedItems.map((item: Item) => ({
+          ...item,
+          color: item.color || 'BLUE',
         }));
-        setTasks(tasksWithColor);
+        setItems(itemsWithColor);
       }
     }
   };
 
-  const saveTasksToCache = async (newTasks: Task[]) => {
+  const saveItemsToCache = async (newItems: Item[]) => {
     try {
-      await AsyncStorage.setItem('tasks', JSON.stringify(newTasks));
+      await AsyncStorage.setItem('items', JSON.stringify(newItems));
     } catch (error) {
-      console.error('Error saving tasks to cache:', error);
+      console.error('Error saving items to cache:', error);
     }
   };
 
-  const handleAddTask = () => {
-    const text = newTaskText.trim();
+  const handleAddItem = () => {
+    const text = newItemText.trim();
     if (text) {
       if (Platform.OS === 'web') {
         // On web, use the selected category and color directly
-        const newTask = {
+        const newItem = {
           text,
           completed: false,
           createdAt: Date.now(),
           category: selectedCategory,
           color: selectedColor,
-          type: 'task',
+          type: 'item',
         };
         
         (async () => {
           try {
-            const created = await createTask(newTask);
-            const updatedTasks = [...tasks, created];
-            setTasks(updatedTasks);
-            saveTasksToCache(updatedTasks);
-            setNewTaskText('');
+            const created = await createItem(newItem);
+            const updatedItems = [...items, created];
+            setItems(updatedItems);
+            saveItemsToCache(updatedItems);
+            setNewItemText('');
           } catch (error) {
-            Alert.alert('Error', 'Failed to create task.');
+            Alert.alert('Error', 'Failed to create item.');
           }
         })();
       } else {
         // On mobile, show the type selection modal
-        setPendingTaskText(text);
-        setShowTaskTypeModal(true);
+        setPendingItemText(text);
+        setShowItemTypeModal(true);
       }
     }
   };
 
-  const handleTaskTypeSelect = async (category: 'PRIORITY' | 'ON' | 'OFF' | 'PAY', color: 'GREEN' | 'PINK' | 'BLUE' | 'BROWN') => {
-    const newTask = {
-      text: pendingTaskText,
+  const handleItemTypeSelect = async (category: 'PRIORITY' | 'ON' | 'OFF' | 'PAY', color: 'GREEN' | 'PINK' | 'BLUE' | 'BROWN') => {
+    const newItem = {
+      text: pendingItemText,
       completed: false,
       createdAt: Date.now(),
       category,
       color,
-      type: 'task',
+      type: 'item',
     };
     try {
-      const created = await createTask(newTask);
-      const updatedTasks = [...tasks, created];
-      setTasks(updatedTasks);
-      saveTasksToCache(updatedTasks);
+      const created = await createItem(newItem);
+      const updatedItems = [...items, created];
+      setItems(updatedItems);
+      saveItemsToCache(updatedItems);
     } catch (error) {
-      Alert.alert('Error', 'Failed to create task.');
+      Alert.alert('Error', 'Failed to create item.');
     }
-    setNewTaskText('');
-    setPendingTaskText('');
-    setShowTaskTypeModal(false);
+    setNewItemText('');
+    setPendingItemText('');
+    setShowItemTypeModal(false);
   };
 
-  // Edit task text handler
+  // Edit item text handler
   const handleUpdateText = async (id: string, newText: string) => {
-    const task = tasks.find(t => t.id === id);
-    if (!task) return;
-    const updatedTask = { ...task, text: newText };
+    const item = items.find(t => t.id === id);
+    if (!item) return;
+    const updatedItem = { ...item, text: newText };
     try {
-      const apiTask = await updateTask(updatedTask);
-      const updatedTasks = tasks.map(t => t.id === id ? apiTask : t);
-      setTasks(updatedTasks);
-      saveTasksToCache(updatedTasks);
+      const apiItem = await updateItem(updatedItem);
+      const updatedItems = items.map(t => t.id === id ? apiItem : t);
+      setItems(updatedItems);
+      saveItemsToCache(updatedItems);
     } catch (error) {
-      Alert.alert('Error', 'Failed to update task text.');
+      Alert.alert('Error', 'Failed to update item text.');
     }
   };
 
   const handleUpdateCategory = async (id: string, category: string) => {
-    const task = tasks.find(t => t.id === id);
-    if (!task) return;
-    const updatedTask = { ...task, category };
+    const item = items.find(t => t.id === id);
+    if (!item) return;
+    const updatedItem = { ...item, category };
     try {
-      const apiTask = await updateTask(updatedTask);
-      const updatedTasks = tasks.map(t => t.id === id ? apiTask : t);
-      setTasks(updatedTasks);
-      saveTasksToCache(updatedTasks);
+      const apiItem = await updateItem(updatedItem);
+      const updatedItems = items.map(t => t.id === id ? apiItem : t);
+      setItems(updatedItems);
+      saveItemsToCache(updatedItems);
     } catch (error) {
-      Alert.alert('Error', 'Failed to update task category.');
+      Alert.alert('Error', 'Failed to update item category.');
     }
   };
 
-  const toggleTask = async (id: string) => {
-    const task = tasks.find(t => t.id === id);
-    if (!task) return;
-    const updatedTask = { ...task, completed: !task.completed };
+  const toggleItem = async (id: string) => {
+    const item = items.find(t => t.id === id);
+    if (!item) return;
+    const updatedItem = { ...item, completed: !item.completed };
     try {
-      const apiTask = await updateTask(updatedTask);
-      const updatedTasks = tasks.map(t => t.id === id ? apiTask : t);
-      setTasks(updatedTasks);
-      saveTasksToCache(updatedTasks);
+      const apiItem = await updateItem(updatedItem);
+      const updatedItems = items.map(t => t.id === id ? apiItem : t);
+      setItems(updatedItems);
+      saveItemsToCache(updatedItems);
     } catch (error) {
-      Alert.alert('Error', 'Failed to update task.');
+      Alert.alert('Error', 'Failed to update item.');
     }
   };
 
-  const deleteTask = (id: string) => {
+  const deleteItem = (id: string) => {
     const doDelete = async () => {
       try {
-        await apiDeleteTask(id);
-        const updatedTasks = tasks.filter(task => task.id !== id);
-        setTasks(updatedTasks);
-        saveTasksToCache(updatedTasks);
+        await apiDeleteItem(id);
+        const updatedItems = items.filter(item => item.id !== id);
+        setItems(updatedItems);
+        saveItemsToCache(updatedItems);
       } catch (error) {
-        Alert.alert('Error', 'Failed to delete task.');
+        Alert.alert('Error', 'Failed to delete item.');
       }
     };
     if (Platform.OS === 'web') {
-      if (window.confirm('Are you sure you want to delete this task?')) {
+      if (window.confirm('Are you sure you want to delete this item?')) {
         doDelete();
       }
     } else {
       Alert.alert(
-        'Delete Task',
-        'Are you sure you want to delete this task?',
+        'Delete Item',
+        'Are you sure you want to delete this item?',
         [
           { text: 'Cancel', style: 'cancel' },
           { text: 'Delete', style: 'destructive', onPress: doDelete },
@@ -217,24 +218,24 @@ export default function AfazerPage() {
 
   const clearCompleted = () => {
     const doClear = async () => {
-      const completedTasks = tasks.filter(task => task.completed);
+      const completedItems = items.filter(item => item.completed);
       try {
-        await Promise.all(completedTasks.map(task => apiDeleteTask(task.id)));
-        const updatedTasks = tasks.filter(task => !task.completed);
-        setTasks(updatedTasks);
-        saveTasksToCache(updatedTasks);
+        await Promise.all(completedItems.map(item => apiDeleteItem(item.id)));
+        const updatedItems = items.filter(item => !item.completed);
+        setItems(updatedItems);
+        saveItemsToCache(updatedItems);
       } catch (error) {
-        Alert.alert('Error', 'Failed to clear completed tasks.');
+        Alert.alert('Error', 'Failed to clear completed items.');
       }
     };
     if (Platform.OS === 'web') {
-      if (window.confirm('Are you sure you want to clear all completed tasks?')) {
+      if (window.confirm('Are you sure you want to clear all completed items?')) {
         doClear();
       }
     } else {
       Alert.alert(
         'Clear Completed',
-        'Are you sure you want to clear all completed tasks?',
+        'Are you sure you want to clear all completed items?',
         [
           { text: 'Cancel', style: 'cancel' },
           { text: 'Clear', style: 'destructive', onPress: doClear },
@@ -243,43 +244,51 @@ export default function AfazerPage() {
     }
   };
 
-  const filteredTasks = tasks.filter(task => {
+  const filteredItems = items.filter(item => {
     if (!showFilter) {
-      // When filter is hidden, show all non-completed tasks
-      return !task.completed;
+      // When filter is hidden, show all non-completed items
+      return !item.completed;
     }
-    if (filter === 'completed') return task.completed;
-    return !task.completed && task.category === filter;
+    if (filter === 'completed') return item.completed;
+    const result = !item.completed && item.category === filter;
+    if (filter === 'PRIORITY' && result) {
+    }
+    return result;
   });
 
   const getFilterCount = (filterType: FilterType) => {
     if (filterType === 'completed') {
-      return tasks.filter(task => task.completed).length;
+      return items.filter(item => item.completed).length;
     }
-    return tasks.filter(task => !task.completed && task.category === filterType).length;
+    return items.filter(item => !item.completed && item.category === filterType).length;
   };
 
-  const renderTask = ({ item }: { item: Task }) => (
-    <TaskItem
-      task={item}
-      onToggle={toggleTask}
-      onDelete={deleteTask}
+  // Pass isHistory=true if filter is 'completed' (history list)
+  const renderItem = ({ item }: { item: Item }) => (
+    <ItemItem
+      item={item}
+      onToggle={toggleItem}
+      onDelete={deleteItem}
       onUpdateCategory={handleUpdateCategory}
       onUpdateText={handleUpdateText}
       onUpdateColor={() => {
-        setColorTaskId(item.id);
-        setColorTaskCurrent(item.color as TaskColor);
+        setColorItemId(item.id);
+        setColorItemCurrent(item.color as ItemColor);
         setShowColorModal(true);
       }}
+      isHistory={filter === 'completed'}
     />
   );
 
   const renderAllCategoriesView = () => {
     // Only use categories that are valid for visibility toggling
     const categories: Array<'PRIORITY' | 'ON' | 'PAY' | 'OFF'> = ['PRIORITY', 'ON', 'PAY', 'OFF'];
-    const tasksByCategory = categories.map(category =>
-      tasks.filter(task => !task.completed && task.category === category)
-    );
+    const itemsByCategory = categories.map(category => {
+      const filtered = items.filter(item => !item.completed && item.category === category);
+      if (category === 'PRIORITY') {
+      }
+      return filtered;
+    });
 
     // Calculate visible categories count for web layout
     const visibleCategories = Platform.OS === 'web' 
@@ -330,7 +339,7 @@ export default function AfazerPage() {
                 {category.charAt(0).toUpperCase() + category.slice(1)}
               </Text>
               <Text style={styles.webCategoryHeaderCount}>
-                ({tasksByCategory[index].length})
+                ({itemsByCategory[index].length})
               </Text>
               <Ionicons
                 name={isVisible ? 'eye' : 'eye-off'}
@@ -403,7 +412,7 @@ export default function AfazerPage() {
                           styles.categoryCount,
                           category === 'OFF' && styles.offCategoryText
                         ]}>
-                          ({tasksByCategory[index].length})
+                          ({itemsByCategory[index].length})
                         </Text>
                       </View>
                       <Ionicons
@@ -414,19 +423,19 @@ export default function AfazerPage() {
                     </Pressable>
                   )}
                   
-                  {/* Tasks list */}
-                  <View style={[styles.categoryTasksContainer, { display: categoryVisibility[category as 'PRIORITY' | 'ON' | 'OFF' | 'PAY'] ? 'flex' : 'none' }]}>
-                    {tasksByCategory[index].map(task => (
-                      <TaskItem
-                        key={task.id}
-                        task={task}
-                        onToggle={toggleTask}
-                        onDelete={deleteTask}
+                  {/* Items list */}
+                  <View style={[styles.categoryItemsContainer, { display: categoryVisibility[category as 'PRIORITY' | 'ON' | 'OFF' | 'PAY'] ? 'flex' : 'none' }]}>
+                    {itemsByCategory[index].map(item => (
+                      <ItemItem
+                        key={item.id}
+                        item={item}
+                        onToggle={toggleItem}
+                        onDelete={deleteItem}
                         onUpdateCategory={handleUpdateCategory}
                         onUpdateText={handleUpdateText}
                         onUpdateColor={() => {
-                          setColorTaskId(task.id);
-                          setColorTaskCurrent(task.color as TaskColor);
+                          setColorItemId(item.id);
+                          setColorItemCurrent(item.color as ItemColor);
                           setShowColorModal(true);
                         }}
                       />
@@ -444,18 +453,18 @@ export default function AfazerPage() {
   // Add onRefresh handler for pull-to-refresh
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadTasks();
+    await loadItems();
     setRefreshing(false);
   };
 
-  const renderTaskInput = () => (
+  const renderItemInput = () => (
     <View style={styles.inputContainer}>
       <TextInput
         style={[styles.input, { flex: 2, marginRight: 8 }]}
-        placeholder="Add a new task..."
-        value={newTaskText}
-        onChangeText={setNewTaskText}
-        onSubmitEditing={handleAddTask}
+        placeholder="Add a new item..."
+        value={newItemText}
+        onChangeText={setNewItemText}
+        onSubmitEditing={handleAddItem}
         returnKeyType="done"
       />
       
@@ -538,7 +547,7 @@ export default function AfazerPage() {
       
       <Pressable 
         style={[styles.addButton, { marginLeft: 8 }]} 
-        onPress={handleAddTask}
+        onPress={handleAddItem}
       >
         <Ionicons name="add" size={24} color="white" />
       </Pressable>
@@ -548,7 +557,7 @@ export default function AfazerPage() {
   const renderPage = () => {
     return (
       <>
-        {renderTaskInput()}
+        {renderItemInput()}
         <View style={styles.filterToggleContainer}>
           <Pressable
             style={styles.filterToggleButton}
@@ -566,10 +575,10 @@ export default function AfazerPage() {
         </View>
         {showFilter ? (
           <FlatList
-            data={filteredTasks}
-            renderItem={renderTask}
+            data={filteredItems}
+            renderItem={renderItem}
             keyExtractor={item => item.id}
-            style={styles.taskList}
+            style={styles.itemList}
             showsVerticalScrollIndicator={false}
             refreshing={refreshing}
             onRefresh={onRefresh}
@@ -589,22 +598,22 @@ export default function AfazerPage() {
   return (
     <>
     {renderPage()}
-    <TaskTypeModal
-          visible={showTaskTypeModal}
+    <ItemTypeModal
+          visible={showItemTypeModal}
           onClose={() => {
-            setShowTaskTypeModal(false);
-            setPendingTaskText('');
+            setShowItemTypeModal(false);
+            setPendingItemText('');
           }}
-          onSelectType={handleTaskTypeSelect}
+          onSelectType={handleItemTypeSelect}
         />
     <ColorSelectorModal
       visible={showColorModal}
       onClose={() => setShowColorModal(false)}
       onSelectColor={(color) => {
-        if (colorTaskId) handleUpdateColor(colorTaskId, color);
+        if (colorItemId) handleUpdateColor(colorItemId, color);
         setShowColorModal(false);
       }}
-      currentColor={colorTaskCurrent}
+      currentColor={colorItemCurrent}
     />
     </>);
 }
@@ -819,7 +828,7 @@ const styles = StyleSheet.create({
   filterIcon: {
     marginRight: 4,
   },
-  taskList: {
+  itemList: {
     flex: 1,
     paddingHorizontal: 20,
   },
@@ -893,7 +902,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#e9ecef',
   },
-  categoryTasksContainer: {
+  categoryItemsContainer: {
     paddingHorizontal: Platform.OS === 'web' ? 10 : 12,
   },
   categoryTitle: {

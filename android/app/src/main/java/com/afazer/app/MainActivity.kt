@@ -47,7 +47,7 @@ class MainActivity : ReactActivity() {
     */
   override fun invokeDefaultOnBackPressed() {
       if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
-          if (!moveTaskToBack(false)) {
+          if (!moveItemToBack(false)) {
               // For non-root activities, use the default implementation to finish them.
               super.invokeDefaultOnBackPressed()
           }
@@ -55,7 +55,7 @@ class MainActivity : ReactActivity() {
       }
 
       // Use the default back button implementation on Android S
-      // because it's doing more than [Activity.moveTaskToBack] in fact.
+      // because it's doing more than [Activity.moveItemToBack] in fact.
       super.invokeDefaultOnBackPressed()
   }
 }
