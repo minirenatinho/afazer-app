@@ -76,8 +76,6 @@ export const ItemItem: React.FC<ItemItemProps> = ({
       <Pressable
         style={[styles.itemCheckbox, { opacity: item.completed ? 0.7 : 1 }]}
         onPress={() => onToggle(item.id)}
-        onTouchStart={(e) => e.stopPropagation()}
-        onTouchEnd={(e) => e.stopPropagation()}
         hitSlop={10}
         pressRetentionOffset={10}
       >
@@ -130,8 +128,6 @@ export const ItemItem: React.FC<ItemItemProps> = ({
           <Pressable
             onPress={() => !item.completed && setIsEditing(true)}
             disabled={item.completed}
-            onTouchStart={(e) => e.stopPropagation()}
-            onTouchEnd={(e) => e.stopPropagation()}
             hitSlop={10}
             pressRetentionOffset={10}
           >
@@ -152,8 +148,6 @@ export const ItemItem: React.FC<ItemItemProps> = ({
             <Pressable
               style={[styles.categoryBadge, { backgroundColor: categoryConfig.color }]}
               onPress={() => setIsCategoryModalVisible(true)}
-              onTouchStart={(e) => e.stopPropagation()}
-              onTouchEnd={(e) => e.stopPropagation()}
               hitSlop={10}
               pressRetentionOffset={10}
             >
@@ -163,8 +157,6 @@ export const ItemItem: React.FC<ItemItemProps> = ({
             <Pressable
               style={[styles.colorBadge, { backgroundColor: colorConfig.backgroundColor, borderColor: colorConfig.borderColor }]}
               onPress={onUpdateColor}
-              onTouchStart={(e) => e.stopPropagation()}
-              onTouchEnd={(e) => e.stopPropagation()}
               hitSlop={10}
               pressRetentionOffset={10}
             >
@@ -177,8 +169,6 @@ export const ItemItem: React.FC<ItemItemProps> = ({
       <Pressable
         style={styles.deleteButton}
         onPress={() => onDelete(item.id)}
-        onTouchStart={(e) => e.stopPropagation()}
-        onTouchEnd={(e) => e.stopPropagation()}
         hitSlop={10}
         pressRetentionOffset={10}
       >

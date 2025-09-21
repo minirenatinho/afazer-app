@@ -1,23 +1,82 @@
+
 import { Item, Supermarket, Country } from './types';
 import Constants from 'expo-constants';
+import { TokenService, TokenResponse } from './services/tokenService';
+import { apiCall } from './services/apiInterceptor';
+
 
 const API_URL = Constants.expoConfig?.extra?.EXPO_API_URL;
 if (!API_URL) {
   throw new Error('API_URL is not set. Check .env and app.config.js');
 }
 const API_BASE = `${API_URL}/items`;
+const AUTH_BASE = `${API_URL}/auth`;
 const ITEMS_LIMIT = 200;
+
+// --- Auth ---
+// Login: POST /auth/token (username, password)
+export async function login(username: string, password: string): Promise<void> {
+  const formData = new URLSearchParams();
+  formData.append('username', username);
+  formData.append('password', password);
+  
+  const res = await fetch(`${API_URL}/auth/token`, {
+    method: 'POST',
+    headers: { 
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: formData.toString(),
+  });
+  
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Login failed');
+  }
+  
+  const tokens: TokenResponse = await res.json();
+  await TokenService.storeTokens(tokens);
+}
+
+// Logout: POST /auth/logout (if available, or clear tokens)
+export async function logout(): Promise<void> {
+  try {
+    // Try to call logout endpoint if it exists
+    await fetch(`${API_URL}/auth/logout`, {
+      method: 'POST',
+    });
+  } catch {
+    // Ignore errors if logout endpoint doesn't exist
+  } finally {
+    // Always clear stored tokens
+    await TokenService.clearTokens();
+  }
+}
+
+// Check if user is authenticated: GET /auth/me
+export async function getCurrentUser(): Promise<any> {
+  const res = await apiCall(`${API_URL}/auth/me`, {
+    method: 'GET',
+  });
+  
+  if (!res.ok) {
+    throw new Error('Not authenticated');
+  }
+  
+  return res.json();
+}
 
 // --- Item CRUD ---
 
+
 export async function fetchItems(): Promise<Item[]> {
-  const res = await fetch(`${API_BASE}/?limit=${ITEMS_LIMIT}`);
+  const res = await apiCall(`${API_BASE}/?limit=${ITEMS_LIMIT}`);
   if (!res.ok) throw new Error('Failed to fetch items');
   return res.json();
 }
 
+
 export async function createItem(item: Omit<Item, 'id'>): Promise<Item> {
-  const res = await fetch(`${API_BASE}/`, {
+  const res = await apiCall(`${API_BASE}/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(item),
@@ -26,8 +85,9 @@ export async function createItem(item: Omit<Item, 'id'>): Promise<Item> {
   return res.json();
 }
 
+
 export async function updateItem(item: Item): Promise<Item> {
-  const res = await fetch(`${API_BASE}/${item.id}/`, {
+  const res = await apiCall(`${API_BASE}/${item.id}/`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(item),
@@ -36,8 +96,9 @@ export async function updateItem(item: Item): Promise<Item> {
   return res.json();
 }
 
+
 export async function deleteItem(id: string): Promise<void> {
-  const res = await fetch(`${API_BASE}/${id}/`, {
+  const res = await apiCall(`${API_BASE}/${id}/`, {
     method: 'DELETE',
   });
   if (!res.ok) throw new Error('Failed to delete item');
@@ -45,12 +106,14 @@ export async function deleteItem(id: string): Promise<void> {
 
 // --- Supermarket CRUD ---
 
+
 export async function fetchSupermarkets(): Promise<Supermarket[]> {
-  const res = await fetch(`${API_BASE}/?type=supermarket&limit=${ITEMS_LIMIT}`);
+  const res = await apiCall(`${API_BASE}/?type=supermarket&limit=${ITEMS_LIMIT}`);
   if (!res.ok) throw new Error('Failed to fetch supermarkets');
   const supermarkets: Supermarket[] = await res.json();
   return supermarkets;
 }
+
 
 export async function createSupermarket(supermarket: Omit<Supermarket, 'id'>): Promise<Supermarket> {
   const supermarketData: Omit<Supermarket, 'id'> = {
@@ -68,7 +131,7 @@ export async function createSupermarket(supermarket: Omit<Supermarket, 'id'>): P
     },
   };
 
-  const res = await fetch(`${API_BASE}/`, {
+  const res = await apiCall(`${API_BASE}/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(supermarketData),
@@ -89,6 +152,7 @@ export async function createSupermarket(supermarket: Omit<Supermarket, 'id'>): P
   };
 }
 
+
 export async function updateSupermarket(supermarket: Supermarket): Promise<Supermarket> {
   const supermarketData: Supermarket = {
     id: supermarket.id,
@@ -106,7 +170,7 @@ export async function updateSupermarket(supermarket: Supermarket): Promise<Super
     },
   };
 
-  const res = await fetch(`${API_BASE}/${supermarket.id}/`, {
+  const res = await apiCall(`${API_BASE}/${supermarket.id}/`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(supermarketData),
@@ -127,8 +191,9 @@ export async function updateSupermarket(supermarket: Supermarket): Promise<Super
   };
 }
 
+
 export async function deleteSupermarket(id: string): Promise<void> {
-  const res = await fetch(`${API_BASE}/${id}/`, {
+  const res = await apiCall(`${API_BASE}/${id}/`, {
     method: 'DELETE',
   });
   if (!res.ok) throw new Error('Failed to delete supermarket');
@@ -136,11 +201,13 @@ export async function deleteSupermarket(id: string): Promise<void> {
 
 // --- Country CRUD ---
 
+
 export async function fetchCountries(): Promise<Country[]> {
-  const res = await fetch(`${API_BASE}/?type=country&limit=${ITEMS_LIMIT}`);
+  const res = await apiCall(`${API_BASE}/?type=country&limit=${ITEMS_LIMIT}`);
   if (!res.ok) throw new Error('Failed to fetch countries');
   return res.json();
 }
+
 
 export async function createCountry(country: Omit<Country, 'id'>): Promise<Country> {
   const countryData: Omit<Country, 'id'> = {
@@ -158,7 +225,7 @@ export async function createCountry(country: Omit<Country, 'id'>): Promise<Count
     },
   };
 
-  const res = await fetch(`${API_BASE}/`, {
+  const res = await apiCall(`${API_BASE}/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(countryData),
@@ -167,6 +234,7 @@ export async function createCountry(country: Omit<Country, 'id'>): Promise<Count
   if (!res.ok) throw new Error('Failed to create country');
   return res.json();
 }
+
 
 export async function updateCountry(country: Country): Promise<Country> {
   const countryData: Country = {
@@ -185,7 +253,7 @@ export async function updateCountry(country: Country): Promise<Country> {
     },
   };
 
-  const res = await fetch(`${API_BASE}/${country.id}/`, {
+  const res = await apiCall(`${API_BASE}/${country.id}/`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(countryData),
@@ -195,8 +263,9 @@ export async function updateCountry(country: Country): Promise<Country> {
   return res.json();
 }
 
+
 export async function deleteCountry(id: string): Promise<void> {
-  const res = await fetch(`${API_BASE}/${id}/`, {
+  const res = await apiCall(`${API_BASE}/${id}/`, {
     method: 'DELETE',
   });
   if (!res.ok) throw new Error('Failed to delete country');
