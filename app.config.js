@@ -11,5 +11,9 @@ module.exports = ({ config }) => {
       },
       EXPO_API_URL: process.env.EXPO_API_URL,
     },
+    plugins: [
+      "expo-font",
+      "expo-secure-store"
+    ]
   };
 };
