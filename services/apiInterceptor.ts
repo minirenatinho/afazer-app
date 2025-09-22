@@ -43,14 +43,26 @@ export const refreshToken = async (): Promise<string> => {
     });
 
     if (!response.ok) {
-      throw new Error('Token refresh failed');
+      if (response.status === 422) {
+        const errorData = await response.json();
+        throw new Error(`Validation error: ${JSON.stringify(errorData.detail)}`);
+      }
+      throw new Error(`Token refresh failed with status ${response.status}`);
     }
 
     const tokens: TokenResponse = await response.json();
+    
+    // Validate that we received the expected tokens
+    if (!tokens.access_token) {
+      throw new Error('Invalid response: access_token is required');
+    }
+    
+    // Store both the new access token and the new refresh token (token rotation)
     await TokenService.storeTokens(tokens);
     
     return tokens.access_token;
   } catch (error) {
+    // Clear tokens on any refresh error to force re-authentication
     await TokenService.clearTokens();
     throw error;
   }
