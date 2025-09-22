@@ -40,12 +40,24 @@ export async function login(username: string, password: string): Promise<void> {
 // Logout: POST /auth/logout (if available, or clear tokens)
 export async function logout(): Promise<void> {
   try {
-    // Try to call logout endpoint if it exists
-    await fetch(`${API_URL}/auth/logout`, {
-      method: 'POST',
-    });
-  } catch {
-    // Ignore errors if logout endpoint doesn't exist
+    // Get the refresh token before clearing
+    const refreshToken = await TokenService.getRefreshToken();
+    
+    if (refreshToken) {
+      // Try to call logout endpoint with refresh token
+      await fetch(`${API_URL}/auth/logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          refresh_token: refreshToken
+        }),
+      });
+    }
+  } catch (error) {
+    // Ignore errors if logout endpoint doesn't exist or fails
+    console.warn('Logout endpoint call failed:', error);
   } finally {
     // Always clear stored tokens
     await TokenService.clearTokens();
