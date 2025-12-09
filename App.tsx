@@ -134,23 +134,12 @@ export default function App() {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
     >
       <StatusBar barStyle="light-content" />
-      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', padding: 10 }}>
-        <Text style={{ marginRight: 10, color: '#34495e', fontWeight: 'bold' }}>{user?.username || 'User'}</Text>
-        <Pressable onPress={handleLogout} style={({ pressed }) => [{
-          backgroundColor: '#e74c3c',
-          paddingVertical: 8,
-          paddingHorizontal: 16,
-          borderRadius: 8,
-          opacity: pressed ? 0.7 : 1,
-        }]}
-        >
-          <Text style={{ color: 'white', fontWeight: 'bold' }}>Logout</Text>
-        </Pressable>
-      </View>
       <PageCarousel 
         pages={pages} 
         currentPageId={page} 
-        onPageChange={(pageId) => setPage(pageId as 'afazer' | 'supermarket' | 'country')} 
+        onPageChange={(pageId) => setPage(pageId as 'afazer' | 'supermarket' | 'country')}
+        username={user?.username}
+        onLogout={handleLogout}
       />
       {renderPage()}
     </KeyboardAvoidingView>
