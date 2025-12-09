@@ -37,36 +37,44 @@ export const PageCarousel: React.FC<PageCarouselProps> = ({
 
   return (
     <View style={styles.container}>
-      <View style={styles.userSection}>
-        <Text style={styles.username}>{username || 'User'}</Text>
-        <Pressable 
-          onPress={onLogout}
-          style={({ pressed }) => [
-            styles.logoutButton,
-            pressed && { opacity: 0.7 }
-          ]}
-        >
-          <Text style={styles.logoutText}>Logout</Text>
-        </Pressable>
-      </View>
-      <View style={styles.carouselSection}>
-        <Pressable 
-          onPress={goToPrevious}
-          style={styles.arrowButton}
-          hitSlop={10}
-        >
-          <Ionicons name="chevron-back" size={24} color="white" />
-        </Pressable>
+      <View style={styles.headerRow}>
+        {/* Left spacer */}
+        <View style={styles.spacer} />
         
-        <Text style={styles.title}>{currentPage?.title}</Text>
+        {/* Center carousel */}
+        <View style={styles.carouselSection}>
+          <Pressable 
+            onPress={goToPrevious}
+            style={styles.arrowButton}
+            hitSlop={10}
+          >
+            <Ionicons name="chevron-back" size={24} color="white" />
+          </Pressable>
+          
+          <Text style={styles.title}>{currentPage?.title}</Text>
+          
+          <Pressable 
+            onPress={goToNext}
+            style={styles.arrowButton}
+            hitSlop={10}
+          >
+            <Ionicons name="chevron-forward" size={24} color="white" />
+          </Pressable>
+        </View>
         
-        <Pressable 
-          onPress={goToNext}
-          style={styles.arrowButton}
-          hitSlop={10}
-        >
-          <Ionicons name="chevron-forward" size={24} color="white" />
-        </Pressable>
+        {/* Right user section */}
+        <View style={styles.userSection}>
+          <Text style={styles.username}>{username || 'User'}</Text>
+          <Pressable 
+            onPress={onLogout}
+            style={({ pressed }) => [
+              styles.logoutButton,
+              pressed && { opacity: 0.7 }
+            ]}
+          >
+            <Text style={styles.logoutText}>Logout</Text>
+          </Pressable>
+        </View>
       </View>
     </View>
   );
@@ -79,48 +87,55 @@ const styles = StyleSheet.create({
     borderBottomColor: '#e0e0e0',
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 10,
   },
-  userSection: {
+  headerRow: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
     alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.2)',
-  },
-  username: {
-    marginRight: 10,
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
-  logoutButton: {
-    backgroundColor: '#e74c3c',
-    paddingVertical: 8,
+    justifyContent: 'space-between',
+    paddingVertical: 12,
     paddingHorizontal: 16,
-    borderRadius: 8,
   },
-  logoutText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 12,
+  spacer: {
+    width: 80,
   },
   carouselSection: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 10,
-    paddingBottom: 10,
+    flex: 1,
+    gap: 12,
+  },
+  userSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    minWidth: 80,
+  },
+  username: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 13,
+  },
+  logoutButton: {
+    backgroundColor: 'rgba(231, 76, 60, 0.9)',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+  },
+  logoutText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 11,
   },
   title: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginHorizontal: 20,
+    fontSize: 20,
+    fontWeight: '700',
     textAlign: 'center',
-    minWidth: 150,
     color: 'white',
+    minWidth: 120,
   },
   arrowButton: {
-    padding: 8,
+    padding: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
