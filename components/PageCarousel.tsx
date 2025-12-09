@@ -11,12 +11,16 @@ type PageCarouselProps = {
   pages: Page[];
   currentPageId: string;
   onPageChange: (pageId: string) => void;
+  username?: string;
+  onLogout?: () => void;
 };
 
 export const PageCarousel: React.FC<PageCarouselProps> = ({
   pages,
   currentPageId,
   onPageChange,
+  username,
+  onLogout,
 }) => {
   const currentIndex = pages.findIndex(page => page.id === currentPageId);
   const currentPage = pages[currentIndex];
@@ -33,37 +37,80 @@ export const PageCarousel: React.FC<PageCarouselProps> = ({
 
   return (
     <View style={styles.container}>
-      <Pressable 
-        onPress={goToPrevious}
-        style={styles.arrowButton}
-        hitSlop={10}
-      >
-        <Ionicons name="chevron-back" size={24} color="white" />
-      </Pressable>
-      
-      <Text style={styles.title}>{currentPage?.title}</Text>
-      
-      <Pressable 
-        onPress={goToNext}
-        style={styles.arrowButton}
-        hitSlop={10}
-      >
-        <Ionicons name="chevron-forward" size={24} color="white" />
-      </Pressable>
+      <View style={styles.userSection}>
+        <Text style={styles.username}>{username || 'User'}</Text>
+        <Pressable 
+          onPress={onLogout}
+          style={({ pressed }) => [
+            styles.logoutButton,
+            pressed && { opacity: 0.7 }
+          ]}
+        >
+          <Text style={styles.logoutText}>Logout</Text>
+        </Pressable>
+      </View>
+      <View style={styles.carouselSection}>
+        <Pressable 
+          onPress={goToPrevious}
+          style={styles.arrowButton}
+          hitSlop={10}
+        >
+          <Ionicons name="chevron-back" size={24} color="white" />
+        </Pressable>
+        
+        <Text style={styles.title}>{currentPage?.title}</Text>
+        
+        <Pressable 
+          onPress={goToNext}
+          style={styles.arrowButton}
+          hitSlop={10}
+        >
+          <Ionicons name="chevron-forward" size={24} color="white" />
+        </Pressable>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 10,
-    paddingBottom: 10,
     backgroundColor: '#FF8C42',
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 10,
+  },
+  userSection: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  username: {
+    marginRight: 10,
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  logoutButton: {
+    backgroundColor: '#e74c3c',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  logoutText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  carouselSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingBottom: 10,
   },
   title: {
     fontSize: 18,
