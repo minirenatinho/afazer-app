@@ -546,10 +546,14 @@ export default function AfazerPage() {
       ) : null}
       
       <Pressable 
-        style={[styles.addButton, { marginLeft: 8 }]} 
+        style={({ pressed }) => [
+          styles.addButton, 
+          { marginLeft: 8 },
+          pressed && { opacity: 0.8, transform: [{ scale: 0.95 }] }
+        ]} 
         onPress={handleAddItem}
       >
-        <Ionicons name="add" size={24} color="white" />
+        <Ionicons name="add" size={26} color="white" />
       </Pressable>
     </View>
   );
@@ -560,7 +564,10 @@ export default function AfazerPage() {
         {renderItemInput()}
         <View style={styles.filterToggleContainer}>
           <Pressable
-            style={styles.filterToggleButton}
+            style={({ pressed }) => [
+              styles.filterToggleButton,
+              pressed && { opacity: 0.8, transform: [{ scale: 0.98 }] }
+            ]}
             onPress={() => setShowFilter(!showFilter)}
           >
             <Ionicons 
@@ -587,7 +594,13 @@ export default function AfazerPage() {
           renderAllCategoriesView()
         )}
         {showFilter && filter === 'completed' && getFilterCount('completed') > 0 && (
-          <Pressable style={styles.clearButton} onPress={clearCompleted}>
+          <Pressable 
+            style={({ pressed }) => [
+              styles.clearButton,
+              pressed && { opacity: 0.8, transform: [{ scale: 0.98 }] }
+            ]} 
+            onPress={clearCompleted}
+          >
             <Text style={styles.clearButtonText}>Clear Completed</Text>
           </Pressable>
         )}
@@ -621,7 +634,7 @@ export default function AfazerPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f5f6fa',
   },
   header: {
     ...(Platform.OS === 'web' ? {
@@ -654,37 +667,68 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 20,
     backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
-    ...(Platform.OS === 'web' ? {
-      alignItems: 'center',
-      gap: 10,
-      paddingVertical: 16,
-      paddingHorizontal: 20,
-      height: 82, // Match height with other pages
-    } : {}),
+    borderBottomWidth: 0,
+    ...Platform.select({
+      web: {
+        alignItems: 'center',
+        gap: 12,
+        paddingVertical: 20,
+        paddingHorizontal: 24,
+        height: 90,
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+      },
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
   input: {
     flex: 1,
-    height: 50,
-    borderWidth: 1,
+    height: 52,
+    borderWidth: 2,
     borderColor: '#e9ecef',
-    borderRadius: 25,
-    paddingHorizontal: 20,
+    borderRadius: 26,
+    paddingHorizontal: 22,
     fontSize: 16,
     backgroundColor: '#f8f9fa',
-    ...(Platform.OS === 'web' ? {
-      height: 50, // Ensure consistent height on web
-    } : {}),
+    ...Platform.select({
+      web: {
+        height: 52,
+        transition: 'all 0.2s ease',
+        outline: 'none',
+      },
+    }),
   },
   addButton: {
-    width: 50,
-    height: 50,
+    width: 52,
+    height: 52,
     backgroundColor: '#FF8C42',
-    borderRadius: 25,
+    borderRadius: 26,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 10,
+    marginLeft: 12,
+    ...Platform.select({
+      web: {
+        boxShadow: '0 4px 12px rgba(255, 140, 66, 0.4)',
+        transition: 'all 0.2s ease',
+        cursor: 'pointer',
+      },
+      ios: {
+        shadowColor: '#FF8C42',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   // Web Controls
   webControlsContainer: {
@@ -702,52 +746,126 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   selectionLabel: {
-    fontSize: 12,
-    color: '#7f8c8d',
-    marginRight: 8,
+    fontSize: 13,
+    color: '#5a6c7d',
+    marginRight: 10,
+    fontWeight: '600',
   },
   checkboxGroup: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 6,
   },
   categoryOption: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 4,
+    marginHorizontal: 2,
     backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.1)',
+    borderWidth: 2,
+    borderColor: 'rgba(0,0,0,0.08)',
+    ...Platform.select({
+      web: {
+        transition: 'all 0.2s ease',
+        cursor: 'pointer',
+      },
+    }),
   },
   colorOption: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 4,
+    marginHorizontal: 2,
     backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.1)',
+    borderWidth: 2,
+    borderColor: 'rgba(0,0,0,0.08)',
+    ...Platform.select({
+      web: {
+        transition: 'all 0.2s ease',
+        cursor: 'pointer',
+      },
+    }),
   },
   // Category selected states
   PRIORITYSelected: {
     backgroundColor: '#e74c3c',
-    transform: [{ scale: 1.1 }],
+    transform: [{ scale: 1.15 }],
+    borderColor: '#c0392b',
+    ...Platform.select({
+      web: {
+        boxShadow: '0 4px 12px rgba(231, 76, 60, 0.4)',
+      },
+      ios: {
+        shadowColor: '#e74c3c',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.4,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
   },
   ONSelected: {
     backgroundColor: '#3498db',
-    transform: [{ scale: 1.1 }],
+    transform: [{ scale: 1.15 }],
+    borderColor: '#2980b9',
+    ...Platform.select({
+      web: {
+        boxShadow: '0 4px 12px rgba(52, 152, 219, 0.4)',
+      },
+      ios: {
+        shadowColor: '#3498db',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.4,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
   },
   PAYSelected: {
     backgroundColor: '#f1c40f',
-    transform: [{ scale: 1.1 }],
+    transform: [{ scale: 1.15 }],
+    borderColor: '#f39c12',
+    ...Platform.select({
+      web: {
+        boxShadow: '0 4px 12px rgba(241, 196, 15, 0.4)',
+      },
+      ios: {
+        shadowColor: '#f1c40f',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.4,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
   },
   OFFSelected: {
     backgroundColor: '#95a5a6',
-    transform: [{ scale: 1.1 }],
+    transform: [{ scale: 1.15 }],
+    borderColor: '#7f8c8d',
+    ...Platform.select({
+      web: {
+        boxShadow: '0 4px 12px rgba(149, 165, 166, 0.4)',
+      },
+      ios: {
+        shadowColor: '#95a5a6',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.4,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
   },
   // Color selected states
   blueColorSelected: {
@@ -768,28 +886,40 @@ const styles = StyleSheet.create({
   },
   filterToggleContainer: {
     paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingVertical: 14,
     backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    borderBottomWidth: 0,
+    ...Platform.select({
+      web: {
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+      },
+    }),
   },
   filterToggleButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 24,
     backgroundColor: '#f8f9fa',
-    borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderWidth: 2,
+    borderColor: '#FF8C42',
     alignSelf: 'center',
+    ...Platform.select({
+      web: {
+        transition: 'all 0.2s ease',
+        cursor: 'pointer',
+        boxShadow: '0 2px 6px rgba(255, 140, 66, 0.2)',
+      },
+    }),
   },
   filterToggleText: {
     color: '#FF8C42',
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: 15,
+    fontWeight: '600',
     marginLeft: 8,
+    letterSpacing: 0.3,
   },
   filterContainer: {
     paddingHorizontal: 20,
@@ -834,7 +964,7 @@ const styles = StyleSheet.create({
   },
   allCategoriesContainer: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f9fa',
   },
   allCategoriesScrollView: {
     flex: 1,
@@ -847,30 +977,56 @@ const styles = StyleSheet.create({
   webCategoriesHeader: {
     display: 'flex',
     flexDirection: Platform.OS === 'web' ? 'row' : 'column',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
-    backgroundColor: '#f8f9fa',
-    paddingHorizontal: Platform.OS === 'web' ? 10 : 0,
+    borderBottomWidth: 0,
+    backgroundColor: '#ffffff',
+    paddingHorizontal: Platform.OS === 'web' ? 12 : 0,
+    ...Platform.select({
+      web: {
+        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.06)',
+      },
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   webCategoryHeaderItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: Platform.OS === 'web' ? 'center' : 'space-between',
-    paddingVertical: 12,
-    paddingHorizontal: Platform.OS === 'web' ? 8 : 20,
-    marginHorizontal: Platform.OS === 'web' ? 2 : 0,
+    paddingVertical: 16,
+    paddingHorizontal: Platform.OS === 'web' ? 12 : 20,
+    marginHorizontal: Platform.OS === 'web' ? 4 : 0,
     borderBottomWidth: Platform.OS === 'web' ? 0 : 1,
     borderBottomColor: '#e9ecef',
+    borderRadius: Platform.OS === 'web' ? 8 : 0,
+    ...Platform.select({
+      web: {
+        transition: 'all 0.2s ease',
+        cursor: 'pointer',
+      },
+    }),
   },
   webCategoryHeaderText: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: 6,
+    fontSize: 15,
+    fontWeight: '700',
+    marginLeft: 8,
+    letterSpacing: 0.3,
   },
   webCategoryHeaderCount: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#7f8c8d',
-    marginLeft: 4,
+    marginLeft: 6,
+    fontWeight: '600',
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
   },
   categoriesRow: {
     flexDirection: Platform.OS === 'web' ? 'row' : 'column',
@@ -881,7 +1037,15 @@ const styles = StyleSheet.create({
     ...(Platform.OS === 'web' 
       ? { 
           height: '100%',
-          paddingHorizontal: 8,
+          paddingHorizontal: 10,
+          backgroundColor: '#ffffff',
+          marginHorizontal: 4,
+          borderRadius: 8,
+          ...Platform.select({
+            web: {
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+            },
+          }),
         } 
       : {
           width: '100%',
@@ -889,6 +1053,7 @@ const styles = StyleSheet.create({
           paddingHorizontal: 0,
           borderBottomWidth: 1,
           borderBottomColor: '#e9ecef',
+          backgroundColor: '#ffffff',
         }
     ),
   },
@@ -896,37 +1061,66 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
+    padding: 18,
     width: '100%',
     backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    borderBottomWidth: 0,
+    ...Platform.select({
+      web: {
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+      },
+    }),
   },
   categoryItemsContainer: {
-    paddingHorizontal: Platform.OS === 'web' ? 10 : 12,
+    paddingHorizontal: Platform.OS === 'web' ? 12 : 14,
+    paddingTop: Platform.OS === 'web' ? 8 : 10,
+    paddingBottom: Platform.OS === 'web' ? 12 : 14,
   },
   categoryTitle: {
-    fontSize: Platform.OS === 'web' ? 20 : 24,
-    fontWeight: '900',
-    color: '#34495e',
-    marginLeft: 8,
+    fontSize: Platform.OS === 'web' ? 18 : 22,
+    fontWeight: '800',
+    color: '#2c3e50',
+    marginLeft: 10,
+    letterSpacing: 0.5,
   },
   categoryCount: {
-    fontSize: Platform.OS === 'web' ? 12 : 14,
+    fontSize: Platform.OS === 'web' ? 13 : 15,
     color: '#7f8c8d',
-    marginLeft: 5,
+    marginLeft: 8,
+    fontWeight: '600',
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
   },
   clearButton: {
     margin: 20,
-    padding: 15,
+    padding: 16,
     backgroundColor: '#e74c3c',
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: 'center',
+    ...Platform.select({
+      web: {
+        boxShadow: '0 4px 12px rgba(231, 76, 60, 0.4)',
+        transition: 'all 0.2s ease',
+        cursor: 'pointer',
+      },
+      ios: {
+        shadowColor: '#e74c3c',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   clearButtonText: {
     color: 'white',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
   offCategoryColumn: {
     opacity: 0.7,  // Make the entire column more transparent
