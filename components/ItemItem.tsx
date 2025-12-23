@@ -74,15 +74,19 @@ export const ItemItem: React.FC<ItemItemProps> = ({
       },
     ]}>
       <Pressable
-        style={[styles.itemCheckbox, { opacity: item.completed ? 0.7 : 1 }]}
+        style={({ pressed }) => [
+          styles.itemCheckbox, 
+          { opacity: item.completed ? 0.7 : 1 },
+          pressed && { opacity: 0.6, transform: [{ scale: 0.95 }] }
+        ]}
         onPress={() => onToggle(item.id)}
         hitSlop={10}
         pressRetentionOffset={10}
       >
         <Ionicons
           name={item.completed ? 'checkmark-circle' : 'ellipse-outline'}
-          size={24}
-          color={item.completed ? '#4CAF50' : '#666'}
+          size={26}
+          color={item.completed ? '#27ae60' : '#7f8c8d'}
         />
       </Pressable>
 
@@ -167,12 +171,15 @@ export const ItemItem: React.FC<ItemItemProps> = ({
       </View>
 
       <Pressable
-        style={styles.deleteButton}
+        style={({ pressed }) => [
+          styles.deleteButton,
+          pressed && { opacity: 0.7, transform: [{ scale: 0.9 }] }
+        ]}
         onPress={() => onDelete(item.id)}
         hitSlop={10}
         pressRetentionOffset={10}
       >
-        <Ionicons name="trash-outline" size={20} color="#FF6B6B" />
+        <Ionicons name="trash-outline" size={22} color="#e74c3c" />
       </Pressable>
 
       <CategorySelectorModal
@@ -208,53 +215,98 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   editButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     justifyContent: 'center',
     alignItems: 'center',
+    ...Platform.select({
+      web: {
+        transition: 'all 0.2s ease',
+        cursor: 'pointer',
+      },
+    }),
   },
   confirmButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#27ae60',
+    ...Platform.select({
+      web: {
+        boxShadow: '0 2px 8px rgba(39, 174, 96, 0.3)',
+      },
+      ios: {
+        shadowColor: '#27ae60',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
   discardButton: {
     backgroundColor: '#e74c3c',
+    ...Platform.select({
+      web: {
+        boxShadow: '0 2px 8px rgba(231, 76, 60, 0.3)',
+      },
+      ios: {
+        shadowColor: '#e74c3c',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
   itemItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
-    marginVertical: 5,
-    borderRadius: 10,
-    borderWidth: 1,
-    elevation: 2,
-    ...Platform.select({
-      ios: {},
-      android: {
-        elevation: 2,
-      },
-      web: {
-        boxShadow: '0px 1px 2px rgba(0,0,0,0.1)',
-      },
-    }),
-  },
-  priorityItemItem: {
-    padding: 18,
+    padding: 16,
     marginVertical: 6,
-    borderWidth: 2,
-    elevation: 3,
+    borderRadius: 14,
+    borderWidth: 1.5,
     ...Platform.select({
-      ios: {},
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 6,
+      },
       android: {
         elevation: 3,
       },
       web: {
-        boxShadow: '0px 2px 3px rgba(0,0,0,0.2)',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+        transition: 'all 0.2s ease',
+        cursor: 'default',
+      },
+    }),
+  },
+  priorityItemItem: {
+    padding: 20,
+    marginVertical: 8,
+    borderWidth: 2.5,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#e74c3c',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 10,
+      },
+      android: {
+        elevation: 5,
+      },
+      web: {
+        boxShadow: '0 4px 16px rgba(231, 76, 60, 0.25)',
+        transition: 'all 0.2s ease',
       },
     }),
   },
   itemCheckbox: {
-    marginRight: 15,
+    marginRight: 16,
   },
   itemContent: {
     flex: 1,
@@ -262,40 +314,64 @@ const styles = StyleSheet.create({
   itemText: {
     fontSize: 16,
     color: '#2c3e50',
-    marginBottom: 4,
+    marginBottom: 6,
+    lineHeight: 22,
+    fontWeight: '500',
   },
   priorityItemText: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '700',
+    lineHeight: 24,
   },
   completedItemText: {
     textDecorationLine: 'line-through',
-    color: '#7f8c8d',
+    color: '#95a5a6',
+    opacity: 0.7,
   },
   categoryBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 14,
     alignSelf: 'flex-start',
+    ...Platform.select({
+      web: {
+        transition: 'all 0.2s ease',
+        cursor: 'pointer',
+      },
+    }),
   },
   categoryText: {
-    fontSize: 10,
+    fontSize: 11,
     color: 'white',
-    fontWeight: '600',
-    marginLeft: 4,
+    fontWeight: '700',
+    marginLeft: 5,
+    letterSpacing: 0.3,
   },
   deleteButton: {
-    padding: 5,
+    padding: 8,
+    borderRadius: 8,
+    ...Platform.select({
+      web: {
+        transition: 'all 0.2s ease',
+        cursor: 'pointer',
+      },
+    }),
   },
   colorBadge: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 2.5,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 4,
+    marginLeft: 6,
+    ...Platform.select({
+      web: {
+        transition: 'all 0.2s ease',
+        cursor: 'pointer',
+      },
+    }),
   },
 });
