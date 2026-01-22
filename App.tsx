@@ -14,11 +14,10 @@ import {
 import { PageCarousel } from './components/PageCarousel';
 import SupermarketPage from './pages/SupermarketPage';
 import AfazerPage from './pages/AfazerPage';
-import CountryPage from './pages/CountryPage';
 import { login, logout, getCurrentUser } from './api';
 
 export default function App() {
-  const [page, setPage] = useState<'afazer' | 'supermarket' | 'country'>('afazer');
+  const [page, setPage] = useState<'afazer' | 'supermarket'>('afazer');
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState('');
@@ -28,7 +27,6 @@ export default function App() {
   const pages = [
     { id: 'afazer', title: 'Afazer' },
     { id: 'supermarket', title: 'Supermarket' },
-    { id: 'country', title: 'Countries' },
   ];
 
   useEffect(() => {
@@ -68,8 +66,6 @@ export default function App() {
     switch (page) {
       case 'supermarket':
         return <SupermarketPage />;
-      case 'country':
-        return <CountryPage />;
       case 'afazer':
       default:
         return <AfazerPage />;
@@ -137,7 +133,7 @@ export default function App() {
       <PageCarousel 
         pages={pages} 
         currentPageId={page} 
-        onPageChange={(pageId) => setPage(pageId as 'afazer' | 'supermarket' | 'country')}
+        onPageChange={(pageId) => setPage(pageId as 'afazer' | 'supermarket')}
         username={user?.username}
         onLogout={handleLogout}
       />
