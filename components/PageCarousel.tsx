@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
       },
     }),
     borderBottomWidth: 0,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 10,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 4,
     ...Platform.select({
       web: {
         boxShadow: '0 4px 12px rgba(255, 140, 66, 0.3)',
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 16,
+    paddingVertical: 8,
     paddingHorizontal: 20,
   },
   spacer: {
