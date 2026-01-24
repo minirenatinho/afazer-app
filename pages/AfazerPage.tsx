@@ -307,7 +307,7 @@ export default function AfazerPage() {
           const iconName = category === 'PRIORITY' ? 'flag' : 
                          category === 'ON' ? 'play' : 
                          category === 'OFF' ? 'pause' : 'card';
-          const iconColor = category === 'PRIORITY' ? '#e74c3c' : 
+          const iconColor = category === 'PRIORITY' ? '#ff88b2' : 
                           category === 'ON' ? '#3498db' : 
                           category === 'OFF' ? '#95a5a6' : '#f1c40f';
           
@@ -394,7 +394,7 @@ export default function AfazerPage() {
                         <Ionicons
                           name={category === 'PRIORITY' ? 'flag' : category === 'ON' ? 'play' : category === 'OFF' ? 'pause' : 'card'}
                           size={20}
-                          color={category === 'PRIORITY' ? '#e74c3c' : category === 'ON' ? '#3498db' : category === 'OFF' ? '#95a5a6' : '#f1c40f'}
+                          color={category === 'PRIORITY' ? '#ff88b2' : category === 'ON' ? '#3498db' : category === 'OFF' ? '#95a5a6' : '#f1c40f'}
                         />
                         <Text style={[
                           styles.categoryTitle,
@@ -588,7 +588,7 @@ export default function AfazerPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f6fa',
+    backgroundColor: '#1a1a1a',
   },
   header: {
     ...(Platform.OS === 'web' ? {
@@ -601,9 +601,9 @@ const styles = StyleSheet.create({
       paddingBottom: 15,
       paddingHorizontal: 20,
     }),
-    backgroundColor: '#FF8C42',
+    backgroundColor: '#FF6B35',
     borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    borderBottomColor: '#333',
   },
   title: {
     fontSize: Platform.OS === 'web' ? 48 : 32,
@@ -613,14 +613,14 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#7f8c8d',
+    color: '#aaa',
     textAlign: 'center',
     marginTop: 5,
   },
   inputContainer: {
     flexDirection: 'row',
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#252525',
     borderBottomWidth: 0,
     ...Platform.select({
       web: {
@@ -629,12 +629,12 @@ const styles = StyleSheet.create({
         paddingVertical: 20,
         paddingHorizontal: 24,
         height: 90,
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
       },
       ios: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0.3,
         shadowRadius: 8,
       },
       android: {
@@ -646,11 +646,12 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 52,
     borderWidth: 2,
-    borderColor: '#e9ecef',
+    borderColor: '#444',
     borderRadius: 26,
     paddingHorizontal: 22,
     fontSize: 16,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#2a2a2a',
+    color: '#fff',
     ...Platform.select({
       web: {
         height: 52,
@@ -662,19 +663,19 @@ const styles = StyleSheet.create({
   addButton: {
     width: 52,
     height: 52,
-    backgroundColor: '#FF8C42',
+    backgroundColor: '#444',
     borderRadius: 26,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 12,
     ...Platform.select({
       web: {
-        boxShadow: '0 4px 12px rgba(255, 140, 66, 0.4)',
+        boxShadow: '0 4px 12px rgba(68, 68, 68, 0.4)',
         transition: 'all 0.2s ease',
         cursor: 'pointer',
       },
       ios: {
-        shadowColor: '#FF8C42',
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -701,7 +702,7 @@ const styles = StyleSheet.create({
   },
   selectionLabel: {
     fontSize: 13,
-    color: '#5a6c7d',
+    color: '#aaa',
     marginRight: 10,
     fontWeight: '600',
   },
@@ -717,9 +718,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginHorizontal: 2,
-    backgroundColor: 'white',
+    backgroundColor: '#2a2a2a',
     borderWidth: 2,
-    borderColor: 'rgba(0,0,0,0.08)',
+    borderColor: '#444',
     ...Platform.select({
       web: {
         transition: 'all 0.2s ease',
@@ -734,9 +735,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginHorizontal: 2,
-    backgroundColor: 'white',
+    backgroundColor: '#2a2a2a',
     borderWidth: 2,
-    borderColor: 'rgba(0,0,0,0.08)',
+    borderColor: '#444',
     ...Platform.select({
       web: {
         transition: 'all 0.2s ease',
@@ -746,15 +747,15 @@ const styles = StyleSheet.create({
   },
   // Category selected states
   PRIORITYSelected: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#ff88b2',
     transform: [{ scale: 1.15 }],
-    borderColor: '#c0392b',
+    borderColor: '#ff6b9d',
     ...Platform.select({
       web: {
-        boxShadow: '0 4px 12px rgba(231, 76, 60, 0.4)',
+        boxShadow: '0 4px 12px rgba(255, 136, 178, 0.4)',
       },
       ios: {
-        shadowColor: '#e74c3c',
+        shadowColor: '#ff88b2',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.4,
         shadowRadius: 8,
@@ -841,11 +842,11 @@ const styles = StyleSheet.create({
   filterToggleContainer: {
     paddingHorizontal: 20,
     paddingVertical: 14,
-    backgroundColor: 'white',
+    backgroundColor: '#252525',
     borderBottomWidth: 0,
     ...Platform.select({
       web: {
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.3)',
       },
     }),
   },
@@ -856,20 +857,20 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 24,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#333',
     borderWidth: 2,
-    borderColor: '#FF8C42',
+    borderColor: '#FF6B35',
     alignSelf: 'center',
     ...Platform.select({
       web: {
         transition: 'all 0.2s ease',
         cursor: 'pointer',
-        boxShadow: '0 2px 6px rgba(255, 140, 66, 0.2)',
+        boxShadow: '0 2px 6px rgba(255, 107, 53, 0.3)',
       },
     }),
   },
   filterToggleText: {
-    color: '#FF8C42',
+    color: '#FF6B35',
     fontSize: 15,
     fontWeight: '600',
     marginLeft: 8,
@@ -878,9 +879,9 @@ const styles = StyleSheet.create({
   filterContainer: {
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: 'white',
+    backgroundColor: '#252525',
     borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    borderBottomColor: '#333',
   },
   filterTabsRow: {
     flexDirection: 'row',
@@ -898,11 +899,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   activeFilterTab: {
-    backgroundColor: '#FF8C42',
+    backgroundColor: '#FF6B35',
   },
   filterText: {
     fontSize: 12,
-    color: '#7f8c8d',
+    color: '#aaa',
     fontWeight: '500',
     marginLeft: 4,
   },
@@ -918,7 +919,7 @@ const styles = StyleSheet.create({
   },
   allCategoriesContainer: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#1a1a1a',
   },
   allCategoriesScrollView: {
     flex: 1,
@@ -932,16 +933,16 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: Platform.OS === 'web' ? 'row' : 'column',
     borderBottomWidth: 0,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#252525',
     paddingHorizontal: Platform.OS === 'web' ? 12 : 0,
     ...Platform.select({
       web: {
-        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.06)',
+        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)',
       },
       ios: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0.3,
         shadowRadius: 4,
       },
       android: {
@@ -957,7 +958,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Platform.OS === 'web' ? 12 : 20,
     marginHorizontal: Platform.OS === 'web' ? 4 : 0,
     borderBottomWidth: Platform.OS === 'web' ? 0 : 1,
-    borderBottomColor: '#e9ecef',
+    borderBottomColor: '#333',
     borderRadius: Platform.OS === 'web' ? 8 : 0,
     ...Platform.select({
       web: {
@@ -971,13 +972,14 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginLeft: 8,
     letterSpacing: 0.3,
+    color: '#fff',
   },
   webCategoryHeaderCount: {
     fontSize: 13,
-    color: '#7f8c8d',
+    color: '#888',
     marginLeft: 6,
     fontWeight: '600',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#333',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,
@@ -992,12 +994,12 @@ const styles = StyleSheet.create({
       ? { 
           height: '100%',
           paddingHorizontal: 10,
-          backgroundColor: '#ffffff',
+          backgroundColor: '#252525',
           marginHorizontal: 4,
           borderRadius: 8,
           ...Platform.select({
             web: {
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.3)',
             },
           }),
         } 
@@ -1006,8 +1008,8 @@ const styles = StyleSheet.create({
           marginBottom: 0,
           paddingHorizontal: 0,
           borderBottomWidth: 1,
-          borderBottomColor: '#e9ecef',
-          backgroundColor: '#ffffff',
+          borderBottomColor: '#333',
+          backgroundColor: '#1e1e1e',
         }
     ),
   },
@@ -1017,11 +1019,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 18,
     width: '100%',
-    backgroundColor: '#fff',
+    backgroundColor: '#252525',
     borderBottomWidth: 0,
     ...Platform.select({
       web: {
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.3)',
       },
     }),
   },
@@ -1033,16 +1035,16 @@ const styles = StyleSheet.create({
   categoryTitle: {
     fontSize: Platform.OS === 'web' ? 18 : 22,
     fontWeight: '800',
-    color: '#2c3e50',
+    color: '#fff',
     marginLeft: 10,
     letterSpacing: 0.5,
   },
   categoryCount: {
     fontSize: Platform.OS === 'web' ? 13 : 15,
-    color: '#7f8c8d',
+    color: '#888',
     marginLeft: 8,
     fontWeight: '600',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#333',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -1050,17 +1052,17 @@ const styles = StyleSheet.create({
   clearButton: {
     margin: 20,
     padding: 16,
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#ff6b6b',
     borderRadius: 12,
     alignItems: 'center',
     ...Platform.select({
       web: {
-        boxShadow: '0 4px 12px rgba(231, 76, 60, 0.4)',
+        boxShadow: '0 4px 12px rgba(255, 107, 107, 0.4)',
         transition: 'all 0.2s ease',
         cursor: 'pointer',
       },
       ios: {
-        shadowColor: '#e74c3c',
+        shadowColor: '#ff6b6b',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,

@@ -192,7 +192,7 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
         {isEditing ? (
           <View style={{ flex: 1, flexDirection: 'column', marginLeft: 12, pointerEvents: 'box-none' }}>
             <TextInput
-              style={[styles.itemText, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e9ecef', borderRadius: 6, paddingHorizontal: 8 }]}
+              style={[styles.itemText, { backgroundColor: '#333', borderWidth: 1, borderColor: '#444', borderRadius: 6, paddingHorizontal: 8, color: '#fff' }]}
               value={editText}
               onChangeText={setEditText}
               autoFocus
@@ -200,20 +200,20 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
             />
             <View style={{ flexDirection: 'row', gap: 8, marginTop: 6 }}>
               <TextInput
-                style={[styles.itemText, { flex: 1, backgroundColor: '#fff', borderWidth: 1, borderColor: '#e9ecef', borderRadius: 6, paddingHorizontal: 8 }]}
+                style={[styles.itemText, { flex: 1, backgroundColor: '#333', borderWidth: 1, borderColor: '#444', borderRadius: 6, paddingHorizontal: 8, color: '#fff' }]}
                 value={editQuantity}
                 onChangeText={setEditQuantity}
                 placeholder="Quantity"
                 keyboardType="numeric"
               />
               <TextInput
-                style={[styles.itemText, { flex: 1, backgroundColor: '#fff', borderWidth: 1, borderColor: '#e9ecef', borderRadius: 6, paddingHorizontal: 8 }]}
+                style={[styles.itemText, { flex: 1, backgroundColor: '#333', borderWidth: 1, borderColor: '#444', borderRadius: 6, paddingHorizontal: 8, color: '#fff' }]}
                 value={editUnit}
                 onChangeText={setEditUnit}
                 placeholder="Unit"
               />
               <TextInput
-                style={[styles.itemText, { flex: 1, backgroundColor: '#fff', borderWidth: 1, borderColor: '#e9ecef', borderRadius: 6, paddingHorizontal: 8 }]}
+                style={[styles.itemText, { flex: 1, backgroundColor: '#333', borderWidth: 1, borderColor: '#444', borderRadius: 6, paddingHorizontal: 8, color: '#fff' }]}
                 value={editPrice}
                 onChangeText={setEditPrice}
                 placeholder="Price"
@@ -221,7 +221,7 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
               />
             </View>
             <TextInput
-              style={[styles.itemText, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e9ecef', borderRadius: 6, paddingHorizontal: 8, marginTop: 6 }]}
+              style={[styles.itemText, { backgroundColor: '#333', borderWidth: 1, borderColor: '#444', borderRadius: 6, paddingHorizontal: 8, marginTop: 6, color: '#fff' }]}
               value={editNotes}
               onChangeText={setEditNotes}
               placeholder="Notes"
@@ -259,7 +259,7 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
                 <Ionicons name="checkmark" size={20} color="white" />
               </Pressable>
               <Pressable
-                style={[styles.addButton, { backgroundColor: '#e74c3c', width: 40, height: 40 }]}
+                style={[styles.addButton, { backgroundColor: '#ff6b6b', width: 40, height: 40 }]}
                 onPress={() => {
                   setEditText(item.text);
                   setEditQuantity(quantity ? String(quantity) : '');
@@ -327,7 +327,7 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
             }
           }}
         >
-          <Ionicons name="trash" size={20} color="#e74c3c" />
+          <Ionicons name="trash" size={20} color="#ff6b6b" />
         </Pressable>
       </View>
     );
@@ -503,11 +503,11 @@ const styles = StyleSheet.create({
   // Modal Styles
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: '#1e1e1e',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '80%',
@@ -518,12 +518,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    borderBottomColor: '#333',
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#34495e',
+    color: '#fff',
   },
   modalBody: {
     padding: 20,
@@ -537,24 +537,25 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#aaa',
     marginBottom: 8,
     fontWeight: '500',
   },
   modalInput: {
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: '#444',
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#2a2a2a',
+    color: '#fff',
   },
   modalFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#e9ecef',
+    borderTopColor: '#333',
   },
   button: {
     flex: 1,
@@ -564,14 +565,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cancelButton: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#2a2a2a',
     marginRight: 10,
   },
   saveButton: {
-    backgroundColor: '#FF8C42',
+    backgroundColor: '#FF6B35',
   },
   cancelButtonText: {
-    color: '#7f8c8d',
+    color: '#aaa',
     fontWeight: '600',
   },
   saveButtonText: {
@@ -582,7 +583,7 @@ const styles = StyleSheet.create({
   // Existing styles
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#1a1a1a',
   },
   header: {
     display: 'none',
@@ -593,24 +594,25 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#252525',
     borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    borderBottomColor: '#333',
   },
   input: {
     flex: 1,
     height: 50,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: '#444',
     borderRadius: 25,
     paddingHorizontal: 20,
     fontSize: 16,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#2a2a2a',
+    color: '#fff',
   },
   addButton: {
     width: 50,
     height: 50,
-    backgroundColor: '#FF8C42',
+    backgroundColor: '#444',
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
@@ -624,17 +626,19 @@ const styles = StyleSheet.create({
   itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: '#252525',
     borderRadius: 10,
     padding: 16,
     marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#333',
     // Deprecated shadow* props replaced by boxShadow for web
     ...(Platform.OS === 'web'
-      ? { boxShadow: '0px 2px 4px rgba(0,0,0,0.05)' }
+      ? { boxShadow: '0px 2px 4px rgba(0,0,0,0.3)' }
       : {
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.05,
+          shadowOpacity: 0.3,
           shadowRadius: 4,
         }),
     elevation: 2,
@@ -642,11 +646,11 @@ const styles = StyleSheet.create({
   itemText: {
     flex: 1,
     fontSize: 16,
-    color: '#34495e',
+    color: '#e0e0e0',
     marginLeft: 12,
   },
   completedText: {
     textDecorationLine: 'line-through',
-    color: '#95a5a6',
+    color: '#666',
   },
 });

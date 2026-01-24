@@ -32,7 +32,7 @@ export const ItemTypeModal: React.FC<ItemTypeModalProps> = ({
       title: 'Priority',
       description: 'High priority items that need immediate attention',
       icon: 'flag',
-      color: '#e74c3c',
+      color: '#ff88b2',
     },
     {
       type: 'ON' as const,
@@ -191,12 +191,12 @@ export const ItemTypeModal: React.FC<ItemTypeModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContainer: {
-    backgroundColor: 'white',
+    backgroundColor: '#1e1e1e',
     borderRadius: 20,
     padding: 20,
     width: Platform.OS === 'web' ? Math.min(width * 0.8, 500) : width * 0.9,
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#fff',
     flex: 1,
     textAlign: 'center',
   },
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#7f8c8d',
+    color: '#aaa',
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -234,10 +234,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 15,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#2a2a2a',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: '#444',
   },
   iconContainer: {
     width: 50,
@@ -253,12 +253,12 @@ const styles = StyleSheet.create({
   optionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#2c3e50',
+    color: '#fff',
     marginBottom: 4,
   },
   optionDescription: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#aaa',
     lineHeight: 20,
   },
   colorGrid: {
@@ -275,6 +275,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 15,
+    backgroundColor: '#2a2a2a',
   },
   colorCircle: {
     width: 30,
@@ -285,6 +286,6 @@ const styles = StyleSheet.create({
   colorName: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#2c3e50',
+    color: '#fff',
   },
 }); 

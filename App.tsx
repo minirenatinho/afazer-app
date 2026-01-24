@@ -88,21 +88,23 @@ export default function App() {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
         <StatusBar barStyle="light-content" />
-        <View style={{ width: 300, padding: 24, backgroundColor: '#fff', borderRadius: 12, elevation: 2 }}>
-          <Text style={{ fontSize: 22, fontWeight: 'bold', marginBottom: 16, textAlign: 'center' }}>Afazer Account</Text>
+        <View style={{ width: 300, padding: 24, backgroundColor: '#1e1e1e', borderRadius: 12, elevation: 2 }}>
+          <Text style={{ fontSize: 22, fontWeight: 'bold', marginBottom: 16, textAlign: 'center', color: '#fff' }}>Afazer Account</Text>
           <TextInput
             placeholder="Username"
+            placeholderTextColor="#888"
             value={username}
             onChangeText={setUsername}
-            style={{ borderWidth: 1, borderColor: '#e9ecef', borderRadius: 8, padding: 10, marginBottom: 12 }}
+            style={{ borderWidth: 1, borderColor: '#444', borderRadius: 8, padding: 10, marginBottom: 12, backgroundColor: '#2a2a2a', color: '#fff' }}
             autoCapitalize="none"
             autoCorrect={false}
           />
           <TextInput
             placeholder="Password"
+            placeholderTextColor="#888"
             value={password}
             onChangeText={setPassword}
-            style={{ borderWidth: 1, borderColor: '#e9ecef', borderRadius: 8, padding: 10, marginBottom: 16 }}
+            style={{ borderWidth: 1, borderColor: '#444', borderRadius: 8, padding: 10, marginBottom: 16, backgroundColor: '#2a2a2a', color: '#fff' }}
             secureTextEntry
           />
           <Pressable
@@ -145,6 +147,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f6fa',
+    backgroundColor: '#1a1a1a',
   },
 });
