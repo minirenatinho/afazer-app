@@ -246,21 +246,17 @@ export default function AfazerPage() {
 
   const filteredItems = items.filter(item => {
     if (!showFilter) {
-      // When filter is hidden, show all non-completed items
-      return !item.completed;
+      // When filter is hidden, show all items
+      return true;
     }
-    if (filter === 'completed') return item.completed;
-    const result = !item.completed && item.category === filter;
+    const result = item.category === filter;
     if (filter === 'PRIORITY' && result) {
     }
     return result;
   });
 
   const getFilterCount = (filterType: FilterType) => {
-    if (filterType === 'completed') {
-      return items.filter(item => item.completed).length;
-    }
-    return items.filter(item => !item.completed && item.category === filterType).length;
+    return items.filter(item => item.category === filterType).length;
   };
 
   // Pass isHistory=true if filter is 'completed' (history list)
@@ -276,7 +272,6 @@ export default function AfazerPage() {
         setColorItemCurrent(item.color as ItemColor);
         setShowColorModal(true);
       }}
-      isHistory={filter === 'completed'}
     />
   );
 
@@ -284,10 +279,10 @@ export default function AfazerPage() {
     // Only use categories that are valid for visibility toggling
     const categories: Array<'PRIORITY' | 'ON' | 'PAY' | 'OFF'> = ['PRIORITY', 'ON', 'PAY', 'OFF'];
     const itemsByCategory = categories.map(category => {
-      const filtered = items.filter(item => !item.completed && item.category === category);
-      if (category === 'PRIORITY') {
-      }
-      return filtered;
+      // Show both completed and non-completed items, sorted by completion status
+      const filtered = items.filter(item => item.category === category);
+      // Sort so completed items appear at the end
+      return filtered.sort((a, b) => (a.completed ? 1 : 0) - (b.completed ? 1 : 0));
     });
 
     // Calculate visible categories count for web layout
@@ -562,48 +557,7 @@ export default function AfazerPage() {
     return (
       <>
         {renderItemInput()}
-        <View style={styles.filterToggleContainer}>
-          <Pressable
-            style={({ pressed }) => [
-              styles.filterToggleButton,
-              pressed && { opacity: 0.8, transform: [{ scale: 0.98 }] }
-            ]}
-            onPress={() => setShowFilter(!showFilter)}
-          >
-            <Ionicons 
-              name={showFilter ? "chevron-up" : "chevron-down"} 
-              size={20} 
-              color="#FF8C42" 
-            />
-            <Text style={styles.filterToggleText}>
-              {showFilter ? 'Show All Categories' : 'Show History'}
-            </Text>
-          </Pressable>
-        </View>
-        {showFilter ? (
-          <FlatList
-            data={filteredItems}
-            renderItem={renderItem}
-            keyExtractor={item => item.id}
-            style={styles.itemList}
-            showsVerticalScrollIndicator={false}
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-          />
-        ) : (
-          renderAllCategoriesView()
-        )}
-        {showFilter && filter === 'completed' && getFilterCount('completed') > 0 && (
-          <Pressable 
-            style={({ pressed }) => [
-              styles.clearButton,
-              pressed && { opacity: 0.8, transform: [{ scale: 0.98 }] }
-            ]} 
-            onPress={clearCompleted}
-          >
-            <Text style={styles.clearButtonText}>Clear Completed</Text>
-          </Pressable>
-        )}
+        {renderAllCategoriesView()}
       </>
     );
   };

@@ -11,7 +11,6 @@ interface ItemItemProps {
   onUpdateCategory: (id: string, category: string) => Promise<void>;
   onUpdateText: (id: string, newText: string) => Promise<void>;
   onUpdateColor: () => void;
-  isHistory?: boolean;
 }
 
 export const ItemItem: React.FC<ItemItemProps> = ({ 
@@ -21,7 +20,6 @@ export const ItemItem: React.FC<ItemItemProps> = ({
   onUpdateCategory,
   onUpdateText,
   onUpdateColor,
-  isHistory = false,
 }) => {
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -67,10 +65,10 @@ export const ItemItem: React.FC<ItemItemProps> = ({
   return (
     <View style={[
       styles.itemItem,
-      item.category === 'PRIORITY' && !isHistory && styles.priorityItemItem,
+      item.category === 'PRIORITY' && !item.completed && styles.priorityItemItem,
       {
         backgroundColor: colorConfig.backgroundColor,
-        borderColor: item.category === 'PRIORITY' && !isHistory ? '#e74c3c' : colorConfig.borderColor,
+        borderColor: item.category === 'PRIORITY' && !item.completed ? '#e74c3c' : colorConfig.borderColor,
       },
     ]}>
       <Pressable
@@ -138,7 +136,7 @@ export const ItemItem: React.FC<ItemItemProps> = ({
             <Text
               style={[ 
                 styles.itemText,
-                item.category === 'PRIORITY' && !isHistory && styles.priorityItemText,
+                item.category === 'PRIORITY' && !item.completed && styles.priorityItemText,
                 item.completed && styles.completedItemText,
               ]}
             >
