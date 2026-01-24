@@ -32,7 +32,7 @@ export const ItemItem: React.FC<ItemItemProps> = ({
   const getCategoryConfig = (category: Item['category']) => {
     switch (category) {
       case 'PRIORITY':
-        return { icon: 'flag', color: '#e74c3c', label: 'Priority' };
+        return { icon: 'flag', color: '#ff88b2', label: 'Priority' };
       case 'ON':
         return { icon: 'play', color: '#3498db', label: 'On' };
       case 'OFF':
@@ -47,15 +47,15 @@ export const ItemItem: React.FC<ItemItemProps> = ({
   const getColorConfig = (color: Item['color']) => {
     switch (color) {
       case 'GREEN':
-        return { backgroundColor: '#E8F5E8', borderColor: '#A8D5A8' };
+        return { backgroundColor: '#1a3a1a', borderColor: '#2ecc71' };
       case 'PINK':
-        return { backgroundColor: '#FCE8F0', borderColor: '#F5B8D1' };
+        return { backgroundColor: '#3a1a2a', borderColor: '#ff88b2' };
       case 'BLUE':
-        return { backgroundColor: '#E8F2FC', borderColor: '#B8D5F5' };
+        return { backgroundColor: '#1a2a3a', borderColor: '#3498db' };
       case 'BROWN':
-        return { backgroundColor: '#F5F0E8', borderColor: '#D5C5B8' };
+        return { backgroundColor: '#3a2a1a', borderColor: '#8B4513' };
       default:
-        return { backgroundColor: '#f8f9fa', borderColor: '#e9ecef' };
+        return { backgroundColor: '#2a2a2a', borderColor: '#444' };
     }
   };
 
@@ -96,7 +96,7 @@ export const ItemItem: React.FC<ItemItemProps> = ({
                 styles.itemText,
                 item.category === 'PRIORITY' && styles.priorityItemText,
                 item.completed && styles.completedItemText,
-                { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e9ecef', borderRadius: 6, paddingHorizontal: 8 },
+                { backgroundColor: '#333', borderWidth: 1, borderColor: '#444', borderRadius: 6, paddingHorizontal: 8, color: '#fff' },
               ]}
               value={editText}
               onChangeText={setEditText}
@@ -177,7 +177,7 @@ export const ItemItem: React.FC<ItemItemProps> = ({
         hitSlop={10}
         pressRetentionOffset={10}
       >
-        <Ionicons name="trash-outline" size={22} color="#e74c3c" />
+        <Ionicons name="trash-outline" size={22} color="#ff6b6b" />
       </Pressable>
 
       <CategorySelectorModal
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 16,
-    color: '#2c3e50',
+    color: '#e0e0e0',
     marginBottom: 6,
     lineHeight: 22,
     fontWeight: '500',
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
   },
   completedItemText: {
     textDecorationLine: 'line-through',
-    color: '#95a5a6',
+    color: '#666',
     opacity: 0.7,
   },
   categoryBadge: {

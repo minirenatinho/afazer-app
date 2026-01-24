@@ -88,22 +88,23 @@ export const PageCarousel: React.FC<PageCarouselProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FF8C42',
+    backgroundColor: '#2a2a2a',
     ...Platform.select({
       web: {
-        background: 'linear-gradient(135deg, #FF8C42 0%, #FF6B35 100%)',
+        background: 'linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%)',
       },
     }),
-    borderBottomWidth: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 4,
     ...Platform.select({
       web: {
-        boxShadow: '0 4px 12px rgba(255, 140, 66, 0.3)',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
       },
       ios: {
-        shadowColor: '#FF8C42',
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
+        shadowOpacity: 0.4,
         shadowRadius: 8,
       },
       android: {
@@ -143,7 +144,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 2,
   },
   logoutButton: {
-    backgroundColor: 'rgba(231, 76, 60, 0.95)',
+    backgroundColor: 'rgba(204, 51, 34, 0.95)',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 8,

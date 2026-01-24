@@ -74,12 +74,12 @@ export const ColorSelectorModal: React.FC<ColorSelectorModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContainer: {
-    backgroundColor: 'white',
+    backgroundColor: '#1e1e1e',
     borderRadius: 16,
     padding: 20,
     width: 300,
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#fff',
   },
   closeButton: {
     padding: 4,
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   selectedColor: {
-    borderColor: '#222',
+    borderColor: '#fff',
   },
   colorLabel: {
     color: 'white',
