@@ -14,13 +14,15 @@ import {
 import { PageCarousel } from './components/PageCarousel';
 import SupermarketPage from './pages/SupermarketPage';
 import AfazerPage from './pages/AfazerPage';
-import { login, logout, getCurrentUser } from './api';
+import { login, logout, getCurrentUser, register } from './api';
 
 export default function App() {
   const [page, setPage] = useState<'afazer' | 'supermarket'>('afazer');
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [mode, setMode] = useState<'login' | 'register'>('login');
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
 
@@ -57,6 +59,30 @@ export default function App() {
     }
   };
 
+  const handleRegister = async () => {
+    setLoginLoading(true);
+    try {
+      await register(username, email, password);
+      await login(username, password);
+      const u = await getCurrentUser();
+      setUser(u);
+      setUsername('');
+      setEmail('');
+      setPassword('');
+    } catch (e: any) {
+      Alert.alert('Registration failed', e?.message || 'Could not create account');
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
+  const switchMode = (next: 'login' | 'register') => {
+    setMode(next);
+    setUsername('');
+    setEmail('');
+    setPassword('');
+  };
+
   const handleLogout = async () => {
     await logout();
     setUser(null);
@@ -81,6 +107,7 @@ export default function App() {
   }
 
   if (!user) {
+    const isRegister = mode === 'register';
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -89,7 +116,9 @@ export default function App() {
       >
         <StatusBar barStyle="light-content" />
         <View style={{ width: 300, padding: 24, backgroundColor: '#1e1e1e', borderRadius: 12, elevation: 2 }}>
-          <Text style={{ fontSize: 22, fontWeight: 'bold', marginBottom: 16, textAlign: 'center', color: '#fff' }}>Afazer Account</Text>
+          <Text style={{ fontSize: 22, fontWeight: 'bold', marginBottom: 16, textAlign: 'center', color: '#fff' }}>
+            {isRegister ? 'Create Account' : 'Afazer Account'}
+          </Text>
           <TextInput
             placeholder="Username"
             placeholderTextColor="#888"
@@ -99,6 +128,18 @@ export default function App() {
             autoCapitalize="none"
             autoCorrect={false}
           />
+          {isRegister && (
+            <TextInput
+              placeholder="Email"
+              placeholderTextColor="#888"
+              value={email}
+              onChangeText={setEmail}
+              style={{ borderWidth: 1, borderColor: '#444', borderRadius: 8, padding: 10, marginBottom: 12, backgroundColor: '#2a2a2a', color: '#fff' }}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="email-address"
+            />
+          )}
           <TextInput
             placeholder="Password"
             placeholderTextColor="#888"
@@ -108,7 +149,7 @@ export default function App() {
             secureTextEntry
           />
           <Pressable
-            onPress={handleLogin}
+            onPress={isRegister ? handleRegister : handleLogin}
             style={({ pressed }) => [{
               backgroundColor: '#FF8C42',
               padding: 14,
@@ -118,7 +159,17 @@ export default function App() {
             }]}
             disabled={loginLoading}
           >
-            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Login</Text>
+            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>
+              {isRegister ? 'Register' : 'Login'}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => switchMode(isRegister ? 'login' : 'register')}
+            style={{ marginTop: 12, alignItems: 'center' }}
+          >
+            <Text style={{ color: '#888', fontSize: 14 }}>
+              {isRegister ? 'Already have an account? Login' : "Don't have an account? Register"}
+            </Text>
           </Pressable>
         </View>
       </KeyboardAvoidingView>
