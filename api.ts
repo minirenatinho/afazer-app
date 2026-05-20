@@ -64,6 +64,20 @@ export async function logout(): Promise<void> {
   }
 }
 
+// Register: POST /auth/register (username, email, password)
+export async function register(username: string, email: string, password: string): Promise<void> {
+  const res = await fetch(`${API_URL}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, email, password }),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Registration failed');
+  }
+}
+
 // Check if user is authenticated: GET /auth/me
 export async function getCurrentUser(): Promise<any> {
   const res = await apiCall(`${API_URL}/auth/me`, {
