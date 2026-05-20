@@ -1,11 +1,2 @@
 @echo off
-
-REM Serve the web build from dist directory
-start /b npx serve -s dist -l 3000
-
-REM Open the browser
-timeout /t 3 /nobreak
-start http://localhost:3000
-
-REM Keep window open
-pause
+npm run web
