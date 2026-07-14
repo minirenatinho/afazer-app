@@ -322,7 +322,7 @@ export default function AfazerPage() {
                   borderBottomWidth: isVisible ? 2 : 1,
                   borderBottomColor: isVisible ? iconColor : '#e9ecef',
                   opacity: isVisible ? 1 : 0.5,
-                  width: `${100 / categories.length}%`,
+                  flex: 1,
                   ...(pressed && { opacity: 0.7 })
                 }
               ]}
@@ -627,10 +627,11 @@ const styles = StyleSheet.create({
     ...Platform.select({
       web: {
         alignItems: 'center',
+        flexWrap: 'wrap',
         gap: 12,
         paddingVertical: 20,
         paddingHorizontal: 24,
-        height: 90,
+        minHeight: 90,
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
       },
       ios: {
@@ -657,8 +658,9 @@ const styles = StyleSheet.create({
     ...Platform.select({
       web: {
         height: 52,
+        minWidth: 220,
         transition: 'all 0.2s ease',
-        outline: 'none',
+        outlineWidth: 0,
       },
     }),
   },
@@ -690,8 +692,12 @@ const styles = StyleSheet.create({
   // Web Controls
   webControlsContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    flexShrink: 1,
+    minWidth: 0,
     alignItems: 'center',
-    gap: 24,
+    columnGap: 24,
+    rowGap: 8,
     margin: 0,
     paddingVertical: 4,
     paddingHorizontal: 0,
@@ -939,6 +945,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Platform.OS === 'web' ? 12 : 0,
     ...Platform.select({
       web: {
+        flexWrap: 'wrap',
         boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)',
       },
       ios: {
@@ -964,6 +971,7 @@ const styles = StyleSheet.create({
     borderRadius: Platform.OS === 'web' ? 8 : 0,
     ...Platform.select({
       web: {
+        minWidth: 160,
         transition: 'all 0.2s ease',
         cursor: 'pointer',
       },

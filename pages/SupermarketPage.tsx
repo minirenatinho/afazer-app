@@ -599,6 +599,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#252525',
     borderBottomWidth: 1,
     borderBottomColor: '#333',
+    ...Platform.select({
+      web: {
+        flexWrap: 'wrap',
+        rowGap: 10,
+        alignItems: 'center',
+      },
+    }),
   },
   input: {
     flex: 1,

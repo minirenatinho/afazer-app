@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, Platform, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Platform, StatusBar, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useI18n } from '../i18n';
 import { LanguageToggle } from './LanguageToggle';
@@ -25,9 +25,13 @@ export const PageCarousel: React.FC<PageCarouselProps> = ({
   onLogout,
 }) => {
   const { t } = useI18n();
+  const { width } = useWindowDimensions();
+  // Below this width the centered carousel and the user controls can't share one
+  // row without overlapping, so they stack in two rows instead.
+  const isCompact = width < 700;
   const currentIndex = pages.findIndex(page => page.id === currentPageId);
   const currentPage = pages[currentIndex];
-  
+
   const goToPrevious = () => {
     const newIndex = (currentIndex - 1 + pages.length) % pages.length;
     onPageChange(pages[newIndex].id);
@@ -38,53 +42,66 @@ export const PageCarousel: React.FC<PageCarouselProps> = ({
     onPageChange(pages[newIndex].id);
   };
 
+  const carousel = (
+    <View style={styles.carouselSection}>
+      <Pressable
+        onPress={goToPrevious}
+        style={({ pressed }) => [
+          styles.arrowButton,
+          pressed && { opacity: 0.7, transform: [{ scale: 0.95 }] }
+        ]}
+        hitSlop={10}
+      >
+        <Ionicons name="chevron-back" size={22} color="white" />
+      </Pressable>
+
+      <Text style={styles.title}>{currentPage?.title}</Text>
+
+      <Pressable
+        onPress={goToNext}
+        style={({ pressed }) => [
+          styles.arrowButton,
+          pressed && { opacity: 0.7, transform: [{ scale: 0.95 }] }
+        ]}
+        hitSlop={10}
+      >
+        <Ionicons name="chevron-forward" size={22} color="white" />
+      </Pressable>
+    </View>
+  );
+
+  const userControls = (
+    <>
+      <LanguageToggle />
+      <Text style={styles.username} numberOfLines={1}>{username || t('nav.user')}</Text>
+      <Pressable
+        onPress={onLogout}
+        style={({ pressed }) => [
+          styles.logoutButton,
+          pressed && { opacity: 0.7 }
+        ]}
+      >
+        <Text style={styles.logoutText}>{t('nav.logout')}</Text>
+      </Pressable>
+    </>
+  );
+
+  if (isCompact) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.compactCarouselRow}>{carousel}</View>
+        <View style={styles.compactUserRow}>{userControls}</View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
-        {/* Left spacer */}
-        <View style={styles.spacer} />
-        
-        {/* Center carousel */}
-        <View style={styles.carouselSection}>
-          <Pressable 
-            onPress={goToPrevious}
-            style={({ pressed }) => [
-              styles.arrowButton,
-              pressed && { opacity: 0.7, transform: [{ scale: 0.95 }] }
-            ]}
-            hitSlop={10}
-          >
-            <Ionicons name="chevron-back" size={22} color="white" />
-          </Pressable>
-          
-          <Text style={styles.title}>{currentPage?.title}</Text>
-          
-          <Pressable 
-            onPress={goToNext}
-            style={({ pressed }) => [
-              styles.arrowButton,
-              pressed && { opacity: 0.7, transform: [{ scale: 0.95 }] }
-            ]}
-            hitSlop={10}
-          >
-            <Ionicons name="chevron-forward" size={22} color="white" />
-          </Pressable>
-        </View>
-        
-        {/* Right user section */}
-        <View style={styles.userSection}>
-          <LanguageToggle />
-          <Text style={styles.username}>{username || t('nav.user')}</Text>
-          <Pressable
-            onPress={onLogout}
-            style={({ pressed }) => [
-              styles.logoutButton,
-              pressed && { opacity: 0.7 }
-            ]}
-          >
-            <Text style={styles.logoutText}>{t('nav.logout')}</Text>
-          </Pressable>
-        </View>
+        {/* Left spacer — same flex as userSection so the carousel centers on the screen */}
+        <View style={styles.sideSection} />
+        {carousel}
+        <View style={[styles.sideSection, styles.userSection]}>{userControls}</View>
       </View>
     </View>
   );
@@ -95,7 +112,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2a2a2a',
     ...Platform.select({
       web: {
-        background: 'linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%)',
+        backgroundImage: 'linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%)',
       },
     }),
     borderBottomWidth: 1,
@@ -123,29 +140,50 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 20,
   },
-  spacer: {
-    width: 80,
+  compactCarouselRow: {
+    alignItems: 'center',
+    paddingTop: 8,
+    paddingHorizontal: 20,
+  },
+  compactUserRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    paddingBottom: 10,
+    paddingHorizontal: 20,
+  },
+  sideSection: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    minWidth: 0,
   },
   carouselSection: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
     gap: 16,
   },
   userSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    justifyContent: 'flex-end',
     gap: 12,
-    minWidth: 80,
   },
   username: {
+    flexShrink: 1,
     color: 'white',
     fontWeight: '600',
     fontSize: 14,
-    textShadowColor: 'rgba(0, 0, 0, 0.1)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    ...Platform.select({
+      web: {
+        textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+      },
+      default: {
+        textShadowColor: 'rgba(0, 0, 0, 0.1)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 2,
+      },
+    }),
   },
   logoutButton: {
     backgroundColor: 'rgba(204, 51, 34, 0.95)',
@@ -180,9 +218,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'white',
     minWidth: 120,
-    textShadowColor: 'rgba(0, 0, 0, 0.15)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 3,
+    ...Platform.select({
+      web: {
+        textShadow: '0 2px 3px rgba(0, 0, 0, 0.15)',
+      },
+      default: {
+        textShadowColor: 'rgba(0, 0, 0, 0.15)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 3,
+      },
+    }),
     letterSpacing: 0.5,
   },
   arrowButton: {
