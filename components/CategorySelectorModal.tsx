@@ -2,10 +2,10 @@ import React from 'react';
 import { View, Text, Modal, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ItemCategory } from '../types';
+import { useI18n } from '../i18n';
 
 interface CategoryOption {
   value: ItemCategory;
-  label: string;
   icon: string;
   color: string;
 }
@@ -18,10 +18,10 @@ interface CategorySelectorModalProps {
 }
 
 const categoryOptions: CategoryOption[] = [
-  { value: 'PRIORITY', label: 'Priority', icon: 'flag', color: '#e74c3c' },
-  { value: 'ON', label: 'On', icon: 'play', color: '#3498db' },
-  { value: 'OFF', label: 'Off', icon: 'pause', color: '#95a5a6' },
-  { value: 'PAY', label: 'Pay', icon: 'card', color: '#f1c40f' },
+  { value: 'PRIORITY', icon: 'flag', color: '#e74c3c' },
+  { value: 'ON', icon: 'play', color: '#3498db' },
+  { value: 'OFF', icon: 'pause', color: '#95a5a6' },
+  { value: 'PAY', icon: 'card', color: '#f1c40f' },
 ];
 
 export const CategorySelectorModal: React.FC<CategorySelectorModalProps> = ({
@@ -30,6 +30,7 @@ export const CategorySelectorModal: React.FC<CategorySelectorModalProps> = ({
   onSelectCategory,
   currentCategory,
 }) => {
+  const { t } = useI18n();
   return (
     <Modal
       visible={visible}
@@ -40,7 +41,7 @@ export const CategorySelectorModal: React.FC<CategorySelectorModalProps> = ({
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Change Category</Text>
+            <Text style={styles.modalTitle}>{t('itemModal.changeCategory')}</Text>
             <Pressable onPress={onClose} style={styles.closeButton}>
               <Ionicons name="close" size={24} color="#666" />
             </Pressable>
@@ -62,7 +63,7 @@ export const CategorySelectorModal: React.FC<CategorySelectorModalProps> = ({
                 <View style={[styles.categoryIcon, { backgroundColor: option.color }]}>
                   <Ionicons name={option.icon as any} size={16} color="white" />
                 </View>
-                <Text style={styles.categoryLabel}>{option.label}</Text>
+                <Text style={styles.categoryLabel}>{t(`categories.${option.value}`)}</Text>
                 {currentCategory === option.value && (
                   <Ionicons name="checkmark" size={20} color="#4CAF50" style={styles.checkmark} />
                 )}

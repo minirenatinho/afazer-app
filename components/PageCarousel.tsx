@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, Platform, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useI18n } from '../i18n';
+import { LanguageToggle } from './LanguageToggle';
 
 type Page = {
   id: string;
@@ -22,6 +24,7 @@ export const PageCarousel: React.FC<PageCarouselProps> = ({
   username,
   onLogout,
 }) => {
+  const { t } = useI18n();
   const currentIndex = pages.findIndex(page => page.id === currentPageId);
   const currentPage = pages[currentIndex];
   
@@ -70,15 +73,16 @@ export const PageCarousel: React.FC<PageCarouselProps> = ({
         
         {/* Right user section */}
         <View style={styles.userSection}>
-          <Text style={styles.username}>{username || 'User'}</Text>
-          <Pressable 
+          <LanguageToggle />
+          <Text style={styles.username}>{username || t('nav.user')}</Text>
+          <Pressable
             onPress={onLogout}
             style={({ pressed }) => [
               styles.logoutButton,
               pressed && { opacity: 0.7 }
             ]}
           >
-            <Text style={styles.logoutText}>Logout</Text>
+            <Text style={styles.logoutText}>{t('nav.logout')}</Text>
           </Pressable>
         </View>
       </View>

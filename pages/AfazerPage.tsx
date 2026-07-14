@@ -18,8 +18,10 @@ import { ItemTypeModal } from '../components/ItemTypeModal';
 import { ColorSelectorModal } from '../components/ColorSelectorModal';
 import { Item, FilterType, ItemColor } from '../types';
 import { fetchItems, createItem, updateItem, deleteItem as apiDeleteItem } from '../api';
+import { useI18n } from '../i18n';
 
 export default function AfazerPage() {
+  const { t } = useI18n();
   const [items, setItems] = useState<Item[]>([]);
   const [newItemText, setNewItemText] = useState('');
   const [filter, setFilter] = useState<FilterType>('completed');
@@ -53,7 +55,7 @@ export default function AfazerPage() {
       setItems(updatedItems);
       saveItemsToCache(updatedItems);
     } catch (error) {
-      Alert.alert('Error', 'Failed to update item color.');
+      Alert.alert(t('common.error'), t('afazer.updateColorFailed'));
     }
   };
 
@@ -113,7 +115,7 @@ export default function AfazerPage() {
             saveItemsToCache(updatedItems);
             setNewItemText('');
           } catch (error) {
-            Alert.alert('Error', 'Failed to create item.');
+            Alert.alert(t('common.error'), t('afazer.createFailed'));
           }
         })();
       } else {
@@ -139,7 +141,7 @@ export default function AfazerPage() {
       setItems(updatedItems);
       saveItemsToCache(updatedItems);
     } catch (error) {
-      Alert.alert('Error', 'Failed to create item.');
+      Alert.alert(t('common.error'), t('afazer.createFailed'));
     }
     setNewItemText('');
     setPendingItemText('');
@@ -157,7 +159,7 @@ export default function AfazerPage() {
       setItems(updatedItems);
       saveItemsToCache(updatedItems);
     } catch (error) {
-      Alert.alert('Error', 'Failed to update item text.');
+      Alert.alert(t('common.error'), t('afazer.updateTextFailed'));
     }
   };
 
@@ -171,7 +173,7 @@ export default function AfazerPage() {
       setItems(updatedItems);
       saveItemsToCache(updatedItems);
     } catch (error) {
-      Alert.alert('Error', 'Failed to update item category.');
+      Alert.alert(t('common.error'), t('afazer.updateCategoryFailed'));
     }
   };
 
@@ -185,7 +187,7 @@ export default function AfazerPage() {
       setItems(updatedItems);
       saveItemsToCache(updatedItems);
     } catch (error) {
-      Alert.alert('Error', 'Failed to update item.');
+      Alert.alert(t('common.error'), t('afazer.updateFailed'));
     }
   };
 
@@ -197,20 +199,20 @@ export default function AfazerPage() {
         setItems(updatedItems);
         saveItemsToCache(updatedItems);
       } catch (error) {
-        Alert.alert('Error', 'Failed to delete item.');
+        Alert.alert(t('common.error'), t('afazer.deleteFailed'));
       }
     };
     if (Platform.OS === 'web') {
-      if (window.confirm('Are you sure you want to delete this item?')) {
+      if (window.confirm(t('afazer.deleteConfirm'))) {
         doDelete();
       }
     } else {
       Alert.alert(
-        'Delete Item',
-        'Are you sure you want to delete this item?',
+        t('afazer.deleteTitle'),
+        t('afazer.deleteConfirm'),
         [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Delete', style: 'destructive', onPress: doDelete },
+          { text: t('common.cancel'), style: 'cancel' },
+          { text: t('common.delete'), style: 'destructive', onPress: doDelete },
         ]
       );
     }
@@ -225,20 +227,20 @@ export default function AfazerPage() {
         setItems(updatedItems);
         saveItemsToCache(updatedItems);
       } catch (error) {
-        Alert.alert('Error', 'Failed to clear completed items.');
+        Alert.alert(t('common.error'), t('afazer.clearFailed'));
       }
     };
     if (Platform.OS === 'web') {
-      if (window.confirm('Are you sure you want to clear all completed items?')) {
+      if (window.confirm(t('afazer.clearConfirm'))) {
         doClear();
       }
     } else {
       Alert.alert(
-        'Clear Completed',
-        'Are you sure you want to clear all completed items?',
+        t('afazer.clearTitle'),
+        t('afazer.clearConfirm'),
         [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Clear', style: 'destructive', onPress: doClear },
+          { text: t('common.cancel'), style: 'cancel' },
+          { text: t('afazer.clear'), style: 'destructive', onPress: doClear },
         ]
       );
     }
@@ -331,7 +333,7 @@ export default function AfazerPage() {
                 styles.webCategoryHeaderText,
                 { color: iconColor }
               ]}>
-                {category.charAt(0).toUpperCase() + category.slice(1)}
+                {t(`categories.${category}`)}
               </Text>
               <Text style={styles.webCategoryHeaderCount}>
                 ({itemsByCategory[index].length})
@@ -401,7 +403,7 @@ export default function AfazerPage() {
                           category === 'OFF' && styles.offCategoryText,
                           { marginLeft: 12 }
                         ]}>
-                          {category.charAt(0).toUpperCase() + category.slice(1)}
+                          {t(`categories.${category}`)}
                         </Text>
                         <Text style={[
                           styles.categoryCount,
@@ -456,7 +458,7 @@ export default function AfazerPage() {
     <View style={styles.inputContainer}>
       <TextInput
         style={[styles.input, { flex: 2, marginRight: 8 }]}
-        placeholder="Add a new item..."
+        placeholder={t('afazer.addPlaceholder')}
         value={newItemText}
         onChangeText={setNewItemText}
         onSubmitEditing={handleAddItem}
@@ -467,7 +469,7 @@ export default function AfazerPage() {
         <View style={styles.webControlsContainer}>
           {/* Category Selection */}
           <View style={styles.selectionGroup}>
-            <Text style={styles.selectionLabel}>Category:</Text>
+            <Text style={styles.selectionLabel}>{t('afazer.category')}</Text>
             <View style={styles.checkboxGroup}>
               {['PRIORITY', 'ON', 'PAY', 'OFF'].map((category) => {
                 const isSelected = selectedCategory === category;
@@ -512,7 +514,7 @@ export default function AfazerPage() {
           
           {/* Color Selection */}
           <View style={styles.selectionGroup}>
-            <Text style={styles.selectionLabel}>Color:</Text>
+            <Text style={styles.selectionLabel}>{t('afazer.color')}</Text>
             <View style={styles.checkboxGroup}>
               {[
                 { id: 'BLUE', color: '#3498db' },

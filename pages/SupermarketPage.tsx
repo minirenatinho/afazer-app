@@ -19,6 +19,7 @@ import { Ionicons } from '@expo/vector-icons';
 // SupermarketItem will be a copy of ItemItem but for supermarket
 // We'll create it after this step
 import { fetchSupermarkets, createSupermarket, updateSupermarket, deleteSupermarket } from '../api';
+import { useI18n } from '../i18n';
 
 export interface Supermarket {
   id: string;
@@ -46,6 +47,7 @@ type SupermarketPageProps = {
 };
 
 export default function SupermarketPage({ onBack }: SupermarketPageProps) {
+  const { t } = useI18n();
   const backPressRef = useRef(false);
   const [showItemModal, setShowItemModal] = useState(false);
 
@@ -133,7 +135,7 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
       setSupermarkets(updated);
       saveSupermarketsToCache(updated);
     } catch (e) {
-      Alert.alert('Error', 'Failed to create supermarket item.');
+      Alert.alert(t('common.error'), t('supermarket.createFailed'));
     }
     setNewSupermarketText('');
     setNewQuantity('');
@@ -152,7 +154,7 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
       setSupermarkets(updatedList);
       saveSupermarketsToCache(updatedList);
     } catch {
-      Alert.alert('Error', 'Failed to update item.');
+      Alert.alert(t('common.error'), t('supermarket.updateFailed'));
     }
   };
 
@@ -163,7 +165,7 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
       setSupermarkets(updated);
       saveSupermarketsToCache(updated);
     } catch {
-      Alert.alert('Error', 'Failed to delete item.');
+      Alert.alert(t('common.error'), t('supermarket.deleteFailed'));
     }
   };
 
@@ -196,27 +198,27 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
               value={editText}
               onChangeText={setEditText}
               autoFocus
-              placeholder="Name"
+              placeholder={t('supermarket.name')}
             />
             <View style={{ flexDirection: 'row', gap: 8, marginTop: 6 }}>
               <TextInput
                 style={[styles.itemText, { flex: 1, backgroundColor: '#333', borderWidth: 1, borderColor: '#444', borderRadius: 6, paddingHorizontal: 8, color: '#fff' }]}
                 value={editQuantity}
                 onChangeText={setEditQuantity}
-                placeholder="Quantity"
+                placeholder={t('supermarket.quantity')}
                 keyboardType="numeric"
               />
               <TextInput
                 style={[styles.itemText, { flex: 1, backgroundColor: '#333', borderWidth: 1, borderColor: '#444', borderRadius: 6, paddingHorizontal: 8, color: '#fff' }]}
                 value={editUnit}
                 onChangeText={setEditUnit}
-                placeholder="Unit"
+                placeholder={t('supermarket.unit')}
               />
               <TextInput
                 style={[styles.itemText, { flex: 1, backgroundColor: '#333', borderWidth: 1, borderColor: '#444', borderRadius: 6, paddingHorizontal: 8, color: '#fff' }]}
                 value={editPrice}
                 onChangeText={setEditPrice}
-                placeholder="Price"
+                placeholder={t('supermarket.price')}
                 keyboardType="numeric"
               />
             </View>
@@ -224,7 +226,7 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
               style={[styles.itemText, { backgroundColor: '#333', borderWidth: 1, borderColor: '#444', borderRadius: 6, paddingHorizontal: 8, marginTop: 6, color: '#fff' }]}
               value={editNotes}
               onChangeText={setEditNotes}
-              placeholder="Notes"
+              placeholder={t('common.notes')}
             />
             <View style={{ flexDirection: 'row', gap: 8, marginTop: 6 }}>
               <Pressable
@@ -251,7 +253,7 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
                     setSupermarkets(updatedList);
                     saveSupermarketsToCache(updatedList);
                   } catch {
-                    Alert.alert('Error', 'Failed to update item.');
+                    Alert.alert(t('common.error'), t('supermarket.updateFailed'));
                   }
                   setEditingId(null);
                 }}
@@ -292,12 +294,12 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
               <Text style={[styles.itemText, item.completed && styles.completedText]}>{item.text}</Text>
               {(quantity !== undefined || item.quantity !== undefined) ? (
                 <Text style={{ marginLeft: 12, marginRight: 8, color: '#888' }}>
-                  Qty: {quantity} {unit || ''}
+                  {t('supermarket.qtyLabel', { qty: String(quantity), unit: unit || '' })}
                 </Text>
               ) : null}
               {(price !== undefined || item.price !== undefined) ? (
                 <Text style={{ marginLeft: 12, marginRight: 8, color: '#888' }}>
-                  Unit price: {Number(price).toFixed(2)}
+                  {t('supermarket.unitPrice', { price: Number(price).toFixed(2) })}
                 </Text>
               ) : null}
               {notes?.trim() ? (
@@ -311,16 +313,16 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
         <Pressable
           onPress={() => {
             if (Platform.OS === 'web') {
-              if (window.confirm('Are you sure you want to delete this supermarket item?')) {
+              if (window.confirm(t('supermarket.deleteConfirm'))) {
                 deleteSupermarketItem(item.id);
               }
             } else {
               Alert.alert(
-                'Delete Item',
-                'Are you sure you want to delete this supermarket item?',
+                t('supermarket.deleteTitle'),
+                t('supermarket.deleteConfirm'),
                 [
-                  { text: 'Cancel', style: 'cancel' },
-                  { text: 'Delete', style: 'destructive', onPress: () => deleteSupermarketItem(item.id) },
+                  { text: t('common.cancel'), style: 'cancel' },
+                  { text: t('common.delete'), style: 'destructive', onPress: () => deleteSupermarketItem(item.id) },
                 ],
                 { cancelable: true }
               );
@@ -342,7 +344,7 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
       <View style={styles.inputContainer}>
         <TextInput
           style={[styles.input, Platform.OS === 'web' && { flex: 2, marginRight: 8 }]}
-          placeholder="Add a new item..."
+          placeholder={t('supermarket.addPlaceholder')}
           value={newSupermarketText}
           onChangeText={setNewSupermarketText}
           onSubmitEditing={Platform.OS === 'web' ? handleAddSupermarket : undefined}
@@ -354,27 +356,27 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
           <>
             <TextInput
               style={[styles.input, { width: 80, marginRight: 8 }]}
-              placeholder="Qty"
+              placeholder={t('supermarket.qty')}
               value={newQuantity}
               onChangeText={setNewQuantity}
               keyboardType="numeric"
             />
             <TextInput
               style={[styles.input, { width: 80, marginRight: 8 }]}
-              placeholder="Unit"
+              placeholder={t('supermarket.unit')}
               value={newUnit}
               onChangeText={setNewUnit}
             />
             <TextInput
               style={[styles.input, { width: 100, marginRight: 8 }]}
-              placeholder="Price"
+              placeholder={t('supermarket.price')}
               value={newPrice}
               onChangeText={setNewPrice}
               keyboardType="numeric"
             />
             <TextInput
               style={[styles.input, { flex: 1, marginRight: 8 }]}
-              placeholder="Notes"
+              placeholder={t('common.notes')}
               value={newNotes}
               onChangeText={setNewNotes}
             />
@@ -405,7 +407,7 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Add New Item</Text>
+              <Text style={styles.modalTitle}>{t('supermarket.addNewItem')}</Text>
               <Pressable onPress={closeNewItemModal}>
                 <Ionicons name="close" size={24} color="#FF8C42" />
               </Pressable>
@@ -413,10 +415,10 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
             
             <ScrollView style={styles.modalBody}>
               <View style={styles.formGroup}>
-                <Text style={styles.label}>Item Name</Text>
+                <Text style={styles.label}>{t('supermarket.itemName')}</Text>
                 <TextInput
                   style={styles.modalInput}
-                  placeholder="Enter item name"
+                  placeholder={t('supermarket.enterItemName')}
                   value={newSupermarketText}
                   onChangeText={setNewSupermarketText}
                   autoFocus
@@ -425,7 +427,7 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
               
               <View style={styles.formRow}>
                 <View style={[styles.formGroup, { flex: 1, marginRight: 8 }]}>
-                  <Text style={styles.label}>Quantity</Text>
+                  <Text style={styles.label}>{t('supermarket.quantity')}</Text>
                   <TextInput
                     style={styles.modalInput}
                     placeholder="1"
@@ -436,10 +438,10 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
                 </View>
                 
                 <View style={[styles.formGroup, { flex: 1 }]}>
-                  <Text style={styles.label}>Unit</Text>
+                  <Text style={styles.label}>{t('supermarket.unit')}</Text>
                   <TextInput
                     style={styles.modalInput}
-                    placeholder="pcs, kg, g, etc."
+                    placeholder={t('supermarket.unitPlaceholder')}
                     value={newUnit}
                     onChangeText={setNewUnit}
                   />
@@ -447,7 +449,7 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
               </View>
               
               <View style={styles.formGroup}>
-                <Text style={styles.label}>Price (optional)</Text>
+                <Text style={styles.label}>{t('supermarket.priceOptional')}</Text>
                 <TextInput
                   style={styles.modalInput}
                   placeholder="0.00"
@@ -458,10 +460,10 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
               </View>
               
               <View style={styles.formGroup}>
-                <Text style={styles.label}>Notes (optional)</Text>
+                <Text style={styles.label}>{t('common.notesOptional')}</Text>
                 <TextInput
                   style={[styles.modalInput, { height: 80, textAlignVertical: 'top', paddingTop: 10 }]}
-                  placeholder="Additional notes"
+                  placeholder={t('common.additionalNotes')}
                   value={newNotes}
                   onChangeText={setNewNotes}
                   multiline
@@ -474,13 +476,13 @@ export default function SupermarketPage({ onBack }: SupermarketPageProps) {
                 style={[styles.button, styles.cancelButton]} 
                 onPress={closeNewItemModal}
               >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
               </Pressable>
-              <Pressable 
-                style={[styles.button, styles.saveButton]} 
+              <Pressable
+                style={[styles.button, styles.saveButton]}
                 onPress={handleAddItem}
               >
-                <Text style={styles.saveButtonText}>Add Item</Text>
+                <Text style={styles.saveButtonText}>{t('supermarket.addItem')}</Text>
               </Pressable>
             </View>
           </View>

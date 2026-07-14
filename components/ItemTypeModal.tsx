@@ -9,6 +9,7 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useI18n } from '../i18n';
 
 interface ItemTypeModalProps {
   visible: boolean;
@@ -23,35 +24,36 @@ export const ItemTypeModal: React.FC<ItemTypeModalProps> = ({
   onClose,
   onSelectType,
 }) => {
+  const { t } = useI18n();
   const [selectedCategory, setSelectedCategory] = useState<'PRIORITY' | 'ON' | 'OFF' | 'PAY' | null>(null);
   const [step, setStep] = useState<'category' | 'color'>('category');
 
   const itemTypes = [
     {
       type: 'PRIORITY' as const,
-      title: 'Priority',
-      description: 'High priority items that need immediate attention',
+      title: t('categories.PRIORITY'),
+      description: t('categoryDescriptions.PRIORITY'),
       icon: 'flag',
       color: '#ff88b2',
     },
     {
       type: 'ON' as const,
-      title: 'On',
-      description: 'Items that are currently in progress',
+      title: t('categories.ON'),
+      description: t('categoryDescriptions.ON'),
       icon: 'play',
       color: '#3498db',
     },
     {
       type: 'OFF' as const,
-      title: 'Off',
-      description: 'Items that are planned but not started',
+      title: t('categories.OFF'),
+      description: t('categoryDescriptions.OFF'),
       icon: 'pause',
       color: '#95a5a6',
     },
     {
       type: 'PAY' as const,
-      title: 'Pay',
-      description: 'Items related to payments or bills',
+      title: t('categories.PAY'),
+      description: t('categoryDescriptions.PAY'),
       icon: 'card',
       color: '#f1c40f',
     },
@@ -60,25 +62,25 @@ export const ItemTypeModal: React.FC<ItemTypeModalProps> = ({
   const colorOptions = [
     {
       color: 'GREEN' as const,
-      name: 'GREEN',
+      name: t('colors.GREEN'),
       backgroundColor: '#E8F5E8',
       borderColor: '#A8D5A8',
     },
     {
       color: 'PINK' as const,
-      name: 'PINK',
+      name: t('colors.PINK'),
       backgroundColor: '#FCE8F0',
       borderColor: '#F5B8D1',
     },
     {
       color: 'BLUE' as const,
-      name: 'BLUE',
+      name: t('colors.BLUE'),
       backgroundColor: '#E8F2FC',
       borderColor: '#B8D5F5',
     },
     {
       color: 'BROWN' as const,
-      name: 'BROWN',
+      name: t('colors.BROWN'),
       backgroundColor: '#F5F0E8',
       borderColor: '#D5C5B8',
     },
@@ -107,14 +109,14 @@ export const ItemTypeModal: React.FC<ItemTypeModalProps> = ({
   const renderCategoryStep = () => (
     <>
       <View style={styles.header}>
-        <Text style={styles.title}>Select Item Type</Text>
+        <Text style={styles.title}>{t('itemModal.selectType')}</Text>
         <Pressable onPress={handleClose} style={styles.closeButton}>
           <Ionicons name="close" size={24} color="#666" />
         </Pressable>
       </View>
-      
+
       <Text style={styles.subtitle}>
-        Choose the category for your new item:
+        {t('itemModal.chooseCategory')}
       </Text>
 
       <View style={styles.optionsContainer}>
@@ -144,14 +146,14 @@ export const ItemTypeModal: React.FC<ItemTypeModalProps> = ({
         <Pressable onPress={() => setStep('category')} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#666" />
         </Pressable>
-        <Text style={styles.title}>Select Color</Text>
+        <Text style={styles.title}>{t('itemModal.selectColor')}</Text>
         <Pressable onPress={handleClose} style={styles.closeButton}>
           <Ionicons name="close" size={24} color="#666" />
         </Pressable>
       </View>
-      
+
       <Text style={styles.subtitle}>
-        Choose a color for your item:
+        {t('itemModal.chooseColor')}
       </Text>
 
       <View style={styles.colorGrid}>

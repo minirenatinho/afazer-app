@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TextInput, Pressable, Platform } from 'react-na
 import { Ionicons } from '@expo/vector-icons';
 import { Item } from '../types';
 import { CategorySelectorModal } from './CategorySelectorModal';
+import { useI18n } from '../i18n';
 
 interface ItemItemProps {
   item: Item;
@@ -21,6 +22,7 @@ export const ItemItem: React.FC<ItemItemProps> = ({
   onUpdateText,
   onUpdateColor,
 }) => {
+  const { t } = useI18n();
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(item.text);
@@ -32,15 +34,15 @@ export const ItemItem: React.FC<ItemItemProps> = ({
   const getCategoryConfig = (category: Item['category']) => {
     switch (category) {
       case 'PRIORITY':
-        return { icon: 'flag', color: '#ff88b2', label: 'Priority' };
+        return { icon: 'flag', color: '#ff88b2', label: t('categories.PRIORITY') };
       case 'ON':
-        return { icon: 'play', color: '#3498db', label: 'On' };
+        return { icon: 'play', color: '#3498db', label: t('categories.ON') };
       case 'OFF':
-        return { icon: 'pause', color: '#95a5a680', label: 'Off' };
+        return { icon: 'pause', color: '#95a5a680', label: t('categories.OFF') };
       case 'PAY':
-        return { icon: 'card', color: '#f1c40f', label: 'Pay' };
+        return { icon: 'card', color: '#f1c40f', label: t('categories.PAY') };
       default:
-        return { icon: 'ellipse', color: '#95a5a6', label: 'Item' };
+        return { icon: 'ellipse', color: '#95a5a6', label: t('categories.ITEM') };
     }
   };
 
@@ -279,7 +281,7 @@ const styles = StyleSheet.create({
       web: {
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
         transition: 'all 0.2s ease',
-        cursor: 'default',
+        cursor: 'auto',
       },
     }),
   },

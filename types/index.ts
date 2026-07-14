@@ -35,6 +35,24 @@ export interface Country extends Omit<Item, 'dynamics'> {
   };
 }
 
+export interface Finance extends Omit<Item, 'dynamics'> {
+  dynamics?: {
+    recordType?: 'transaction' | 'budget' | 'category';
+    // transaction fields
+    kind?: 'income' | 'expense';
+    amount?: number;
+    category?: string;
+    date?: string; // "YYYY-MM-DD"
+    notes?: string;
+    // budget fields
+    limit?: number;
+    // category fields (per-user category pool; defaults use canonical keys)
+    name?: string;
+    isDefault?: boolean;
+    order?: number;
+  };
+}
+
 export type FilterType = 'PRIORITY' | 'ON' | 'OFF' | 'PAY' | 'SUPERMARKET' | 'COUNTRY' | 'completed';
 export type ItemCategory = 'PRIORITY' | 'ON' | 'OFF' | 'PAY';
 export type ItemColor = 'BLUE' | 'GREEN' | 'PINK' | 'BROWN';

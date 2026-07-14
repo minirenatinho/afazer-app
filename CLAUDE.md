@@ -65,6 +65,10 @@ All persistent entities (`Item`, `Supermarket`, `Country`) share the same REST e
 - **Web**: category/color selectors appear inline in the input bar; confirmation dialogs use `window.confirm`; `localStorage` for tokens; CSS properties like `boxShadow`/`transition`/`cursor` added via `Platform.select`.
 - **Mobile**: `ItemTypeModal` pops up on item creation to pick category/color; `Alert.alert` for confirmations; `SecureStore` for tokens (falls back to `AsyncStorage`).
 
+### Internationalization (i18n)
+
+The app is bilingual (English and pt-BR) via a dependency-free module in `i18n/`. `LanguageProvider` (wraps the app in `App.tsx`) exposes `useI18n()` returning `{ t, locale, setLocale }`. All user-facing strings live in `i18n/translations.ts` — when adding UI text, add the key to **both** the `en` and `'pt-BR'` dictionaries and render it with `t('section.key')` (supports `{{param}}` interpolation). The language defaults to the device locale (pt\* → pt-BR, otherwise en), is switchable via the `LanguageToggle` component (header + login screen), and persists in AsyncStorage under the key `"language"`. Finance categories are a per-user pool stored as items (`type: 'finance'`, `dynamics.recordType: 'category'`), seeded with the generic defaults on first load. Default categories store canonical English keys and only their display labels are translated; user-created categories are stored and displayed as literal text (see `categoryLabel()` in `FinancesPage.tsx`). Month names come from `Intl.DateTimeFormat` with the active locale.
+
 ### Caching
 
 `AfazerPage` and `SupermarketPage` write the latest API response to `AsyncStorage` under the key `"items"` / `"supermarkets"` and read from cache as a fallback when the API is unreachable.

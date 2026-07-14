@@ -12,12 +12,24 @@ import {
 } from 'react-native';
 
 import { PageCarousel } from './components/PageCarousel';
+import { LanguageToggle } from './components/LanguageToggle';
 import SupermarketPage from './pages/SupermarketPage';
 import AfazerPage from './pages/AfazerPage';
+import FinancesPage from './pages/FinancesPage';
 import { login, logout, getCurrentUser, register } from './api';
+import { LanguageProvider, useI18n } from './i18n';
 
 export default function App() {
-  const [page, setPage] = useState<'afazer' | 'supermarket'>('afazer');
+  return (
+    <LanguageProvider>
+      <AppContent />
+    </LanguageProvider>
+  );
+}
+
+function AppContent() {
+  const { t } = useI18n();
+  const [page, setPage] = useState<'afazer' | 'supermarket' | 'finances'>('afazer');
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -27,8 +39,9 @@ export default function App() {
   const [loginLoading, setLoginLoading] = useState(false);
 
   const pages = [
-    { id: 'afazer', title: 'Afazer' },
-    { id: 'supermarket', title: 'Supermarket' },
+    { id: 'afazer', title: t('nav.afazer') },
+    { id: 'supermarket', title: t('nav.supermarket') },
+    { id: 'finances', title: t('nav.finances') },
   ];
 
   useEffect(() => {
@@ -53,7 +66,7 @@ export default function App() {
       setUsername('');
       setPassword('');
     } catch (e: any) {
-      Alert.alert('Login failed', e?.message || 'Invalid credentials');
+      Alert.alert(t('auth.loginFailed'), e?.message || t('auth.invalidCredentials'));
     } finally {
       setLoginLoading(false);
     }
@@ -70,7 +83,7 @@ export default function App() {
       setEmail('');
       setPassword('');
     } catch (e: any) {
-      Alert.alert('Registration failed', e?.message || 'Could not create account');
+      Alert.alert(t('auth.registrationFailed'), e?.message || t('auth.couldNotCreateAccount'));
     } finally {
       setLoginLoading(false);
     }
@@ -92,6 +105,8 @@ export default function App() {
     switch (page) {
       case 'supermarket':
         return <SupermarketPage />;
+      case 'finances':
+        return <FinancesPage />;
       case 'afazer':
       default:
         return <AfazerPage />;
@@ -100,8 +115,8 @@ export default function App() {
 
   if (loading) {
     return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}> 
-        <Text>Loading...</Text>
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text>{t('common.loading')}</Text>
       </View>
     );
   }
@@ -117,10 +132,10 @@ export default function App() {
         <StatusBar barStyle="light-content" />
         <View style={{ width: 300, padding: 24, backgroundColor: '#1e1e1e', borderRadius: 12, elevation: 2 }}>
           <Text style={{ fontSize: 22, fontWeight: 'bold', marginBottom: 16, textAlign: 'center', color: '#fff' }}>
-            {isRegister ? 'Create Account' : 'Afazer Account'}
+            {isRegister ? t('auth.registerTitle') : t('auth.loginTitle')}
           </Text>
           <TextInput
-            placeholder="Username"
+            placeholder={t('auth.username')}
             placeholderTextColor="#888"
             value={username}
             onChangeText={setUsername}
@@ -130,7 +145,7 @@ export default function App() {
           />
           {isRegister && (
             <TextInput
-              placeholder="Email"
+              placeholder={t('auth.email')}
               placeholderTextColor="#888"
               value={email}
               onChangeText={setEmail}
@@ -141,7 +156,7 @@ export default function App() {
             />
           )}
           <TextInput
-            placeholder="Password"
+            placeholder={t('auth.password')}
             placeholderTextColor="#888"
             value={password}
             onChangeText={setPassword}
@@ -160,7 +175,7 @@ export default function App() {
             disabled={loginLoading}
           >
             <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>
-              {isRegister ? 'Register' : 'Login'}
+              {isRegister ? t('auth.register') : t('auth.login')}
             </Text>
           </Pressable>
           <Pressable
@@ -168,9 +183,12 @@ export default function App() {
             style={{ marginTop: 12, alignItems: 'center' }}
           >
             <Text style={{ color: '#888', fontSize: 14 }}>
-              {isRegister ? 'Already have an account? Login' : "Don't have an account? Register"}
+              {isRegister ? t('auth.haveAccount') : t('auth.noAccount')}
             </Text>
           </Pressable>
+          <View style={{ marginTop: 16, alignItems: 'center' }}>
+            <LanguageToggle />
+          </View>
         </View>
       </KeyboardAvoidingView>
     );
@@ -186,7 +204,7 @@ export default function App() {
       <PageCarousel 
         pages={pages} 
         currentPageId={page} 
-        onPageChange={(pageId) => setPage(pageId as 'afazer' | 'supermarket')}
+        onPageChange={(pageId) => setPage(pageId as 'afazer' | 'supermarket' | 'finances')}
         username={user?.username}
         onLogout={handleLogout}
       />

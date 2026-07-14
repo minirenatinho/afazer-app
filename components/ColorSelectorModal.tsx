@@ -2,10 +2,10 @@ import React from 'react';
 import { View, Text, Modal, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ItemColor } from '../types';
+import { useI18n } from '../i18n';
 
 interface ColorOption {
   value: ItemColor;
-  label: string;
   color: string;
 }
 
@@ -17,10 +17,10 @@ interface ColorSelectorModalProps {
 }
 
 const colorOptions: ColorOption[] = [
-  { value: 'BLUE', label: 'Blue', color: '#3498db' },
-  { value: 'GREEN', label: 'Green', color: '#2ecc71' },
-  { value: 'PINK', label: 'Pink', color: '#e84393' },
-  { value: 'BROWN', label: 'Brown', color: '#8B4513' },
+  { value: 'BLUE', color: '#3498db' },
+  { value: 'GREEN', color: '#2ecc71' },
+  { value: 'PINK', color: '#e84393' },
+  { value: 'BROWN', color: '#8B4513' },
 ];
 
 export const ColorSelectorModal: React.FC<ColorSelectorModalProps> = ({
@@ -29,6 +29,7 @@ export const ColorSelectorModal: React.FC<ColorSelectorModalProps> = ({
   onSelectColor,
   currentColor,
 }) => {
+  const { t } = useI18n();
   return (
     <Modal
       visible={visible}
@@ -39,7 +40,7 @@ export const ColorSelectorModal: React.FC<ColorSelectorModalProps> = ({
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Change Color</Text>
+            <Text style={styles.modalTitle}>{t('itemModal.changeColor')}</Text>
             <Pressable onPress={onClose} style={styles.closeButton}>
               <Ionicons name="close" size={24} color="#666" />
             </Pressable>
@@ -58,7 +59,7 @@ export const ColorSelectorModal: React.FC<ColorSelectorModalProps> = ({
                   onClose();
                 }}
               >
-                <Text style={styles.colorLabel}>{option.label}</Text>
+                <Text style={styles.colorLabel}>{t(`colors.${option.value}`)}</Text>
                 {currentColor === option.value && (
                   <Ionicons name="checkmark" size={18} color="white" style={{ marginLeft: 8 }} />
                 )}

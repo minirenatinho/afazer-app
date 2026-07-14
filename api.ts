@@ -1,5 +1,5 @@
 
-import { Item, Supermarket, Country } from './types';
+import { Item, Supermarket, Country, Finance } from './types';
 import Constants from 'expo-constants';
 import { TokenService, TokenResponse } from './services/tokenService';
 import { apiCall } from './services/apiInterceptor';
@@ -295,4 +295,82 @@ export async function deleteCountry(id: string): Promise<void> {
     method: 'DELETE',
   });
   if (!res.ok) throw new Error('Failed to delete country');
+}
+
+// --- Finance CRUD ---
+
+
+function mapFinanceDynamics(finance: Omit<Finance, 'id'> | Finance): Finance['dynamics'] {
+  return {
+    recordType: finance.dynamics?.recordType,
+    kind: finance.dynamics?.kind,
+    amount: finance.dynamics?.amount,
+    category: finance.dynamics?.category,
+    date: finance.dynamics?.date,
+    notes: finance.dynamics?.notes,
+    limit: finance.dynamics?.limit,
+    name: finance.dynamics?.name,
+    isDefault: finance.dynamics?.isDefault,
+    order: finance.dynamics?.order,
+  };
+}
+
+
+export async function fetchFinances(): Promise<Finance[]> {
+  const res = await apiCall(`${API_BASE}/?type=finance&limit=${ITEMS_LIMIT}`);
+  if (!res.ok) throw new Error('Failed to fetch finances');
+  return res.json();
+}
+
+
+export async function createFinance(finance: Omit<Finance, 'id'>): Promise<Finance> {
+  const financeData: Omit<Finance, 'id'> = {
+    text: finance.text,
+    type: 'finance',
+    completed: finance.completed || false,
+    createdAt: finance.createdAt || Date.now(),
+    category: 'FINANCE',
+    color: finance.color,
+    dynamics: mapFinanceDynamics(finance),
+  };
+
+  const res = await apiCall(`${API_BASE}/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(financeData),
+  });
+
+  if (!res.ok) throw new Error('Failed to create finance record');
+  return res.json();
+}
+
+
+export async function updateFinance(finance: Finance): Promise<Finance> {
+  const financeData: Finance = {
+    id: finance.id,
+    text: finance.text,
+    type: 'finance',
+    completed: finance.completed,
+    createdAt: finance.createdAt,
+    category: 'FINANCE',
+    color: finance.color,
+    dynamics: mapFinanceDynamics(finance),
+  };
+
+  const res = await apiCall(`${API_BASE}/${finance.id}/`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(financeData),
+  });
+
+  if (!res.ok) throw new Error('Failed to update finance record');
+  return res.json();
+}
+
+
+export async function deleteFinance(id: string): Promise<void> {
+  const res = await apiCall(`${API_BASE}/${id}/`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to delete finance record');
 }
