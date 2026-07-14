@@ -36,7 +36,6 @@ export default function AfazerPage() {
   const [categoryVisibility, setCategoryVisibility] = useState({
     PRIORITY: true,
     ON: true,
-    PAY: false,
     OFF: false,
   });
 
@@ -126,7 +125,7 @@ export default function AfazerPage() {
     }
   };
 
-  const handleItemTypeSelect = async (category: 'PRIORITY' | 'ON' | 'OFF' | 'PAY', color: 'GREEN' | 'PINK' | 'BLUE' | 'BROWN') => {
+  const handleItemTypeSelect = async (category: 'PRIORITY' | 'ON' | 'OFF', color: 'GREEN' | 'PINK' | 'BLUE' | 'BROWN') => {
     const newItem = {
       text: pendingItemText,
       completed: false,
@@ -279,7 +278,7 @@ export default function AfazerPage() {
 
   const renderAllCategoriesView = () => {
     // Only use categories that are valid for visibility toggling
-    const categories: Array<'PRIORITY' | 'ON' | 'PAY' | 'OFF'> = ['PRIORITY', 'ON', 'PAY', 'OFF'];
+    const categories: Array<'PRIORITY' | 'ON' | 'OFF'> = ['PRIORITY', 'ON', 'OFF'];
     const itemsByCategory = categories.map(category => {
       // Show both completed and non-completed items, sorted by completion status
       const filtered = items.filter(item => item.category === category);
@@ -289,7 +288,7 @@ export default function AfazerPage() {
 
     // Calculate visible categories count for web layout
     const visibleCategories = Platform.OS === 'web' 
-      ? categories.filter(cat => categoryVisibility[cat as 'PRIORITY' | 'ON' | 'OFF' | 'PAY']).length 
+      ? categories.filter(cat => categoryVisibility[cat as 'PRIORITY' | 'ON' | 'OFF']).length 
       : 1; // For mobile, we'll use full width
     const columnFlex = Platform.OS === 'web' ? 1 : 1;
 
@@ -297,7 +296,7 @@ export default function AfazerPage() {
     const handleToggleCategoryVisibility = (category: FilterType) => {
       setCategoryVisibility(prev => ({
         ...prev,
-        [category]: !prev[category as 'PRIORITY' | 'ON' | 'OFF' | 'PAY'],
+        [category]: !prev[category as 'PRIORITY' | 'ON' | 'OFF'],
       }));
     };
 
@@ -305,13 +304,11 @@ export default function AfazerPage() {
     const renderWebHeader = () => (
       <View style={styles.webCategoriesHeader}>
         {categories.map((category, index) => {
-          const isVisible = categoryVisibility[category as 'PRIORITY' | 'ON' | 'OFF' | 'PAY'];
-          const iconName = category === 'PRIORITY' ? 'flag' : 
-                         category === 'ON' ? 'play' : 
-                         category === 'OFF' ? 'pause' : 'card';
-          const iconColor = category === 'PRIORITY' ? '#ff88b2' : 
-                          category === 'ON' ? '#3498db' : 
-                          category === 'OFF' ? '#95a5a6' : '#f1c40f';
+          const isVisible = categoryVisibility[category as 'PRIORITY' | 'ON' | 'OFF'];
+          const iconName = category === 'PRIORITY' ? 'flag' :
+                         category === 'ON' ? 'play' : 'pause';
+          const iconColor = category === 'PRIORITY' ? '#ff88b2' :
+                          category === 'ON' ? '#3498db' : '#95a5a6';
           
           return (
             <Pressable
@@ -369,7 +366,7 @@ export default function AfazerPage() {
         >
           <View style={styles.categoriesRow}>
             {categories.map((category, index) => {
-              if (Platform.OS === 'web' && !categoryVisibility[category as 'PRIORITY' | 'ON' | 'OFF' | 'PAY']) {
+              if (Platform.OS === 'web' && !categoryVisibility[category as 'PRIORITY' | 'ON' | 'OFF']) {
                 return null; // Skip rendering hidden categories on web
               }
               
@@ -394,9 +391,9 @@ export default function AfazerPage() {
                     >
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Ionicons
-                          name={category === 'PRIORITY' ? 'flag' : category === 'ON' ? 'play' : category === 'OFF' ? 'pause' : 'card'}
+                          name={category === 'PRIORITY' ? 'flag' : category === 'ON' ? 'play' : 'pause'}
                           size={20}
-                          color={category === 'PRIORITY' ? '#ff88b2' : category === 'ON' ? '#3498db' : category === 'OFF' ? '#95a5a6' : '#f1c40f'}
+                          color={category === 'PRIORITY' ? '#ff88b2' : category === 'ON' ? '#3498db' : '#95a5a6'}
                         />
                         <Text style={[
                           styles.categoryTitle,
@@ -413,7 +410,7 @@ export default function AfazerPage() {
                         </Text>
                       </View>
                       <Ionicons
-                        name={categoryVisibility[category as 'PRIORITY' | 'ON' | 'OFF' | 'PAY'] ? 'chevron-up' : 'chevron-down'}
+                        name={categoryVisibility[category as 'PRIORITY' | 'ON' | 'OFF'] ? 'chevron-up' : 'chevron-down'}
                         size={20}
                         color="#95a5a6"
                       />
@@ -421,7 +418,7 @@ export default function AfazerPage() {
                   )}
                   
                   {/* Items list */}
-                  <View style={[styles.categoryItemsContainer, { display: categoryVisibility[category as 'PRIORITY' | 'ON' | 'OFF' | 'PAY'] ? 'flex' : 'none' }]}>
+                  <View style={[styles.categoryItemsContainer, { display: categoryVisibility[category as 'PRIORITY' | 'ON' | 'OFF'] ? 'flex' : 'none' }]}>
                     {itemsByCategory[index].map(item => (
                       <ItemItem
                         key={item.id}
@@ -471,17 +468,15 @@ export default function AfazerPage() {
           <View style={styles.selectionGroup}>
             <Text style={styles.selectionLabel}>{t('afazer.category')}</Text>
             <View style={styles.checkboxGroup}>
-              {['PRIORITY', 'ON', 'PAY', 'OFF'].map((category) => {
+              {['PRIORITY', 'ON', 'OFF'].map((category) => {
                 const isSelected = selectedCategory === category;
-                const iconName = 
-                  category === 'PRIORITY' ? 'flag' : 
-                  category === 'ON' ? 'play' : 
-                  category === 'PAY' ? 'card' : 'pause';
-                const iconColor = 
+                const iconName =
+                  category === 'PRIORITY' ? 'flag' :
+                  category === 'ON' ? 'play' : 'pause';
+                const iconColor =
                   isSelected ? 'white' :
                   category === 'PRIORITY' ? '#e74c3c' :
-                  category === 'ON' ? '#3498db' :
-                  category === 'PAY' ? '#f1c40f' : '#95a5a6';
+                  category === 'ON' ? '#3498db' : '#95a5a6';
                 
                 return (
                   <Pressable
@@ -783,25 +778,6 @@ const styles = StyleSheet.create({
       },
       ios: {
         shadowColor: '#3498db',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.4,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 6,
-      },
-    }),
-  },
-  PAYSelected: {
-    backgroundColor: '#f1c40f',
-    transform: [{ scale: 1.15 }],
-    borderColor: '#f39c12',
-    ...Platform.select({
-      web: {
-        boxShadow: '0 4px 12px rgba(241, 196, 15, 0.4)',
-      },
-      ios: {
-        shadowColor: '#f1c40f',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.4,
         shadowRadius: 8,

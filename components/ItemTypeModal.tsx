@@ -14,7 +14,7 @@ import { useI18n } from '../i18n';
 interface ItemTypeModalProps {
   visible: boolean;
   onClose: () => void;
-  onSelectType: (type: 'PRIORITY' | 'ON' | 'PAY' | 'OFF', color: 'GREEN' | 'PINK' | 'BLUE' | 'BROWN') => void;
+  onSelectType: (type: 'PRIORITY' | 'ON' | 'OFF', color: 'GREEN' | 'PINK' | 'BLUE' | 'BROWN') => void;
 }
 
 const { width } = Dimensions.get('window');
@@ -25,7 +25,7 @@ export const ItemTypeModal: React.FC<ItemTypeModalProps> = ({
   onSelectType,
 }) => {
   const { t } = useI18n();
-  const [selectedCategory, setSelectedCategory] = useState<'PRIORITY' | 'ON' | 'OFF' | 'PAY' | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<'PRIORITY' | 'ON' | 'OFF' | null>(null);
   const [step, setStep] = useState<'category' | 'color'>('category');
 
   const itemTypes = [
@@ -49,13 +49,6 @@ export const ItemTypeModal: React.FC<ItemTypeModalProps> = ({
       description: t('categoryDescriptions.OFF'),
       icon: 'pause',
       color: '#95a5a6',
-    },
-    {
-      type: 'PAY' as const,
-      title: t('categories.PAY'),
-      description: t('categoryDescriptions.PAY'),
-      icon: 'card',
-      color: '#f1c40f',
     },
   ];
 
@@ -86,7 +79,7 @@ export const ItemTypeModal: React.FC<ItemTypeModalProps> = ({
     },
   ];
 
-  const handleCategorySelect = (category: 'PRIORITY' | 'ON' | 'OFF' | 'PAY') => {
+  const handleCategorySelect = (category: 'PRIORITY' | 'ON' | 'OFF') => {
     setSelectedCategory(category);
     setStep('color');
   };

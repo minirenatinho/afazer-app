@@ -21,7 +21,6 @@ const categoryOptions: CategoryOption[] = [
   { value: 'PRIORITY', icon: 'flag', color: '#e74c3c' },
   { value: 'ON', icon: 'play', color: '#3498db' },
   { value: 'OFF', icon: 'pause', color: '#95a5a6' },
-  { value: 'PAY', icon: 'card', color: '#f1c40f' },
 ];
 
 export const CategorySelectorModal: React.FC<CategorySelectorModalProps> = ({
