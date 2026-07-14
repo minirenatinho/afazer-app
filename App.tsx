@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   StyleSheet,
   KeyboardAvoidingView,
@@ -37,6 +37,9 @@ function AppContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
+  const usernameInputRef = useRef<TextInput>(null);
+  const emailInputRef = useRef<TextInput>(null);
+  const passwordInputRef = useRef<TextInput>(null);
 
   const pages = [
     { id: 'afazer', title: t('nav.afazer') },
@@ -135,6 +138,7 @@ function AppContent() {
             {isRegister ? t('auth.registerTitle') : t('auth.loginTitle')}
           </Text>
           <TextInput
+            ref={usernameInputRef}
             placeholder={t('auth.username')}
             placeholderTextColor="#888"
             value={username}
@@ -142,9 +146,13 @@ function AppContent() {
             style={{ borderWidth: 1, borderColor: '#444', borderRadius: 8, padding: 10, marginBottom: 12, backgroundColor: '#2a2a2a', color: '#fff' }}
             autoCapitalize="none"
             autoCorrect={false}
+            returnKeyType="next"
+            blurOnSubmit={false}
+            onSubmitEditing={() => (isRegister ? emailInputRef : passwordInputRef).current?.focus()}
           />
           {isRegister && (
             <TextInput
+              ref={emailInputRef}
               placeholder={t('auth.email')}
               placeholderTextColor="#888"
               value={email}
@@ -153,15 +161,21 @@ function AppContent() {
               autoCapitalize="none"
               autoCorrect={false}
               keyboardType="email-address"
+              returnKeyType="next"
+              blurOnSubmit={false}
+              onSubmitEditing={() => passwordInputRef.current?.focus()}
             />
           )}
           <TextInput
+            ref={passwordInputRef}
             placeholder={t('auth.password')}
             placeholderTextColor="#888"
             value={password}
             onChangeText={setPassword}
             style={{ borderWidth: 1, borderColor: '#444', borderRadius: 8, padding: 10, marginBottom: 16, backgroundColor: '#2a2a2a', color: '#fff' }}
             secureTextEntry
+            returnKeyType="done"
+            onSubmitEditing={isRegister ? handleRegister : handleLogin}
           />
           <Pressable
             onPress={isRegister ? handleRegister : handleLogin}

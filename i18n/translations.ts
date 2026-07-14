@@ -37,6 +37,8 @@ export const translations = {
       finances: 'Finances',
       logout: 'Logout',
       user: 'User',
+      menu: 'Menu',
+      language: 'Language',
     },
     categories: {
       PRIORITY: 'Priority',
@@ -200,6 +202,8 @@ export const translations = {
       finances: 'Finanças',
       logout: 'Sair',
       user: 'Usuário',
+      menu: 'Menu',
+      language: 'Idioma',
     },
     categories: {
       PRIORITY: 'Prioridade',

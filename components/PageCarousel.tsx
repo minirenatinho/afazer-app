@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable, Platform, StatusBar, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useI18n } from '../i18n';
-import { LanguageToggle } from './LanguageToggle';
+import { UserMenu } from './UserMenu';
 
 type Page = {
   id: string;
@@ -72,17 +72,8 @@ export const PageCarousel: React.FC<PageCarouselProps> = ({
 
   const userControls = (
     <>
-      <LanguageToggle />
       <Text style={styles.username} numberOfLines={1}>{username || t('nav.user')}</Text>
-      <Pressable
-        onPress={onLogout}
-        style={({ pressed }) => [
-          styles.logoutButton,
-          pressed && { opacity: 0.7 }
-        ]}
-      >
-        <Text style={styles.logoutText}>{t('nav.logout')}</Text>
-      </Pressable>
+      <UserMenu onLogout={onLogout} />
     </>
   );
 
@@ -184,33 +175,6 @@ const styles = StyleSheet.create({
         textShadowRadius: 2,
       },
     }),
-  },
-  logoutButton: {
-    backgroundColor: 'rgba(204, 51, 34, 0.95)',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    ...Platform.select({
-      web: {
-        boxShadow: '0 2px 6px rgba(231, 76, 60, 0.4)',
-        transition: 'all 0.2s ease',
-      },
-      ios: {
-        shadowColor: '#e74c3c',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 3,
-      },
-    }),
-  },
-  logoutText: {
-    color: 'white',
-    fontWeight: '700',
-    fontSize: 12,
-    letterSpacing: 0.5,
   },
   title: {
     fontSize: 24,
