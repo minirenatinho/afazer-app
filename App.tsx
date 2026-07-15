@@ -19,6 +19,16 @@ import FinancesPage from './pages/FinancesPage';
 import { login, logout, getCurrentUser, register } from './api';
 import { LanguageProvider, useI18n } from './i18n';
 
+// Alert.alert is a no-op on react-native-web, so auth feedback needs window.alert there
+const showAlert = (title: string, message: string) => {
+  if (Platform.OS === 'web') {
+    window.alert(`${title}
+${message}`);
+  } else {
+    Alert.alert(title, message);
+  }
+};
+
 export default function App() {
   return (
     <LanguageProvider>
@@ -69,13 +79,17 @@ function AppContent() {
       setUsername('');
       setPassword('');
     } catch (e: any) {
-      Alert.alert(t('auth.loginFailed'), e?.message || t('auth.invalidCredentials'));
+      showAlert(t('auth.loginFailed'), e?.message || t('auth.invalidCredentials'));
     } finally {
       setLoginLoading(false);
     }
   };
 
   const handleRegister = async () => {
+    if (password.length < 8) {
+      showAlert(t('auth.registrationFailed'), t('auth.passwordTooShort'));
+      return;
+    }
     setLoginLoading(true);
     try {
       await register(username, email, password);
@@ -86,7 +100,7 @@ function AppContent() {
       setEmail('');
       setPassword('');
     } catch (e: any) {
-      Alert.alert(t('auth.registrationFailed'), e?.message || t('auth.couldNotCreateAccount'));
+      showAlert(t('auth.registrationFailed'), e?.message || t('auth.couldNotCreateAccount'));
     } finally {
       setLoginLoading(false);
     }

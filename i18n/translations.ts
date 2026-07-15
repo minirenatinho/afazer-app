@@ -30,6 +30,7 @@ export const translations = {
       invalidCredentials: 'Invalid credentials',
       registrationFailed: 'Registration failed',
       couldNotCreateAccount: 'Could not create account',
+      passwordTooShort: 'Password must be at least 8 characters',
     },
     nav: {
       afazer: 'Afazer',
@@ -195,6 +196,7 @@ export const translations = {
       invalidCredentials: 'Credenciais inválidas',
       registrationFailed: 'Falha no cadastro',
       couldNotCreateAccount: 'Não foi possível criar a conta',
+      passwordTooShort: 'A senha deve ter pelo menos 8 caracteres',
     },
     nav: {
       afazer: 'Afazer',

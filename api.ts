@@ -74,7 +74,11 @@ export async function register(username: string, email: string, password: string
 
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.detail || 'Registration failed');
+    // FastAPI validation errors return detail as an array of {msg, ...} objects
+    const detail = Array.isArray(errorData.detail)
+      ? errorData.detail[0]?.msg
+      : errorData.detail;
+    throw new Error(detail || 'Registration failed');
   }
 }
 
